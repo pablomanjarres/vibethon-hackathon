@@ -1,7 +1,7 @@
 import { ChevronRight, ParkingSquare } from "lucide-react";
 import { routes } from "./routes";
 import { href } from "./shared/route";
-import { PanelCabecera } from "./ui/PanelCabecera";
+import { Marca } from "./ui/Marca";
 import { Shell, VISTAS } from "./ui/Shell";
 import { TarjetaDatos } from "./ui/TarjetaDatos";
 import { useEstado } from "./ui/useTienda";
@@ -14,7 +14,12 @@ export function IndexPage() {
   const enFila = estado.entradas.reduce((suma, e) => suma + e.fila.length, 0);
   return (
     <Shell>
-      <PanelCabecera Icono={ParkingSquare} titulo="Parqueadero EAFIT" subtitulo="Reserva tu celda y tu valet en el campus" />
+      <header className="index-marca">
+        <h1>
+          <Marca alto={44} />
+        </h1>
+        <p className="ui-texto-suave">Reserva tu celda y tu valet en el campus EAFIT</p>
+      </header>
       <TarjetaDatos Icono={ParkingSquare} titulo="Lote en vivo" contador={{ valor: `${libres}/${estado.celdas.length}`, etiqueta: "Libres" }}>
         <p className="ui-texto-suave">
           {enFila === 1 ? "1 carro espera" : `${enFila} carros esperan`} en los pasajes. Todas las vistas comparten este lote.

@@ -35,3 +35,16 @@
   color: var(--ink-muted);
   font-size: 13px;
 }
+
+.index-marca {
+  display: grid;
+  gap: 6px;
+  padding: 4px 2px 8px;
+}
+.index-marca h1 {
+  margin: 0;
+  line-height: 0;
+}
+.index-marca p {
+  margin: 0;
+}

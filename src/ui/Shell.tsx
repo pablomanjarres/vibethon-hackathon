@@ -1,7 +1,9 @@
 import { useEffect, type ReactNode } from "react";
-import { Building2, Car, House, KeyRound, ShieldCheck, type LucideIcon } from "lucide-react";
+import { Building2, Car, KeyRound, ShieldCheck, type LucideIcon } from "lucide-react";
 import { href, useRoute } from "../shared/route";
 import { MapaLote } from "./MapaLote";
+import { Marca } from "./Marca";
+import { tituloPagina } from "./identidad";
 import { AccesoRapido } from "./AccesoRapido";
 import { Recorrido } from "./Recorrido";
 import { Reloj } from "./Reloj";
@@ -20,7 +22,7 @@ export const VISTAS: { id: VistaId; nombre: string; Icono: LucideIcon }[] = [
   { id: "oficina", nombre: "Oficina", Icono: Building2 },
 ];
 
-const PILA = [{ id: "", nombre: "Inicio", Icono: House }, ...VISTAS];
+const PILA = [{ id: "", nombre: "Inicio", Icono: null }, ...VISTAS];
 
 interface Props {
   /** The open view; none on the entry page. */
@@ -43,7 +45,7 @@ export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, privado
   const embebido = useRoute().params.has("embebido");
   const nombre = VISTAS.find((item) => item.id === vista)?.nombre;
   useEffect(() => {
-    document.title = nombre ? `${nombre} · Parqueadero EAFIT` : "Parqueadero EAFIT";
+    document.title = tituloPagina(nombre);
   }, [nombre]);
   const mapa = estado.mapas[0];
   return (
@@ -69,7 +71,7 @@ export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, privado
           {PILA.map(({ id, nombre: etiqueta, Icono }) => (
             <li key={id}>
               <a href={href(id)} aria-label={etiqueta} aria-current={id === (vista ?? "") ? "page" : undefined}>
-                <Icono size={19} strokeWidth={2} aria-hidden="true" />
+                {Icono ? <Icono size={19} strokeWidth={2} aria-hidden="true" /> : <Marca soloSimbolo alto={26} decorativa />}
               </a>
               <span className="ui-pila-etiqueta" aria-hidden="true">
                 {etiqueta}
