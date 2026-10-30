@@ -30,3 +30,15 @@ status
 ```text
 make sure the repo lands in the laptop
 ```
+
+## 5 · 30/10/2026, 1:36 p. m.
+
+```text
+work in the macmini then. everything there and make the commits into a private repo in github
+```
+
+## 6 · 30/10/2026, 1:37 p. m.
+
+```text
+do that with parallel agents in the background, let's move to another stage of the project
+```
