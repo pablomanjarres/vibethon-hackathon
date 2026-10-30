@@ -31,7 +31,7 @@ export function pasoActual(v: VistaConductor, elegida: string | null): PasoActua
     switch (s.estado) {
       case "pago pendiente":
         return {
-          principal: { texto: "Pagar (aprobado)", Icono: Banknote, comando: { tipo: "pagarValet", servicio: s.id, aprobado: true } },
+          principal: { texto: `Pagar ${s.precio} COP (aprobado)`, Icono: Banknote, comando: { tipo: "pagarValet", servicio: s.id, aprobado: true } },
           instruccion: null,
           secundario: { texto: "Simular rechazo", Icono: CircleAlert, comando: { tipo: "pagarValet", servicio: s.id, aprobado: false } },
         };

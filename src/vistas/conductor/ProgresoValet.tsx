@@ -16,13 +16,20 @@ const AVANCE: Record<EstadoServicio, number> = {
   vencido: -1,
 };
 
+/** What the driver does before the ficho is confirmed, by service state. */
+const ANTES: Partial<Record<EstadoServicio, string>> = {
+  "pago pendiente": "Paga para que el valet venga a tu carro.",
+  pagado: "El valet va hacia tu carro. Entrégale las llaves.",
+  "ficho emitido": "Entrega las llaves y confirma tu ficho.",
+};
+
 /** One status line and four dots, from keys handed over to car returned. */
 export function ProgresoValet({ estado }: { estado: EstadoServicio }) {
   const avance = AVANCE[estado];
   return (
     <div className="cd-progreso">
       <p className="cd-progreso-linea">
-        {avance < 0 ? "El valet va hacia tu carro. Entrégale las llaves." : `Paso ${avance + 1} de ${PASOS.length}: ${PASOS[avance]}`}
+        {avance < 0 ? (ANTES[estado] ?? "Servicio de valet cerrado.") : `Paso ${avance + 1} de ${PASOS.length}: ${PASOS[avance]}`}
       </p>
       <ol className="cd-progreso-pasos" aria-label={`Valet: paso ${avance + 1} de ${PASOS.length}`}>
         {PASOS.map((paso, i) => (

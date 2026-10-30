@@ -100,7 +100,7 @@ export function PaginaConductor({ placa, codigo, registro, onRegistrada, demo }:
       )}
       {v.encontrado && (
         <div>
-          <Acordeon Icono={ListOrdered} titulo="Detalles" extra={v.ficho ? `Ficho ${v.ficho}` : undefined}>
+          <Acordeon Icono={ListOrdered} titulo="Detalles" extra={v.servicio ? `Ficho ${v.servicio.ficho}` : undefined}>
             <DetallesConductor estado={estado} v={v} />
           </Acordeon>
         </div>

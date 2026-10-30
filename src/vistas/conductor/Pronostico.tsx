@@ -5,6 +5,8 @@ import "./pasos.css";
 interface Props {
   espera: Espera;
   entrada: string | null;
+  /** Inside the passage already; otherwise still in the outer line. */
+  enPasaje: boolean;
   inicio: string;
   minuto: number;
   llegoEn: number;
@@ -18,10 +20,12 @@ function turno(espera: Espera, inicio: string, minuto: number): string {
 }
 
 /** The wait as a forecast: the steps from registration to the cell, with their times. */
-export function Pronostico({ espera, entrada, inicio, minuto, llegoEn }: Props) {
+export function Pronostico({ espera, entrada, enPasaje, inicio, minuto, llegoEn }: Props) {
   const pasos = [
     { texto: "Registro", detalle: `A las ${hora(inicio, llegoEn)}`, hecho: true },
-    { texto: "Pasaje", detalle: entrada ? `En ${entrada}, ahora` : "Ahora", hecho: true },
+    enPasaje
+      ? { texto: "Pasaje", detalle: entrada ? `En ${entrada}, ahora` : "Ahora", hecho: true }
+      : { texto: "Pasaje", detalle: "Apenas haya cupo", hecho: false },
     { texto: "Portería", detalle: turno(espera, inicio, minuto), hecho: false },
     { texto: "Celda", detalle: "Justo después de la portería", hecho: false },
   ];
