@@ -18,7 +18,8 @@ interface Fila {
   nota: string;
   /** A link that opens a screen already signed in, or a command sent right here. */
   ir?: string;
-  comando?: Comando;
+  /** Commands sent in order; stops at the first rejection. */
+  comandos?: Comando[];
 }
 
 /** The quick actions of each view: sign in fast on the driver and valet phones; act fast at the gate and the office. */
@@ -30,12 +31,34 @@ function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[
     return [{ titulo: "Entrar como conductor", filas: carros.map((c) => ({ clave: c.placa, titulo: c.placa, dato: c.codigo, nota: c.estado, ir: href("conductor", { placa: c.placa, codigo: c.codigo, demo: "1" }) })) }];
   }
   if (vista === "valet") {
-    return estado.entradas.map((e) => ({
+    // Demo: give a free valet the first car of their entrance that has no valet, already paid.
+    const asignar: Fila[] = estado.entradas.flatMap((e) => {
+      const valet = estado.valets.find((v) => v.entrada === e.id && v.estado === "disponible");
+      const placa = e.fila.find((p) => {
+        const s = estado.carros[p].servicio;
+        return !s || ["rechazado", "vencido"].includes(estado.servicios[s]?.estado);
+      });
+      if (!valet || !placa) return [];
+      const servicio = `S-${estado.consecutivos.servicio + 1}`;
+      return [
+        {
+          clave: `asignar-${e.id}`,
+          titulo: `Asignar ${placa} a ${valet.id}`,
+          dato: `${estado.reglas.tarifaValet}`,
+          nota: `${e.nombre} · pago aprobado`,
+          comandos: [
+            { tipo: "contratarValet", placa, valet: valet.id },
+            { tipo: "pagarValet", servicio, aprobado: true },
+          ],
+        },
+      ];
+    });
+    return [{ titulo: "Asignar un carro a un valet", filas: asignar }, ...estado.entradas.map((e) => ({
       titulo: `Entrar como valet · ${e.nombre}`,
       filas: estado.valets
         .filter((v) => v.entrada === e.id)
         .map((v) => ({ clave: v.id, titulo: v.id, dato: v.codigo, nota: v.estado, ir: href("valet", { valet: v.id, codigo: v.codigo, demo: "1" }) })),
-    }));
+    }))];
   }
   if (vista === "porteria") {
     return estado.entradas.map((e) => {
@@ -45,10 +68,10 @@ function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[
         titulo: `Confirmar ${c.placa}`,
         dato: c.celda,
         nota: "placa y reserva",
-        comando: { tipo: "confirmarIngreso", entrada: e.id, placa: c.placa },
+        comandos: [{ tipo: "confirmarIngreso", entrada: e.id, placa: c.placa }],
       }));
-      if (p.puedeAsignar) filas.unshift({ clave: `a-${e.id}`, titulo: "Asignar celda", dato: p.celdasLibres[0], nota: p.turno, comando: { tipo: "asignarCelda", entrada: e.id } });
-      if (p.puedeDejarSalir) filas.unshift({ clave: `s-${e.id}`, titulo: "Dejar salir", dato: p.fila[0]?.placa, nota: "sale sin parquear", comando: { tipo: "dejarSalir", entrada: e.id } });
+      if (p.puedeAsignar) filas.unshift({ clave: `a-${e.id}`, titulo: "Asignar celda", dato: p.celdasLibres[0], nota: p.turno, comandos: [{ tipo: "asignarCelda", entrada: e.id }] });
+      if (p.puedeDejarSalir) filas.unshift({ clave: `s-${e.id}`, titulo: "Dejar salir", dato: p.fila[0]?.placa, nota: "sale sin parquear", comandos: [{ tipo: "dejarSalir", entrada: e.id }] });
       return { titulo: `Portería ${e.nombre}`, filas };
     });
   }
@@ -59,13 +82,13 @@ function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[
         titulo: "Recibir llaves del valet",
         filas: servicios
           .filter((s) => s.estado === "estacionado")
-          .map((s) => ({ clave: `r-${s.id}`, titulo: s.placa, dato: s.ficho, nota: `${s.valet} trae las llaves`, comando: { tipo: "dejarLlaves", ficho: s.ficho } })),
+          .map((s) => ({ clave: `r-${s.id}`, titulo: s.placa, dato: s.ficho, nota: `${s.valet} trae las llaves`, comandos: [{ tipo: "dejarLlaves", ficho: s.ficho }] })),
       },
       {
         titulo: "Entregar llaves con el ficho",
         filas: servicios
           .filter((s) => s.estado === "llaves en oficina")
-          .map((s) => ({ clave: `e-${s.id}`, titulo: s.placa, dato: s.ficho, nota: "llaves en la oficina", comando: { tipo: "reclamarLlaves", ficho: s.ficho } })),
+          .map((s) => ({ clave: `e-${s.id}`, titulo: s.placa, dato: s.ficho, nota: "llaves en la oficina", comandos: [{ tipo: "reclamarLlaves", ficho: s.ficho }] })),
       },
     ];
   }
@@ -98,7 +121,7 @@ export function AccesoRapido({ vista }: { vista?: VistaId }) {
         {contenido}
       </a>
     ) : (
-      <button type="button" onClick={() => f.comando && enviar(f.comando)}>
+      <button type="button" onClick={() => f.comandos?.every((c) => enviar(c))}>
         {contenido}
       </button>
     );
