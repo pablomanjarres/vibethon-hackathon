@@ -4,7 +4,7 @@
   height: 12px;
   border-radius: 50%;
   border: 2px solid var(--ink-muted);
-  background: var(--surface);
+  background: var(--panel);
   flex: none;
 }
 .cd-hecho .cd-punto { background: var(--libre); border-color: var(--libre); }

@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { Ticket } from "lucide-react";
 import { CodigoFicho } from "./CodigoFicho";
 import "./ficho.css";
@@ -8,12 +7,10 @@ interface Props {
   placa: string;
   celda: string | null;
   valet: string | null;
-  /** Status line or actions shown under the ticket stub. */
-  children?: ReactNode;
 }
 
 /** The valet claim ticket: big ficho code, plate, cell when known and a code to show at the gate. */
-export function Ficho({ ficho, placa, celda, valet, children }: Props) {
+export function Ficho({ ficho, placa, celda, valet }: Props) {
   const filas = [
     { etiqueta: "Placa", valor: placa },
     { etiqueta: "Celda", valor: celda ?? "Por asignar" },
@@ -40,7 +37,6 @@ export function Ficho({ ficho, placa, celda, valet, children }: Props) {
         <CodigoFicho texto={`${ficho}-${placa}`} />
         <p className="ui-texto-suave">Muéstralo en la portería para recibir tus llaves.</p>
       </div>
-      {children && <div className="cd-ticket-extra">{children}</div>}
     </section>
   );
 }
