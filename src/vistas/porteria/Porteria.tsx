@@ -18,6 +18,7 @@ import { BuscarPlaca } from "./BuscarPlaca";
 import { ConfirmarIngreso } from "./ConfirmarIngreso";
 import { DetallePorteria, type SeleccionPorteria } from "./DetallePorteria";
 import { FilaPasaje } from "./FilaPasaje";
+import { ResumenLote } from "./ResumenLote";
 import "./porteria.css";
 
 /**
@@ -85,6 +86,7 @@ export default function Porteria() {
         etiqueta="Entradas"
         chips={estado.entradas.map((e) => ({ id: e.id, texto: e.nombre, href: href("porteria", { entrada: e.id }), actual: e.id === entradaId }))}
       />
+      <ResumenLote estado={estado} actual={entradaId} />
       {v.porConfirmar.length > 0 && (
         <ConfirmarIngreso
           porConfirmar={v.porConfirmar}
