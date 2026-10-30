@@ -47,7 +47,7 @@ export default function Porteria() {
 
   const confirmar: AccionPanel | null =
     v.porConfirmar.length > 0
-      ? { texto: `Confirmar ingreso (${v.porConfirmar.length})`, Icono: ScanLine, onClick: () => campoConfirmar.current?.focus() }
+      ? { texto: `Confirmar a mano (${v.porConfirmar.length})`, Icono: ScanLine, onClick: () => campoConfirmar.current?.focus() }
       : null;
   const pasar: AccionPanel = v.puedeDejarSalir
     ? { texto: "Dejar salir", Icono: LogOut, onClick: () => enviar({ tipo: "dejarSalir", entrada: v.entrada }) }
@@ -63,7 +63,7 @@ export default function Porteria() {
     activa: esperaAbierta,
     onClick: () => setEsperaAbierta(!esperaAbierta),
   };
-  // A reserved car cannot park until the gate confirms it, so that tile leads while anyone waits for it.
+  // The camera confirms entries; the manual tile leads only while some car still needs it.
   const acciones = confirmar ? [confirmar, pasar, espera] : [pasar, espera];
 
   // Switching gates closes the open detail: it may belong to the other entrance.

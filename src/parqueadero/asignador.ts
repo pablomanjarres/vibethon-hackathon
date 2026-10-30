@@ -80,10 +80,14 @@ function reservar(estado: Estado, carro: Carro, celda: Celda): void {
   estado.asignaciones = [...(estado.asignaciones ?? []), estado.minuto];
 }
 
-/** The first car of an entrance leaves the passage with its cell reserved. */
+/**
+ * The first car of an entrance leaves the passage with its cell reserved. The gate camera reads its
+ * plate on the way through, so the entry is confirmed; the gate confirms by hand only after a reassignment.
+ */
 export function darCelda(estado: Estado, entrada: Entrada, celda: Celda): Carro {
   const carro = salirPorLaPorteria(estado, entrada);
   reservar(estado, carro, celda);
+  carro.confirmado = true;
   entrada.celdasAsignadas += 1;
   return carro;
 }

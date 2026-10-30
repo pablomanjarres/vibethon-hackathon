@@ -53,12 +53,12 @@ describe("asignación, portería y salida", () => {
     expect(rechazo(estado, { tipo: "asignarCelda", entrada: "las-vegas" })).toMatch(/No hay celdas libres/);
   });
 
-  it("la portería confirma placa y reserva antes de entrar; reservada pasa a ocupada al estacionar", () => {
+  it("la cámara de la portería confirma la placa al asignar; reservada pasa a ocupada al estacionar", () => {
     let estado = correr(semilla(), { tipo: "asignarCelda", entrada: "regional" });
-    expect(rechazo(estado, { tipo: "estacionar", placa: "CXM540" })).toMatch(/todavía no confirmó/);
-    expect(rechazo(estado, { tipo: "confirmarIngreso", entrada: "las-vegas", placa: "CXM540" })).toMatch(/otra entrada/);
+    expect(estado.carros.CXM540.confirmado).toBe(true);
+    expect(rechazo(estado, { tipo: "confirmarIngreso", entrada: "regional", placa: "CXM540" })).toMatch(/ya fue confirmado/);
     expect(rechazo(estado, { tipo: "confirmarIngreso", entrada: "regional", placa: "NBD218" })).toMatch(/no tiene una celda reservada/);
-    estado = correr(estado, { tipo: "confirmarIngreso", entrada: "regional", placa: "CXM540" }, { tipo: "estacionar", placa: "CXM540" });
+    estado = correr(estado, { tipo: "estacionar", placa: "CXM540" });
     expect(celda(estado, "A04")?.estado).toBe("ocupada");
   });
 

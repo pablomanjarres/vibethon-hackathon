@@ -11,11 +11,11 @@ interface Props {
   inputRef?: Ref<HTMLInputElement>;
 }
 
-/** Cars with a reserved cell wait here until the gate checks the plate: type it or pick it from the list. */
+/** Manual fallback for the gate camera: type a plate or pick a car the camera could not confirm. */
 export function ConfirmarIngreso({ porConfirmar, onConfirmar, inputRef }: Props) {
   return (
-    <TarjetaDatos Icono={ScanLine} titulo="Confirmar ingreso" contador={{ valor: porConfirmar.length, etiqueta: "Por confirmar" }}>
-      <p className="pt-turno">Revisa la placa contra su reserva: el carro no puede estacionar hasta que la confirmes.</p>
+    <TarjetaDatos Icono={ScanLine} titulo="Confirmación manual" contador={{ valor: porConfirmar.length, etiqueta: "Por confirmar" }}>
+      <p className="pt-turno">La cámara confirma cada placa sola. Usa esto solo si no la pudo leer: revisa la placa contra su reserva.</p>
       <CampoPlaca etiqueta="Placa en la portería" accion="Confirmar" Icono={ScanLine} onEnviar={onConfirmar} inputRef={inputRef} />
       <ul className="ui-lista pt-confirmar">
         {porConfirmar.map((carro) => (
