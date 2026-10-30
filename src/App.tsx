@@ -12,8 +12,8 @@ export function App() {
   if (!route)
     return (
       <main className="app-message">
-        <p>That page does not exist.</p>
-        <a href={href("")}>See all pages</a>
+        <p>Esa página no existe.</p>
+        <a href={href("")}>Ver todas las vistas</a>
       </main>
     );
   const { Page } = route;
@@ -22,7 +22,7 @@ export function App() {
       <Suspense
         fallback={
           <p className="app-message" role="status">
-            Opening {route.name}
+            Abriendo {route.name}
           </p>
         }
       >
