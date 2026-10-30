@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CircleArrowRight, Clock3, DoorOpen, Hourglass, ListOrdered, ParkingSquare, ShieldCheck, UsersRound } from "lucide-react";
+import { CircleArrowRight, Clock3, DoorOpen, Hourglass, ListOrdered, LogOut, ParkingSquare, ScanLine, ShieldCheck, UsersRound } from "lucide-react";
 import { vistaPorteria } from "../../parqueadero/lecturas/porteria";
 import { registroCarros } from "../../parqueadero/lecturas/registro";
 import { href, useRoute } from "../../shared/route";
@@ -8,13 +8,14 @@ import { AvisoResultado } from "../../ui/AvisoResultado";
 import { Chips } from "../../ui/Chips";
 import { Cifra, Vacio } from "../../ui/Datos";
 import { ESTADO_VALET } from "../../ui/estados";
-import { FilaAcciones } from "../../ui/FilaAcciones";
+import { FilaAcciones, type AccionPanel } from "../../ui/FilaAcciones";
 import { PanelCabecera } from "../../ui/PanelCabecera";
 import { Pastilla } from "../../ui/Pastilla";
 import { Shell } from "../../ui/Shell";
 import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useComando, useEstado } from "../../ui/useTienda";
 import { BuscarPlaca } from "./BuscarPlaca";
+import { ConfirmarIngreso } from "./ConfirmarIngreso";
 import { DetallePorteria, type SeleccionPorteria } from "./DetallePorteria";
 import { FilaPasaje } from "./FilaPasaje";
 import "./porteria.css";
@@ -30,6 +31,7 @@ export default function Porteria() {
   const [seleccion, setSeleccion] = useState<SeleccionPorteria | null>(null);
   const [esperaAbierta, setEsperaAbierta] = useState(false);
   const detalle = useRef<HTMLDivElement>(null);
+  const campoConfirmar = useRef<HTMLInputElement>(null);
   const entradaId = estado.entradas.some((e) => e.id === params.get("entrada")) ? params.get("entrada")! : estado.entradas[0].id;
   const v = vistaPorteria(estado, entradaId);
   const carros = registroCarros(estado, entradaId);
@@ -41,6 +43,27 @@ export default function Porteria() {
   const celdaElegida =
     seleccion?.tipo === "celda" ? seleccion.id : seleccion?.tipo === "carro" ? (estado.carros[seleccion.placa]?.celda ?? null) : null;
   const claveSeleccion = seleccion ? `${seleccion.tipo}:${seleccion.tipo === "carro" ? seleccion.placa : seleccion.id}` : null;
+
+  const confirmar: AccionPanel | null =
+    v.porConfirmar.length > 0
+      ? { texto: `Confirmar ingreso (${v.porConfirmar.length})`, Icono: ScanLine, onClick: () => campoConfirmar.current?.focus() }
+      : null;
+  const pasar: AccionPanel = v.puedeDejarSalir
+    ? { texto: "Dejar salir", Icono: LogOut, onClick: () => enviar({ tipo: "dejarSalir", entrada: v.entrada }) }
+    : {
+        texto: v.puedeAsignar ? `Asignar ${v.celdasLibres[0]}` : "Asignar celda",
+        Icono: ParkingSquare,
+        onClick: () => enviar({ tipo: "asignarCelda", entrada: v.entrada }),
+        motivo: v.puedeAsignar ? null : v.turno,
+      };
+  const espera: AccionPanel = {
+    texto: `Fila de espera (${v.enEspera.length})`,
+    Icono: Clock3,
+    activa: esperaAbierta,
+    onClick: () => setEsperaAbierta(!esperaAbierta),
+  };
+  // A reserved car cannot park until the gate confirms it, so that tile leads while anyone waits for it.
+  const acciones = confirmar ? [confirmar, pasar, espera] : [pasar, espera];
 
   // Switching gates closes the open detail: it may belong to the other entrance.
   useEffect(() => setSeleccion(null), [entradaId]);
@@ -56,27 +79,19 @@ export default function Porteria() {
         subtitulo={`Pasaje ${v.pasaje.ocupados} de ${v.pasaje.capacidad} · ${v.enEspera.length} en espera afuera`}
         cerrar={{ href: href(""), etiqueta: "Volver al inicio" }}
       />
-      <FilaAcciones
-        acciones={[
-          {
-            texto: v.puedeAsignar ? `Asignar ${v.celdasLibres[0]}` : "Asignar celda",
-            Icono: ParkingSquare,
-            onClick: () => enviar({ tipo: "asignarCelda", entrada: v.entrada }),
-            motivo: v.puedeAsignar ? null : v.turno,
-          },
-          {
-            texto: `Fila de espera (${v.enEspera.length})`,
-            Icono: Clock3,
-            activa: esperaAbierta,
-            onClick: () => setEsperaAbierta(!esperaAbierta),
-          },
-        ]}
-      />
+      <FilaAcciones acciones={acciones} />
       <AvisoResultado aviso={aviso} />
       <Chips
         etiqueta="Entradas"
         chips={estado.entradas.map((e) => ({ id: e.id, texto: e.nombre, href: href("porteria", { entrada: e.id }), actual: e.id === entradaId }))}
       />
+      {v.porConfirmar.length > 0 && (
+        <ConfirmarIngreso
+          porConfirmar={v.porConfirmar}
+          onConfirmar={(placa) => enviar({ tipo: "confirmarIngreso", entrada: v.entrada, placa })}
+          inputRef={campoConfirmar}
+        />
+      )}
       <TarjetaDatos Icono={DoorOpen} titulo={`Pasaje ${v.nombre}`} contador={{ valor: v.celdasLibres.length, etiqueta: "Celdas libres" }}>
         <div className="ui-cifras">
           <Cifra valor={`${v.pasaje.ocupados}/${v.pasaje.capacidad}`} etiqueta="Pasaje" />
