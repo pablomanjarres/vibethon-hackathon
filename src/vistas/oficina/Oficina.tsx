@@ -73,7 +73,7 @@ export default function Oficina() {
         celdas={{ libres: estado.celdas.filter((c) => c.estado === "libre").length, total: estado.celdas.length }}
       />
       <div>
-        <Acordeon Icono={KeyRound} titulo="Llaves y fichos" extra={pendientes || undefined}>
+        <Acordeon Icono={KeyRound} titulo="Llaves y fichos" extra={pendientes || undefined} inicial>
           <LlavesOficina fichos={fichos} />
         </Acordeon>
         <Acordeon Icono={Wallet} titulo="Ingresos de valet" extra={estado.ingresos?.length || undefined}>
