@@ -3,6 +3,7 @@ import { Building2, Car, House, KeyRound, ShieldCheck, type LucideIcon } from "l
 import { href } from "../shared/route";
 import { MapaLote } from "./MapaLote";
 import { AccesoRapido } from "./AccesoRapido";
+import { Recorrido } from "./Recorrido";
 import { Reloj } from "./Reloj";
 import { useEstado } from "./useTienda";
 import "./tokens.css";
@@ -76,6 +77,7 @@ export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, privado
         <AccesoRapido vista={vista} />
         <Reloj />
       </nav>
+      <Recorrido />
     </div>
   );
 }
