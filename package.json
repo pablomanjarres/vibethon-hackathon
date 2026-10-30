@@ -11,7 +11,8 @@
     "shot": "node scripts/shot.mjs",
     "sweep": "node scripts/sweep.mjs",
     "foto": "node scripts/foto.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "estados": "node scripts/estados.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
