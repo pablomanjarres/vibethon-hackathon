@@ -76,6 +76,8 @@ export interface Servicio {
   ficho: string;
   valet: string | null;
   estado: EstadoServicio;
+  /** Minute the current valet got this job (the request, or the return). */
+  asignadoEn?: number;
 }
 
 export interface Pago {
