@@ -103,3 +103,130 @@
   font-size: 13px;
   color: var(--ink-muted);
 }
+
+/* Chips */
+.ui-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.ui-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--ink-muted);
+  color: var(--ink);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.ui-chip:hover {
+  background: var(--tile);
+}
+.ui-chip[aria-current="true"] {
+  background: var(--surface-light);
+  border-color: var(--surface-light);
+  color: var(--ink-inverse);
+}
+
+/* Inner card */
+.ui-td {
+  background: var(--panel-inner);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.ui-td-cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.ui-td-cabeza h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.ui-contador {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  flex: none;
+}
+.ui-contador-valor {
+  min-width: 28px;
+  padding: 1px 8px;
+  border-radius: var(--radius-tag);
+  background: var(--libre);
+  color: #0f2a1d;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+.ui-contador-etiqueta {
+  font-size: 13px;
+  color: var(--libre);
+  font-weight: 500;
+}
+
+/* Sections */
+.ui-acordeon {
+  border-top: 1px solid var(--hairline);
+  margin: 0 calc(-1 * var(--space-4));
+}
+.ui-acordeon h2 {
+  margin: 0;
+  font-size: inherit;
+}
+.ui-acordeon > h2 > button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+.ui-acordeon > h2 > button:hover {
+  background: var(--tile);
+}
+.ui-acordeon > h2 > button:focus-visible {
+  outline-offset: -3px;
+}
+.ui-acordeon-titulo {
+  flex: 1;
+}
+.ui-acordeon-extra {
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+.ui-acordeon-chevron {
+  flex: none;
+  transition: transform 160ms ease;
+}
+.ui-acordeon > h2 > button[aria-expanded="true"] .ui-acordeon-chevron {
+  transform: rotate(180deg);
+}
+.ui-acordeon-cuerpo {
+  padding: 0 var(--space-4) var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+}
