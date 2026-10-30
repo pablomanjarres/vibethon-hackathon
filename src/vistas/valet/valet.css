@@ -140,3 +140,9 @@
 .vl-paso-hora {
   font-size: 14px;
 }
+
+/* Sign-in: valet id, code and the one button, stacked. */
+.vl-entrar {
+  display: grid;
+  gap: var(--space-3);
+}

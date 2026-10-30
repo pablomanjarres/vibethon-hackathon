@@ -11,7 +11,7 @@ import { Shell } from "../../ui/Shell";
 import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useComando, useEstado } from "../../ui/useTienda";
 import { NotiAsignacion } from "./NotiAsignacion";
-import { etapasDe } from "./pasos";
+import { celdaOcupada, etapasDe, type AccionValet } from "./pasos";
 import { Progreso } from "./Progreso";
 import { TarjetaAsignacion } from "./TarjetaAsignacion";
 import { useNuevaAsignacion } from "./useNuevaAsignacion";
@@ -24,7 +24,7 @@ export function PanelValet({ valetId }: { valetId: string }) {
   const s = v.servicio;
   const [nueva, descartar] = useNuevaAsignacion(s);
   const etapa = s ? etapasDe(estado, s) : null;
-  const accion = etapa?.accion;
+  const acciones = [etapa?.accion, s ? celdaOcupada(estado, s) : null].filter((a): a is AccionValet => Boolean(a));
 
   return (
     <Shell vista="valet" seleccion={s?.celda ?? null} enfoque={s?.celda ?? null} privado>
@@ -34,7 +34,7 @@ export function PanelValet({ valetId }: { valetId: string }) {
         subtitulo={`Entrada ${v.entrada} · ${ESTADO_VALET[v.estado].texto}`}
         cerrar={{ href: href("valet"), etiqueta: "Cambiar de valet" }}
       />
-      {nueva && <NotiAsignacion servicio={nueva} onCerrar={descartar} />}
+      {nueva && <NotiAsignacion asignacion={nueva} onCerrar={descartar} />}
       {s ? (
         <>
           <TarjetaAsignacion servicio={s} />
@@ -45,18 +45,17 @@ export function PanelValet({ valetId }: { valetId: string }) {
           <Vacio>Sin asignación. Te avisamos cuando llegue una.</Vacio>
         </TarjetaDatos>
       )}
-      {accion && (
+      {acciones.length > 0 && (
         <FilaAcciones
-          acciones={[
-            {
-              texto: accion.texto,
-              Icono: accion.Icono,
-              onClick: () => {
-                descartar();
-                enviar(accion.comando);
-              },
+          acciones={acciones.map((accion) => ({
+            texto: accion.texto,
+            Icono: accion.Icono,
+            motivo: accion.motivo,
+            onClick: () => {
+              descartar();
+              enviar(accion.comando);
             },
-          ]}
+          }))}
         />
       )}
       <AvisoResultado aviso={aviso} />
