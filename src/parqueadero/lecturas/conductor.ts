@@ -65,7 +65,7 @@ function mensaje(carro: Carro, servicio: Servicio | null, espera: Espera | null)
     case "estacionado":
       return `Estás en la celda ${carro.celda}.`;
     case "en devolución":
-      return "Tu carro va saliendo.";
+      return "Tu carro va saliendo: recógelo en la salida de tu entrada.";
     case "retirado":
       return "Ya saliste del parqueadero.";
   }
@@ -105,7 +105,8 @@ export function vistaConductor(estado: Estado, placaEscrita: string, codigo?: st
     };
   }
   const servicio = carro.servicio ? estado.servicios[carro.servicio] : null;
-  const activo = Boolean(servicio && !["rechazado", "vencido"].includes(servicio.estado));
+  // An expired, rejected or finished-and-gone service shows nothing old to the driver.
+  const activo = Boolean(servicio && !["rechazado", "vencido"].includes(servicio.estado) && carro.estado !== "retirado");
   const puedeContratar = carro.estado === "en fila" && !activo && estado.valets.some((v) => v.entrada === carro.entrada && v.estado === "disponible");
   const espera = carro.estado === "en fila" || carro.estado === "en espera" ? estimarEspera(estado, placa) : null;
   const celdasLibres = estado.celdas.filter((c) => c.estado === "libre").map((c) => c.id);
@@ -117,8 +118,8 @@ export function vistaConductor(estado: Estado, placaEscrita: string, codigo?: st
     mensaje: mensaje(carro, activo ? servicio : null, espera),
     espera,
     celda: carro.celda,
-    ficho: servicio?.ficho ?? null,
-    valet: servicio?.valet ?? null,
+    ficho: activo ? (servicio?.ficho ?? null) : null,
+    valet: activo ? (servicio?.valet ?? null) : null,
     llave: carro.llave,
     puedePedirValet: puedeContratar,
     oferta: puedeContratar
