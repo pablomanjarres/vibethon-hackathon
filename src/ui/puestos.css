@@ -49,3 +49,25 @@ button.ui-puesto:hover {
 .ui-puesto:focus-visible {
   z-index: 3;
 }
+
+.ui-puesto-id {
+  white-space: nowrap;
+}
+
+/* Small maps (phone preview, narrow panes): tighter stalls, the id stays on one line, no icon. */
+@container (max-width: 520px) {
+  .ui-puesto {
+    justify-content: center;
+    gap: 3px;
+    padding: 0 2px;
+    border-radius: 4px;
+    font-size: 10px;
+  }
+  .ui-puesto svg {
+    display: none;
+  }
+  .ui-puesto-punto {
+    width: 6px;
+    height: 6px;
+  }
+}
