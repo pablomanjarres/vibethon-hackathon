@@ -30,4 +30,10 @@ export const routes: PageRoute[] = [
     summary: "El servicio en curso, el siguiente paso, los fichos y las llaves.",
     Page: lazy(() => import("./vistas/valet/Valet")),
   },
+  {
+    path: "oficina",
+    name: "Oficina",
+    summary: "Todo el lote en vivo: entradas, celdas, fichos, llaves, pagos y bitácora.",
+    Page: lazy(() => import("./vistas/oficina/Oficina")),
+  },
 ];
