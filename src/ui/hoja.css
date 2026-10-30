@@ -1,0 +1,59 @@
+/* Refusal sheet: slides up from the bottom on phones, centered card on wider screens. */
+.ui-hoja-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  background: rgb(29 28 26 / 0.45);
+  padding: var(--space-4);
+}
+.ui-hoja {
+  width: min(100%, 420px);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-panel);
+  text-align: center;
+}
+.ui-hoja-icono {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--tono-suave);
+  color: var(--tono);
+}
+.ui-hoja-titulo {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.ui-hoja-texto {
+  margin: 0 0 var(--space-2);
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+@media (min-width: 700px) {
+  .ui-hoja-fondo {
+    align-items: center;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ui-hoja {
+    animation: ui-hoja-sube 180ms ease-out;
+  }
+}
+@keyframes ui-hoja-sube {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+}
