@@ -1,4 +1,4 @@
-import { asignarCelda, estacionar, registrarLlegada } from "./comandos/filas.ts";
+import { asignarCelda, estacionar, registrarLlegada, reservarCelda } from "./comandos/filas.ts";
 import { avanzarReloj, pagar, salir } from "./comandos/salida.ts";
 import { entregarCarro, entregarLlaves, pedirDevolucion, pedirValet, recogerCarro } from "./comandos/valet.ts";
 import { Rechazo } from "./transiciones.ts";
@@ -8,6 +8,7 @@ import type { Estado, Evento } from "./tipos.ts";
 export type Comando =
   | { tipo: "registrarLlegada"; placa: string; entrada: string }
   | { tipo: "asignarCelda"; entrada: string }
+  | { tipo: "reservarCelda"; placa: string; celda: string }
   | { tipo: "estacionar"; placa: string }
   | { tipo: "pedirValet"; placa: string }
   | { tipo: "entregarLlaves"; placa: string }
@@ -28,6 +29,8 @@ function aplicar(estado: Estado, comando: Comando): string {
       return registrarLlegada(estado, comando.placa, comando.entrada);
     case "asignarCelda":
       return asignarCelda(estado, comando.entrada);
+    case "reservarCelda":
+      return reservarCelda(estado, comando.placa, comando.celda);
     case "estacionar":
       return estacionar(estado, comando.placa);
     case "pedirValet":
