@@ -55,15 +55,6 @@ summary:focus-visible,
   white-space: nowrap;
   border: 0;
 }
-.brand-logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  white-space: nowrap;
-}
-.brand-logo svg {
-  flex: none;
-}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

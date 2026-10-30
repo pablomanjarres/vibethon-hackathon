@@ -1,4 +1,4 @@
-# Parqueadero EAFIT en hora pico
+# Hedge Parking: el parqueadero de EAFIT en hora pico
 
 Registro de prompts: [`docs/prompting.md`](docs/prompting.md) (especificación, correcciones y comprobaciones) y [`docs/prompting.raw.md`](docs/prompting.raw.md) (cada prompt escrito, tal cual).
 

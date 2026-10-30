@@ -7,6 +7,7 @@ import { Ingreso } from "./Ingreso";
 import { PantallaConductor } from "./PantallaConductor";
 import { ListaAccesos } from "../../ui/AccesoRapido";
 import { Recorrido } from "../../ui/Recorrido";
+import { tituloPagina } from "../../ui/identidad";
 import "../../ui/acceso.css";
 import "../../ui/tokens.css";
 import "../../ui/texto.css";
@@ -32,7 +33,7 @@ export default function Telefono() {
   };
 
   useEffect(() => {
-    document.title = "Teléfono del conductor · Parqueadero EAFIT";
+    document.title = tituloPagina("Teléfono del conductor");
   }, []);
 
   return (

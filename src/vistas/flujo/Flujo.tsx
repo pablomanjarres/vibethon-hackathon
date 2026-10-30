@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { tituloPagina } from "../../ui/identidad";
 import "./flujo.css";
 
 /** The four real screens of the flow, side by side and live: every action shows up in the others at once. */
@@ -11,7 +12,7 @@ const PANTALLAS = [
 
 export default function Flujo() {
   useEffect(() => {
-    document.title = "Flujo completo · Parqueadero EAFIT";
+    document.title = tituloPagina("Flujo completo");
   }, []);
   const base = window.location.pathname;
   return (

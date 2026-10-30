@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { ChevronLeft, Info, SlidersHorizontal, X } from "lucide-react";
 import { TARIFA, peso } from "./datos";
+import { MARCA } from "../../ui/identidad";
 import "./telefono.css";
 
 /** A phone frame with the shared map header: back, title, info and the filter chips. */
@@ -15,7 +16,7 @@ export function Telefono({ titulo, children }: { titulo: string; children: React
         <header className="mk-cabecera">
           <ChevronLeft size={20} aria-hidden="true" />
           <div>
-            <strong>Parqueadero EAFIT</strong>
+            <strong>{MARCA}</strong>
             <span>Hoy, jue 30 oct · 7:30 a.m.</span>
           </div>
           <Info size={18} aria-hidden="true" />
