@@ -107,7 +107,7 @@ export function vistaConductor(estado: Estado, placaEscrita: string, codigo?: st
   const servicio = carro.servicio ? estado.servicios[carro.servicio] : null;
   // An expired, rejected or finished-and-gone service shows nothing old to the driver.
   const activo = Boolean(servicio && !["rechazado", "vencido"].includes(servicio.estado) && carro.estado !== "retirado");
-  const puedeContratar = carro.estado === "en fila" && !activo && estado.valets.some((v) => v.entrada === carro.entrada && v.estado === "disponible");
+  const puedeContratar = (carro.estado === "en fila" || carro.estado === "con celda") && !activo && estado.valets.some((v) => v.entrada === carro.entrada && v.estado === "disponible");
   const espera = carro.estado === "en fila" || carro.estado === "en espera" ? estimarEspera(estado, placa) : null;
   const celdasLibres = estado.celdas.filter((c) => c.estado === "libre").map((c) => c.id);
   return {

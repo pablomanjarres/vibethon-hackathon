@@ -1,6 +1,7 @@
 import { estadoInicial, type Escenario } from "./escenario.ts";
 import { ESCENARIO_INICIAL } from "./escenarios/index.ts";
 import { ejecutar, type Comando, type Resultado } from "./motor.ts";
+import { asignacionAutomatica } from "./asignador.ts";
 import { simularHasta } from "./simulacion.ts";
 import type { Estado } from "./tipos.ts";
 
@@ -65,6 +66,19 @@ function borrar(clave: string): void {
  * Store around the engine, saved in this browser's localStorage so a refresh keeps the state.
  * Nothing leaves the browser: no database, no network.
  */
+/** Hands every free cell to the car whose turn it is, after each accepted action (bounded by the number of cells). */
+function conAsignacionAutomatica(estado: Estado): Estado {
+  let actual = estado;
+  for (let i = 0; i < actual.celdas.length; i += 1) {
+    const comando = asignacionAutomatica(actual);
+    if (!comando) break;
+    const r = ejecutar(actual, comando);
+    if (!r.ok) break;
+    actual = r.estado;
+  }
+  return actual;
+}
+
 export function crearTienda(escenario: Escenario = ESCENARIO_INICIAL): Tienda {
   // v3: cars and valets carry access codes and the valet service has its steps; older saved states start over from the seed.
   const clave = `parqueadero:${escenario.id}:v3`;
@@ -86,7 +100,7 @@ export function crearTienda(escenario: Escenario = ESCENARIO_INICIAL): Tienda {
     leer: () => estado,
     ejecutar(comando) {
       const resultado = ejecutar(estado, comando);
-      if (resultado.ok) publicar(resultado.estado);
+      if (resultado.ok) publicar(conAsignacionAutomatica(resultado.estado));
       return resultado;
     },
     suscribir(oyente) {

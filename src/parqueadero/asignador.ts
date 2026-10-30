@@ -128,3 +128,16 @@ export function reasignar(estado: Estado, carro: Carro): string {
   carro.aviso = `La celda ${anterior.id} estaba ocupada y no hay otra libre. Eres el primero en entrar cuando haya cupo.`;
   return `${anterior.id} estaba ocupada y no hay otra libre; ${carro.placa} queda primero en la fila de espera, sin pasar el cupo del pasaje.`;
 }
+
+/**
+ * Automatic assignment: while a cell is free, the car whose turn it is gets it, as if its gate had
+ * pressed "Asignar celda". Returns the next command to run, or null when nothing applies.
+ */
+export function asignacionAutomatica(estado: Estado): { tipo: "asignarCelda"; entrada: string } | null {
+  if (!estado.celdas.some((c) => c.estado === "libre")) return null;
+  const turno = siguienteEntrada(estado);
+  if (!turno) return null;
+  const primero = estado.carros[turno.fila[0]];
+  if (!primero || primero.sinParquear) return null;
+  return { tipo: "asignarCelda", entrada: turno.id };
+}

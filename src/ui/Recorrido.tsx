@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle, RotateCcw, X } from "lucide-react";
+import { useEffect } from "react";
 import { tienda } from "../parqueadero/tienda";
 import type { Estado, EstadoServicio } from "../parqueadero/tipos";
 import { href, useRoute } from "../shared/route";
@@ -47,7 +48,7 @@ const PASOS: Paso[] = [
     texto: (e) => `Confirma el ficho del conductor (${servicioDe(e)?.ficho ?? "F-…"}) y recibe las llaves. El conductor ya puede ir a clase.`,
     hecho: (e) => llego(e, "en curso"),
   },
-  { quien: "Portería Regional", vista: "porteria", params: porteria, texto: () => `Asigna la celda: ${PLACA} es el primero en el turno.`, hecho: (e) => Boolean(e.carros[PLACA]?.celda) },
+  { quien: "Portería Regional", vista: "porteria", params: porteria, texto: (e) => (e.carros[PLACA]?.celda ? `La celda ${e.carros[PLACA]?.celda} se asignó sola: había una libre y era su turno.` : "La celda se asigna sola apenas haya una libre; si no hay, libera una desde las acciones rápidas."), hecho: (e) => Boolean(e.carros[PLACA]?.celda) },
   { quien: "Portería Regional", vista: "porteria", params: porteria, texto: () => `Confirma la entrada de ${PLACA} (placa y reserva).`, hecho: (e) => Boolean(e.carros[PLACA]?.confirmado) || llego(e, "estacionado") },
   { quien: `Valet ${VALET}`, vista: "valet", params: valet, texto: (e) => `Estaciona el carro en ${e.carros[PLACA]?.celda ?? "su celda"}.`, hecho: (e) => llego(e, "estacionado") },
   { quien: `Valet ${VALET}`, vista: "valet", params: valet, texto: () => "Deja las llaves en la oficina.", hecho: (e) => llego(e, "llaves en oficina") },
@@ -66,12 +67,24 @@ export function inicioRecorrido(estado: Estado): string {
  */
 export function Recorrido() {
   const estado = useEstado();
-  const { params } = useRoute();
-  const n = Number(params.get("recorrido"));
-  if (!n || n < 1 || n > PASOS.length) return null;
+  const { path, params } = useRoute();
+  const activo = params.has("recorrido");
+  // The step shown is the first one the engine has not recorded yet, so the bar follows the real process.
+  const pendiente = PASOS.findIndex((p) => !p.hecho(estado));
+  const n = pendiente < 0 ? PASOS.length : pendiente + 1;
+  const ir = (i: number) => href(PASOS[i - 1].vista, { ...PASOS[i - 1].params(estado), recorrido: String(i) });
+  const destino = ir(n);
+  // When the next step happens on another screen, go there on its own, a moment after the action.
+  useEffect(() => {
+    if (!activo || PASOS[n - 1].vista === path) return;
+    const t = window.setTimeout(() => {
+      window.location.hash = destino.replace(/^#/, "");
+    }, 700);
+    return () => window.clearTimeout(t);
+  }, [activo, n, path, destino]);
+  if (!activo) return null;
   const paso = PASOS[n - 1];
   const hecho = paso.hecho(estado);
-  const ir = (i: number) => href(PASOS[i - 1].vista, { ...PASOS[i - 1].params(estado), recorrido: String(i) });
   return (
     <aside className="ui-recorrido" aria-label="Recorrido guiado" data-hecho={hecho}>
       <p className="ui-recorrido-paso">
