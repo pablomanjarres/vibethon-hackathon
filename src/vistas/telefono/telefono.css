@@ -5,7 +5,15 @@
   color: var(--ink);
 }
 .tl-presentador {
-  display: none;
+  display: grid;
+  gap: var(--space-3);
+  padding: 24px 16px;
+}
+.tl-accesos {
+  position: static;
+  width: auto;
+  max-height: none;
+  box-shadow: none;
 }
 @media (min-width: 760px) {
   .tl-escena {
@@ -16,10 +24,10 @@
     padding: 24px;
   }
   .tl-presentador {
-    display: grid;
     align-content: start;
-    gap: var(--space-3);
     width: min(360px, 100%);
+    max-height: 90dvh;
+    overflow-y: auto;
   }
 }
 .tl-presentador-titulo {
