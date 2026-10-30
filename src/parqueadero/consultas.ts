@@ -11,6 +11,11 @@ export function nombreEntrada(estado: Estado, id: string | null): string {
   return estado.entradas.find((e) => e.id === id)?.nombre ?? "el lote";
 }
 
+/** The n-th access code: four digits, all different for the first 9000 cars, the same on every run. */
+export function codigoAcceso(n: number): string {
+  return String(((n * 7919 + 4271) % 9000) + 1000);
+}
+
 /** Cars registered outside a full passage (older saved states have no list yet). */
 export function esperaDe(entrada: Entrada): string[] {
   return entrada.espera ?? [];

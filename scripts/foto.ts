@@ -23,4 +23,6 @@ for (const entrada of estado.entradas) {
   console.log(`  ${p.turno}`);
   console.log("  " + p.fila.map((c) => `${c.placa} (llegó ${c.llego}, espera ~${c.esperaMinutos} min)`).join("\n  "));
 }
+console.log("\nCódigos de acceso de los carros en los pasajes (solo para la demo):");
+for (const entrada of estado.entradas) console.log("  " + entrada.fila.map((p) => `${p} ${estado.carros[p].codigo}`).join(", "));
 console.log(`\nPagos: ${oficina.pagos.cantidad}. Fichos activos: ${oficina.fichosActivos.length}. Eventos simulados: ${ESCENARIO_INICIAL.eventos.length}.`);

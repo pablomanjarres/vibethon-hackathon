@@ -1,76 +1,89 @@
-import { useEffect } from "react";
-import { ChevronLeft, ScrollText, Ticket } from "lucide-react";
-import { hora } from "../../parqueadero/lecturas/formato";
-import { vistaOficina } from "../../parqueadero/lecturas/oficina";
-import { vistaPorteria } from "../../parqueadero/lecturas/porteria";
-import { listaValets, vistaValet } from "../../parqueadero/lecturas/valet";
-import { href } from "../../shared/route";
-import { MapaLote } from "../../ui/MapaLote";
+import { useEffect, useRef } from "react";
+import type { EstadoCarro } from "../../parqueadero/tipos";
+import { href, useRoute } from "../../shared/route";
+import { Chips } from "../../ui/Chips";
 import { Reloj } from "../../ui/Reloj";
-import { Cifra } from "../../ui/Datos";
-import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useEstado } from "../../ui/useTienda";
-import { Bitacora, FichosActivos } from "../oficina/Registros";
-import { Pasajes } from "./Pasajes";
-import { Valets } from "./Valets";
+import { PantallaConductor } from "./PantallaConductor";
 import "../../ui/tokens.css";
 import "../../ui/texto.css";
 import "./telefono.css";
 
+/** Plate groups for the presenter, in the order a car goes through the lot. */
+const GRUPOS: { estado: EstadoCarro; nombre: string }[] = [
+  { estado: "en fila", nombre: "En fila" },
+  { estado: "con celda", nombre: "Con celda" },
+  { estado: "estacionado", nombre: "Estacionados" },
+  { estado: "en devolución", nombre: "Saliendo" },
+];
+
 /**
- * A read-only phone that follows the lot live: whatever the driver, gate, valet or office screens
- * do, in this tab or another, shows up here. It never sends a command.
+ * How the driver app looks on a phone, for one plate (#/telefono?placa=SVK088). It follows the lot
+ * live, including what the gate, valet and office do in other tabs, and never sends a command.
  */
 export default function Telefono() {
   const estado = useEstado();
-  const oficina = vistaOficina(estado);
-  const porterias = estado.entradas.map((e) => vistaPorteria(estado, e.id));
-  const valets = listaValets(estado).map((v) => vistaValet(estado, v.id));
-  const ultimo = oficina.bitacora[0];
+  const { params } = useRoute();
+  const pedida = params.get("placa")?.toUpperCase() ?? "";
+  const enLote = Object.values(estado.carros).filter((c) => c.estado !== "retirado");
+  const placa = estado.carros[pedida] ? pedida : (estado.entradas.find((e) => e.fila.length > 0)?.fila[0] ?? enLote[0]?.placa ?? pedida);
 
   useEffect(() => {
-    document.title = "Teléfono · Parqueadero EAFIT";
-  }, []);
+    document.title = `Teléfono de ${placa} · Parqueadero EAFIT`;
+  }, [placa]);
+
+  // The map zooms to the driver's cell with scrollIntoView on the next frame, which would also
+  // scroll the phone screen. Put the screen back where it was right after.
+  const pantalla = useRef<HTMLDivElement>(null);
+  const celda = estado.carros[placa]?.celda ?? null;
+  useEffect(() => {
+    const arriba = pantalla.current?.scrollTop ?? 0;
+    const ventana = window.scrollY;
+    const id = requestAnimationFrame(() => {
+      if (pantalla.current) pantalla.current.scrollTop = arriba;
+      window.scrollTo({ top: ventana });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [placa, celda]);
 
   return (
-    <div className="tl-fondo">
+    <div className="tl-escena">
       <div className="tl-marco">
-        <div className="tl-pantalla">
-          <header className="tl-cabecera">
-            <a href={href("")} aria-label="Ver todas las vistas" className="tl-volver">
-              <ChevronLeft size={20} aria-hidden="true" />
-            </a>
-            <div>
-              <h1>Parqueadero EAFIT</h1>
-              <p className="tl-vivo" role="status">
-                <span className="tl-punto" aria-hidden="true" />
-                En vivo{ultimo ? ` · último cambio ${hora(estado.inicio, ultimo.minuto)}` : ""}
-              </p>
-            </div>
+        <div className="tl-pantalla" ref={pantalla}>
+          <div className="tl-estado">
+            <span className="tl-vivo">
+              <span className="tl-punto" aria-hidden="true" /> En vivo
+            </span>
             <Reloj />
-          </header>
-          <main className="tl-contenido">
-            <div className="tl-cifras">
-              <Cifra valor={oficina.celdas.libre} etiqueta="Libres" />
-              <Cifra valor={oficina.celdas.reservada} etiqueta="Reservadas" />
-              <Cifra valor={oficina.celdas.ocupada} etiqueta="Ocupadas" />
-            </div>
-            {oficina.mapas.map((mapa) => (
-              <div key={mapa.id} className="tl-mapa">
-                <MapaLote nombre={mapa.nombre} celdas={mapa.celdas} entradas={estado.entradas} />
-              </div>
-            ))}
-            <Pasajes porterias={porterias} />
-            <TarjetaDatos Icono={ScrollText} titulo="Bitácora">
-              <Bitacora eventos={oficina.bitacora.slice(0, 8)} inicio={estado.inicio} />
-            </TarjetaDatos>
-            <TarjetaDatos Icono={Ticket} titulo="Fichos activos">
-              <FichosActivos fichos={oficina.fichosActivos} />
-            </TarjetaDatos>
-            <Valets valets={valets} />
-          </main>
+          </div>
+          {placa ? <PantallaConductor estado={estado} placa={placa} /> : <p className="tl-seccion ui-texto-suave">No hay carros en el lote.</p>}
         </div>
       </div>
+      <aside className="tl-presentador" aria-label="Elegir el teléfono de otro conductor">
+        <h1 className="tl-presentador-titulo">Teléfono del conductor</h1>
+        <p className="ui-texto-suave">Elige una placa. La pantalla cambia sola cuando la portería, el valet o la oficina actúan.</p>
+        {GRUPOS.map(({ estado: grupo, nombre }) => {
+          const placas = enLote.filter((c) => c.estado === grupo);
+          return (
+            placas.length > 0 && (
+              <section key={grupo} className="tl-grupo">
+                <h2>
+                  {nombre} <span className="num">{placas.length}</span>
+                </h2>
+                <Chips
+                  etiqueta={`Placas: ${nombre}`}
+                  chips={placas.map((c) => ({
+                    id: c.placa,
+                    texto: <span className="num">{c.placa}</span>,
+                    href: href("telefono", { placa: c.placa }),
+                    actual: c.placa === placa,
+                  }))}
+                />
+              </section>
+            )
+          );
+        })}
+      </aside>
     </div>
   );
 }
