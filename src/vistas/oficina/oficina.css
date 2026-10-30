@@ -105,3 +105,27 @@
 .of-lineas .of-total {
   border-style: dashed;
 }
+
+/* Received fichos: car and cell on the left, key state and the one valid action on the right. */
+.of-fichos li {
+  flex-wrap: wrap;
+  align-items: center;
+}
+.of-ficho-datos {
+  display: grid;
+  gap: 2px;
+}
+.of-ficho-datos span {
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.of-ficho-estado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.of-motivo {
+  font-size: 13px;
+  color: var(--ink-muted);
+}
