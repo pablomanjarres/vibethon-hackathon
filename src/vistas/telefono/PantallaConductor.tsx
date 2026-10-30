@@ -12,21 +12,35 @@ import { DetallesConductor } from "../conductor/DetallesConductor";
 import { EstadoPaso } from "../conductor/EstadoPaso";
 import { OfertaValet } from "../conductor/OfertaValet";
 import { PasoValet } from "../conductor/PasoValet";
+import { SiguientePasoDemo } from "../conductor/SiguientePasoDemo";
 import { HojaInferior } from "./HojaInferior";
 import { Ingreso } from "./Ingreso";
+import { sinOtrasPlacas } from "./privacidad";
 import { Recorrido } from "./Recorrido";
 import "../conductor/conductor.css";
 
 /**
  * The driver app on a phone for one plate and access code: the lot map behind, the driver's details
- * in a bottom sheet. Other drivers' plates never show. The step's buttons send the driver's commands.
+ * in a bottom sheet. Other drivers' plates never show. The step's buttons send the driver's commands,
+ * and the simulation moves the gate, valets and other drivers forward one step at a time.
  */
-export function PantallaConductor({ estado, placa, codigo }: { estado: Estado; placa: string; codigo: string }) {
-  const { aviso, enviar } = useComando();
+interface Props {
+  estado: Estado;
+  placa: string;
+  codigo: string;
+  /** Carried over from check-in: the new code and the engine's confirmation. */
+  registro: { codigo: string; texto: string } | null;
+  onRegistrada: (placa: string, codigo: string, texto: string) => void;
+}
+
+export function PantallaConductor({ estado, placa, codigo, registro, onRegistrada }: Props) {
+  const { aviso, enviar, informar } = useComando();
   const [valet, setValet] = useState<string | null>(null);
   const v = vistaConductor(estado, placa, codigo);
-  if (!v.encontrado) return <Ingreso placa={v.placa} error={v.mensaje} />;
+  if (!v.encontrado) return <Ingreso estado={estado} onRegistrada={onRegistrada} placa={v.placa} error={v.mensaje} />;
 
+  const privado = (texto: string) => sinOtrasPlacas(texto, estado, v.placa);
+  const resultado = aviso ?? (registro && { ok: true, texto: registro.texto });
   const mapa = estado.mapas[0];
   const paso = pasoActual(v, null);
 
@@ -44,8 +58,9 @@ export function PantallaConductor({ estado, placa, codigo }: { estado: Estado; p
         etiqueta={`Tu carro ${v.placa}`}
         pie={
           <>
-            <AvisoResultado aviso={aviso} />
+            <AvisoResultado aviso={resultado && { ...resultado, texto: privado(resultado.texto) }} />
             <AccionesPaso paso={paso} onEnviar={enviar} />
+            <SiguientePasoDemo estado={estado} placa={v.placa} onResultado={informar} ocultar={privado} />
           </>
         }
         cabeza={
@@ -60,6 +75,11 @@ export function PantallaConductor({ estado, placa, codigo }: { estado: Estado; p
         }
       >
         <div className="tl-detalles">
+          {registro?.codigo && (
+            <p className="cd-codigo-linea">
+              Tu código <strong className="num">{registro.codigo}</strong> · con tu placa entras desde otro teléfono
+            </p>
+          )}
           <OfertaValet v={v} tarifa={{ precio: estado.reglas.tarifaValet, moneda: estado.reglas.moneda }} elegido={valet} onElegir={setValet} onEnviar={enviar} />
           <DetallesConductor estado={estado} v={v} />
         </div>
