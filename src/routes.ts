@@ -13,9 +13,21 @@ export interface PageRoute {
 
 export const routes: PageRoute[] = [
   {
-    path: "product",
-    name: "Placeholder product",
-    summary: "A list and detail on sample data. Replace it with the product.",
-    Page: lazy(() => import("./product/Page")),
+    path: "conductor",
+    name: "Conductor",
+    summary: "Mi lugar en la fila, la espera estimada, mi celda y la entrega al valet.",
+    Page: lazy(() => import("./vistas/conductor/Conductor")),
+  },
+  {
+    path: "porteria",
+    name: "Portería",
+    summary: "El pasaje de cada entrada, de quién es el turno y las celdas libres.",
+    Page: lazy(() => import("./vistas/porteria/Porteria")),
+  },
+  {
+    path: "valet",
+    name: "Valet",
+    summary: "El servicio en curso, el siguiente paso, los fichos y las llaves.",
+    Page: lazy(() => import("./vistas/valet/Valet")),
   },
 ];
