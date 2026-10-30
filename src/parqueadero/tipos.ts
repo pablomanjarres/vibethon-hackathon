@@ -6,14 +6,26 @@
 export type EstadoCelda = "libre" | "reservada" | "ocupada";
 export type EstadoValet = "disponible" | "reservado" | "en servicio";
 export type EstadoCarro = "en espera" | "en fila" | "con celda" | "estacionado" | "en devolución" | "retirado";
-export type EstadoServicio = "solicitado" | "en curso" | "estacionado" | "devolución" | "entregado";
+export type EstadoServicio =
+  | "pago pendiente"
+  | "pagado"
+  | "ficho emitido"
+  | "en curso"
+  | "estacionado"
+  | "llaves en oficina"
+  | "entregado"
+  | "rechazado"
+  | "vencido";
 export type UbicacionLlave = "conductor" | "valet" | "tablero";
 
 export interface Reglas {
   /** Average minutes between two cells freeing up at rush hour; drives the wait estimate. */
   minutosPorLiberacion: number;
   tarifaPorMinuto: number;
+  /** Price of a valet service, charged upfront (configurable; the demo uses 8000). */
   tarifaValet: number;
+  /** Minutes a valet stays held while the simulated payment runs (default 2). */
+  minutosPago?: number;
   moneda: string;
 }
 
@@ -86,14 +98,28 @@ export interface Servicio {
   ficho: string;
   valet: string | null;
   estado: EstadoServicio;
-  /** Minute the current valet got this job (the request, or the return). */
+  /** Minute the service was hired. */
   asignadoEn?: number;
+  precio?: number;
+  /** The held valet is released if the payment is still pending at this minute. */
+  pagoVence?: number;
+  /** Minute the office handed the keys back. */
+  entregadoEn?: number;
 }
 
 export interface Pago {
   id: string;
   placa: string;
   minutos: number;
+  monto: number;
+  enMinuto: number;
+}
+
+/** Simulated income from one valet service, credited to the valet who took it. */
+export interface Ingreso {
+  id: string;
+  servicio: string;
+  valet: string;
   monto: number;
   enMinuto: number;
 }
@@ -120,5 +146,6 @@ export interface Estado {
   /** Minutes when a cell was freed, and when one was handed out: the wait estimate is built on them. */
   liberaciones?: number[];
   asignaciones?: number[];
-  consecutivos: { servicio: number; pago: number; codigo: number };
+  ingresos?: Ingreso[];
+  consecutivos: { servicio: number; pago: number; codigo: number; ingreso?: number };
 }
