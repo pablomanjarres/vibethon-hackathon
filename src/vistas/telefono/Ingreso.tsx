@@ -21,7 +21,7 @@ export function Ingreso({ estado, onRegistrada, placa, error }: Props) {
         <Car size={28} />
       </span>
       <h1>Guarda tu puesto</h1>
-      <p className="ui-texto-suave">Tu placa y tu entrada, y entras a la fila del Parqueadero EAFIT.</p>
+      <p className="ui-texto-suave">Tu placa y tu entrada, y entras a la fila del parqueadero de EAFIT.</p>
       {error && (
         <p className="tl-ingreso-error" role="alert">
           {error}
