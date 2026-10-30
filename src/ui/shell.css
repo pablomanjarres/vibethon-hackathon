@@ -1,0 +1,104 @@
+.ui-app {
+  min-height: 100vh;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Top bar: the white rounded nav bar floating on the beige canvas. */
+.ui-barra {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  background: var(--surface-raised);
+  border-radius: var(--radius-card);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-5);
+}
+.ui-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+  min-height: var(--control-height);
+}
+.ui-marca-punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-dot);
+}
+.ui-nav {
+  display: flex;
+  gap: var(--space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+.ui-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-control);
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+}
+.ui-nav a:hover {
+  background: var(--tile);
+}
+.ui-nav a[aria-current="page"] {
+  background: var(--ink);
+  color: var(--surface-raised);
+}
+.ui-barra-extra {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.ui-main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-3);
+}
+.ui-main-ancho {
+  max-width: none;
+}
+
+@media (max-width: 720px) {
+  .ui-app {
+    padding: var(--space-2);
+  }
+  .ui-barra {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+  .ui-nav {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .ui-nav a {
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-1);
+    font-size: 12px;
+    justify-content: center;
+  }
+  .ui-barra-extra {
+    margin-left: 0;
+    width: 100%;
+  }
+}

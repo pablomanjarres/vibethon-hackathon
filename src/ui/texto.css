@@ -1,0 +1,28 @@
+/* Headline serif, as in the reference hero. */
+.ui-titulo {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.ui-ceja {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--accent);
+  font-weight: 500;
+  margin: 0 0 var(--space-2);
+}
+.ui-ceja::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-dot);
+}
+.ui-texto-suave {
+  color: var(--ink-muted);
+  margin: 0;
+}
