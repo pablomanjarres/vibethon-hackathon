@@ -1,7 +1,7 @@
+import { darCelda, ordenDeAtencion, reasignar, salirPorLaPorteria, siguienteEntrada } from "../asignador.ts";
 import { carroPorPlaca, celdaDe, codigoAcceso, entradaPorId, esperaDe, normalizarPlaca, servicioDe, valetPorId } from "../consultas.ts";
-import { ordenDeAtencion, siguienteEntrada } from "../equidad.ts";
 import { cambiarCelda, cambiarValet, exigir } from "../transiciones.ts";
-import type { Carro, Celda, Entrada, Estado } from "../tipos.ts";
+import type { Entrada, Estado } from "../tipos.ts";
 
 /**
  * Plate registration (the camera, or the driver from the app): the car joins the passage, or the
@@ -35,27 +35,17 @@ export function registrarLlegada(estado: Estado, placaLeida: string, entradaId: 
   return `${placa} entró al pasaje de ${entrada.nombre} (${entrada.fila.length} de ${entrada.capacidadPasaje}).`;
 }
 
-/** Moves the first car of an entrance out of its passage and reserves the cell for it. */
-function darCelda(estado: Estado, entrada: Entrada, celda: Celda): Carro {
-  const carro = estado.carros[entrada.fila.shift() as string];
-  cambiarCelda(celda, "reservada");
-  celda.placa = carro.placa;
-  carro.estado = "con celda";
-  carro.celda = celda.id;
-  entrada.celdasAsignadas += 1;
-  const [siguiente, ...resto] = esperaDe(entrada);
-  if (siguiente) {
-    entrada.espera = resto;
-    entrada.fila.push(siguiente);
-    estado.carros[siguiente].estado = "en fila";
-  }
-  return carro;
+/** The car at the gate must leave before anyone behind it can be served. */
+function exigirQueNoSalga(entrada: Entrada, estado: Estado): void {
+  const primero = entrada.fila[0];
+  exigir(!primero || !estado.carros[primero].sinParquear, `${primero} sale sin parquear: primero déjalo salir por la portería.`);
 }
 
 /** The gate of one entrance hands its first car the next free cell, only when the fairness rule says it is its turn. */
 export function asignarCelda(estado: Estado, entradaId: string): string {
   const entrada = entradaPorId(estado, entradaId);
   exigir(entrada.fila.length > 0, `No hay carros en el pasaje de ${entrada.nombre}.`);
+  exigirQueNoSalga(entrada, estado);
   const turno = siguienteEntrada(estado);
   exigir(turno?.id === entrada.id, `Es el turno de ${turno?.nombre}: su primer carro llegó antes.`);
   const celda = estado.celdas.find((c) => c.estado === "libre");
@@ -68,6 +58,7 @@ export function asignarCelda(estado: Estado, entradaId: string): string {
 export function reservarCelda(estado: Estado, placa: string, celdaId: string): string {
   const carro = carroPorPlaca(estado, placa);
   exigir(carro.estado === "en fila" && carro.entrada, `${carro.placa} no está esperando en un pasaje.`);
+  exigir(!carro.sinParquear, `${carro.placa} va a salir sin parquear.`);
   const adelante = ordenDeAtencion(estado).indexOf(carro.placa);
   exigir(adelante === 0, `Todavía no es tu turno: ${adelante === 1 ? "hay 1 carro" : `hay ${adelante} carros`} antes que tú.`);
   const celda = estado.celdas.find((c) => c.id === celdaId);
@@ -77,16 +68,59 @@ export function reservarCelda(estado: Estado, placa: string, celdaId: string): s
   return `${carro.placa} reservó la celda ${celda.id}.`;
 }
 
+/** The gate checks the plate against its reservation before the car drives in. */
+export function confirmarIngreso(estado: Estado, entradaId: string, placaLeida: string): string {
+  const entrada = entradaPorId(estado, entradaId);
+  const carro = carroPorPlaca(estado, placaLeida);
+  exigir(carro.estado === "con celda", `${carro.placa} no tiene una celda reservada: no puede entrar.`);
+  exigir(carro.entrada === entrada.id, `${carro.placa} se registró en otra entrada.`);
+  const celda = celdaDe(estado, carro);
+  exigir(celda.estado === "reservada" && celda.placa === carro.placa, `La reserva de ${carro.placa} no coincide con la celda ${celda.id}.`);
+  exigir(!carro.confirmado, `${carro.placa} ya fue confirmado.`);
+  carro.confirmado = true;
+  return `Portería ${entrada.nombre}: ${carro.placa} confirmado con reserva en la celda ${celda.id}. Puede entrar.`;
+}
+
+/** The driver decides not to park: the car keeps its place in the line until it reaches the gate. */
+export function salirSinParquear(estado: Estado, placa: string): string {
+  const carro = carroPorPlaca(estado, placa);
+  exigir(carro.estado === "en fila" || carro.estado === "en espera", `${carro.placa} ya no está en la fila.`);
+  exigir(!carro.sinParquear, `${carro.placa} ya avisó que sale sin parquear.`);
+  exigir(!carro.servicio, `${carro.placa} tiene un valet asignado.`);
+  carro.sinParquear = true;
+  return `${carro.placa} saldrá sin parquear; conserva su puesto hasta llegar a la portería.`;
+}
+
+/** At the gate, a car that is not parking leaves without taking a cell; the next car moves up. */
+export function dejarSalir(estado: Estado, entradaId: string): string {
+  const entrada = entradaPorId(estado, entradaId);
+  const primero = entrada.fila[0];
+  exigir(primero && estado.carros[primero].sinParquear, `El primer carro de ${entrada.nombre} no va a salir sin parquear.`);
+  const carro = salirPorLaPorteria(estado, entrada);
+  carro.estado = "retirado";
+  carro.salioEn = estado.minuto;
+  return `${carro.placa} salió por la portería de ${entrada.nombre} sin parquear.`;
+}
+
+/** The driver or valet finds the reserved cell taken: another one is reserved and the driver is told. */
+export function reportarCeldaOcupada(estado: Estado, placa: string): string {
+  const carro = carroPorPlaca(estado, placa);
+  exigir(carro.estado === "con celda", `${carro.placa} no tiene una celda reservada.`);
+  return reasignar(estado, carro);
+}
+
 /** The car reaches its reserved cell. A valet who drove it goes back to available and the keys go to the board. */
 export function estacionar(estado: Estado, placa: string): string {
   const carro = carroPorPlaca(estado, placa);
   exigir(carro.estado === "con celda", `${carro.placa} no tiene una celda reservada.`);
+  exigir(carro.confirmado, `La portería todavía no confirmó la placa y la reserva de ${carro.placa}.`);
   const servicio = carro.servicio ? servicioDe(estado, carro) : null;
   exigir(!servicio || servicio.estado === "en curso", `El valet todavía no recibió las llaves de ${carro.placa}.`);
   const celda = celdaDe(estado, carro);
   cambiarCelda(celda, "ocupada");
   carro.estado = "estacionado";
   carro.estacionadoEn = estado.minuto;
+  carro.aviso = null;
   if (!servicio) return `${carro.placa} se estacionó en ${celda.id}.`;
   const valet = valetPorId(estado, servicio.valet);
   cambiarValet(valet, "disponible");
