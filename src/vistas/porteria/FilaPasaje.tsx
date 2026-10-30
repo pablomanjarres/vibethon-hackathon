@@ -33,7 +33,7 @@ export function FilaPasaje({ fila }: { fila: CarroEnPasaje[] }) {
         />
       </div>
       {fila.length === 0 ? (
-        <Vacio>No hay carros en el pasaje. Registra la placa cuando llegue el siguiente.</Vacio>
+        <Vacio>No hay carros en el pasaje. Cada conductor registra su placa al llegar.</Vacio>
       ) : visibles.length === 0 ? (
         <Vacio>Ninguna placa en esta fila coincide con «{busqueda}».</Vacio>
       ) : (

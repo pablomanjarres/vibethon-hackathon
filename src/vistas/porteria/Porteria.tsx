@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { CircleArrowRight, DoorOpen, Hourglass, ListOrdered, ParkingSquare, ScanLine, ShieldCheck, UsersRound } from "lucide-react";
+import { useState } from "react";
+import { CircleArrowRight, Clock3, DoorOpen, Hourglass, ListOrdered, ParkingSquare, ShieldCheck, UsersRound } from "lucide-react";
 import { vistaPorteria } from "../../parqueadero/lecturas/porteria";
 import { href, useRoute } from "../../shared/route";
 import { Acordeon } from "../../ui/Acordeon";
@@ -14,17 +14,15 @@ import { Shell } from "../../ui/Shell";
 import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useComando, useEstado } from "../../ui/useTienda";
 import { FilaPasaje } from "./FilaPasaje";
-import { Registro } from "./Registro";
 import "./porteria.css";
 
-/** One gate: whose turn it is and why, the plate camera, the passage line and its valets, over the lot. */
+/** One gate: whose turn it is and why, its passage, the waiting line outside and its valets, over the lot. Drivers register themselves. */
 export default function Porteria() {
   const estado = useEstado();
   const { params } = useRoute();
   const { aviso, enviar } = useComando();
   const [elegida, setElegida] = useState<string | null>(null);
-  const [registroAbierto, setRegistroAbierto] = useState(false);
-  const campo = useRef<HTMLInputElement>(null);
+  const [esperaAbierta, setEsperaAbierta] = useState(false);
   const entradaId = estado.entradas.some((e) => e.id === params.get("entrada")) ? params.get("entrada")! : estado.entradas[0].id;
   const v = vistaPorteria(estado, entradaId);
   const indice = estado.entradas.findIndex((e) => e.id === entradaId);
@@ -39,7 +37,7 @@ export default function Porteria() {
       <PanelCabecera
         Icono={ShieldCheck}
         titulo={`Portería ${v.nombre}`}
-        subtitulo={`Pasaje ${v.pasaje.ocupados} de ${v.pasaje.capacidad} · ${v.valetsDisponibles} valets libres`}
+        subtitulo={`Pasaje ${v.pasaje.ocupados} de ${v.pasaje.capacidad} · ${v.enEspera.length} en espera afuera`}
         cerrar={{ href: href(""), etiqueta: "Volver al inicio" }}
       />
       <FilaAcciones
@@ -51,13 +49,10 @@ export default function Porteria() {
             motivo: v.puedeAsignar ? null : v.turno,
           },
           {
-            texto: "Registrar placa",
-            Icono: ScanLine,
-            activa: registroAbierto,
-            onClick: () => {
-              setRegistroAbierto(!registroAbierto);
-              if (!registroAbierto) requestAnimationFrame(() => campo.current?.focus());
-            },
+            texto: `Fila de espera (${v.enEspera.length})`,
+            Icono: Clock3,
+            activa: esperaAbierta,
+            onClick: () => setEsperaAbierta(!esperaAbierta),
           },
           otra
             ? { texto: otra.nombre, Icono: DoorOpen, href: href("porteria", { entrada: otra.id }) }
@@ -81,17 +76,29 @@ export default function Porteria() {
       <TarjetaDatos Icono={DoorOpen} titulo={`Pasaje ${v.nombre}`} contador={{ valor: v.celdasLibres.length, etiqueta: "Celdas libres" }}>
         <div className="ui-cifras">
           <Cifra valor={`${v.pasaje.ocupados}/${v.pasaje.capacidad}`} etiqueta="Pasaje" />
+          <Cifra valor={v.enEspera.length} etiqueta="En espera afuera" />
           <Cifra valor={v.valetsDisponibles} etiqueta="Valets libres" />
         </div>
         <Pastilla {...turno} />
         <p className="pt-turno">{v.turno}</p>
       </TarjetaDatos>
       <div>
-        <Acordeon Icono={ScanLine} titulo="Registrar placa" abierto={registroAbierto} onCambiar={setRegistroAbierto}>
-          <Registro v={v} campo={campo} />
-        </Acordeon>
         <Acordeon Icono={ListOrdered} titulo="Fila del pasaje" extra={`${v.fila.length} de ${v.pasaje.capacidad}`} inicial>
           <FilaPasaje fila={v.fila} />
+        </Acordeon>
+        <Acordeon Icono={Clock3} titulo="Fila de espera afuera" extra={v.enEspera.length} abierto={esperaAbierta} onCambiar={setEsperaAbierta}>
+          {v.enEspera.length === 0 ? (
+            <Vacio>Nadie espera afuera: el pasaje tiene cupo o está vacío.</Vacio>
+          ) : (
+            <ol className="ui-lista pt-fila">
+              {v.enEspera.map((placa, i) => (
+                <li key={placa}>
+                  <span className="pt-pos num">{i + 1}</span>
+                  <strong className="pt-placa num">{placa}</strong>
+                </li>
+              ))}
+            </ol>
+          )}
         </Acordeon>
         <Acordeon Icono={UsersRound} titulo="Valets" extra={valets.length}>
           {valets.length === 0 ? (
