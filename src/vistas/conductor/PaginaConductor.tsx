@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Banknote, Car, KeyRound, ListOrdered, MapPin, ParkingSquare, Ticket, Timer } from "lucide-react";
+import { Banknote, Car, KeyRound, ListOrdered, LogIn, MapPin, ParkingSquare, Ticket, Timer } from "lucide-react";
 import { vistaConductor } from "../../parqueadero/lecturas/conductor";
 import { carros } from "../../parqueadero/lecturas/formato";
+import type { Estado } from "../../parqueadero/tipos";
 import { href } from "../../shared/route";
 import { Acordeon } from "../../ui/Acordeon";
 import { AvisoResultado } from "../../ui/AvisoResultado";
@@ -13,40 +14,61 @@ import { Shell } from "../../ui/Shell";
 import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useComando, useEstado } from "../../ui/useTienda";
 import { motivoValet, pasos, type Seccion } from "./acciones";
-import { ElegirPlaca } from "./ElegirPlaca";
+import { IngresoConductor } from "./IngresoConductor";
+import { RegistroLlegada } from "./RegistroLlegada";
 import { Ficho } from "./Ficho";
 import { ProgresoValet } from "./ProgresoValet";
 import { Pronostico } from "./Pronostico";
 import "./conductor.css";
 
 /** The driver panel for one plate, or the plate picker when there is none. */
-export function PaginaConductor({ placa }: { placa: string | null }) {
+interface Props {
+  placa: string | null;
+  /** The access code; without the right one the driver sees nothing about the car. */
+  codigo: string;
+  /** Carried over from check-in: the new code and the engine's confirmation. */
+  registro: { codigo: string; texto: string } | null;
+  onRegistrada: (placa: string, codigo: string, texto: string) => void;
+}
+
+export function PaginaConductor({ placa, codigo, registro, onRegistrada }: Props) {
   const estado = useEstado();
   const { aviso, enviar } = useComando();
   const [elegida, setElegida] = useState<string | null>(null);
-  const v = placa ? vistaConductor(estado, placa) : null;
+  const v = placa ? vistaConductor(estado, placa, codigo) : null;
   const [fichoAbierto, setFichoAbierto] = useState(() => Boolean(v && pasos(v).some((paso) => paso.seccion === "ficho")));
   const libres = estado.celdas.filter((c) => c.estado === "libre").length;
   const contador = { valor: `${libres}/${estado.celdas.length}`, etiqueta: "Libres" };
 
   if (!v) {
     return (
-      <Shell vista="conductor" seleccion={elegida} onSeleccionar={setElegida}>
-        <PanelCabecera Icono={Car} titulo="Conductor" subtitulo="Reserva tu celda o tu valet en EAFIT" cerrar={{ href: href(""), etiqueta: "Volver al inicio" }} />
-        <ElegirPlaca estado={estado} actual={null} />
+      <Shell vista="conductor" seleccion={elegida} onSeleccionar={setElegida} privado>
+        <PanelCabecera
+          Icono={Car}
+          titulo="Registra tu placa para guardar tu puesto"
+          subtitulo="Llegaste a EAFIT: elige tu entrada y entras a la fila."
+          cerrar={{ href: href(""), etiqueta: "Volver al inicio" }}
+        />
+        <RegistroLlegada estado={estado} onRegistrada={onRegistrada} />
         <TarjetaDatos Icono={ParkingSquare} titulo="Lote EAFIT ahora" contador={contador}>
-          <p className="ui-texto-suave">Escribe tu placa para ver tu turno, reservar una celda o pedir un valet.</p>
+          <p className="ui-texto-suave">La celda la asigna el orden de llegada entre ambas entradas: quien llegó primero, entra primero.</p>
         </TarjetaDatos>
+        <div>
+          <Acordeon Icono={LogIn} titulo="Ya me registré">
+            <IngresoConductor />
+          </Acordeon>
+        </div>
       </Shell>
     );
   }
 
-  const carro = estado.carros[v.placa];
+  const carro = v.encontrado ? estado.carros[v.placa] : undefined;
   const servicio = carro?.servicio ? estado.servicios[carro.servicio] : null;
   const siguientes = pasos(v);
   const libresSet = new Set(v.celdasLibres);
   const reservable = v.puedeReservar && elegida && libresSet.has(elegida) ? elegida : null;
   const minutosEstacionado = carro?.estacionadoEn != null ? estado.minuto - carro.estacionadoEn : null;
+  const lugar = lugarEnFila(estado, v.placa);
 
   const acciones: AccionPanel[] = [
     {
@@ -58,7 +80,9 @@ export function PaginaConductor({ placa }: { placa: string | null }) {
           ? `ya tienes la celda ${v.celda}.`
           : v.estado === "en fila"
             ? "aún no es tu turno de reservar."
-            : "solo se reserva desde la fila."
+            : v.estado === "en espera"
+              ? "primero entras al pasaje, apenas haya cupo."
+              : "solo se reserva desde la fila."
         : reservable
           ? null
           : "toca una celda libre (verde) en el mapa.",
@@ -93,16 +117,22 @@ export function PaginaConductor({ placa }: { placa: string | null }) {
   const tiene = (seccion: Seccion) => siguientes.some((paso) => paso.seccion === seccion);
 
   return (
-    <Shell vista="conductor" seleccion={reservable ?? elegida ?? v.celda} onSeleccionar={setElegida} enfoque={v.celda}>
+    <Shell vista="conductor" seleccion={reservable ?? elegida ?? v.celda} onSeleccionar={setElegida} enfoque={v.celda} privado>
       <PanelCabecera
         Icono={Car}
         titulo={v.placa}
         subtitulo={v.entrada ? `Entrada ${v.entrada}` : "Conductor"}
-        cerrar={{ href: href("conductor"), etiqueta: "Cambiar de placa" }}
+        cerrar={{ href: href("conductor"), etiqueta: "Salir de mi puesto" }}
       />
       <FilaAcciones acciones={acciones} />
-      <AvisoResultado aviso={aviso} />
-      {!v.encontrado && <ElegirPlaca estado={estado} actual={v.placa} />}
+      <AvisoResultado aviso={aviso ?? (registro && { ok: true, texto: registro.texto })} />
+      {registro?.codigo && (
+        <TarjetaDatos Icono={KeyRound} titulo="Tu código">
+          <p className="cd-codigo-acceso num">{registro.codigo}</p>
+          <p className="ui-texto-suave">Guárdalo para ver tu puesto. Con tu placa y este código entras desde cualquier teléfono.</p>
+        </TarjetaDatos>
+      )}
+      {!v.encontrado && <IngresoConductor placa={v.placa} />}
       <TarjetaDatos Icono={Timer} titulo={v.espera ? "Tu espera" : "Tu carro"} contador={contador}>
         {v.espera && (
           <p className="cd-espera num">
@@ -119,6 +149,7 @@ export function PaginaConductor({ placa }: { placa: string | null }) {
         {v.encontrado && (
           <Datos
             filas={[
+              ...(lugar ? [{ etiqueta: "Tu lugar", valor: lugar }] : []),
               { etiqueta: "Celda", valor: v.celda ?? "Por asignar" },
               ...(minutosEstacionado !== null ? [{ etiqueta: "Estacionado hace", valor: `${minutosEstacionado} min` }] : []),
             ]}
@@ -156,4 +187,15 @@ export function PaginaConductor({ placa }: { placa: string | null }) {
       )}
     </Shell>
   );
+}
+
+/** Where the plate stands: its place in an entrance's passage or in the waiting line outside. */
+function lugarEnFila(estado: Estado, placa: string): string | null {
+  for (const entrada of estado.entradas) {
+    const enPasaje = entrada.fila.indexOf(placa);
+    if (enPasaje >= 0) return `${enPasaje + 1}.º en el pasaje de ${entrada.nombre}`;
+    const enEspera = (entrada.espera ?? []).indexOf(placa);
+    if (enEspera >= 0) return `${enEspera + 1}.º en la fila de espera de ${entrada.nombre}`;
+  }
+  return null;
 }

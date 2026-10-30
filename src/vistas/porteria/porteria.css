@@ -59,31 +59,6 @@
   min-width: 0;
   flex: 1;
 }
-.pt-checkin {
-  display: flex;
-  gap: var(--space-3);
-  align-items: flex-start;
-  margin-top: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-radius: 12px;
-  background: var(--tono-suave);
-  color: var(--tono);
-}
-.pt-checkin svg {
-  flex: none;
-  margin-top: 2px;
-}
-.pt-checkin p {
-  margin: 0;
-}
-.pt-checkin-titulo {
-  font-size: 17px;
-}
-.pt-checkin-detalle {
-  font-size: 14px;
-  color: var(--ink);
-}
-.pt-registro,
 .pt-filapasaje {
   display: grid;
   gap: var(--space-3);
