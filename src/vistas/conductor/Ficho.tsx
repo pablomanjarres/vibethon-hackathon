@@ -1,4 +1,5 @@
 import { Ticket } from "lucide-react";
+import type { EstadoServicio } from "../../parqueadero/tipos";
 import { CodigoFicho } from "./CodigoFicho";
 import "./ficho.css";
 
@@ -7,10 +8,18 @@ interface Props {
   placa: string;
   celda: string | null;
   valet: string | null;
+  estado: EstadoServicio;
+}
+
+/** Where the keys are, so the ticket says where to claim them. */
+function indicacion(estado: EstadoServicio): string {
+  if (estado === "llaves en oficina") return "Reclama tus llaves en la oficina con el ficho.";
+  if (estado === "entregado") return "Ya recibiste tus llaves.";
+  return "Guárdalo: con él reclamas tus llaves en la oficina.";
 }
 
 /** The valet claim ticket: big ficho code, plate, cell when known and a code to show at the gate. */
-export function Ficho({ ficho, placa, celda, valet }: Props) {
+export function Ficho({ ficho, placa, celda, valet, estado }: Props) {
   const filas = [
     { etiqueta: "Placa", valor: placa },
     { etiqueta: "Celda", valor: celda ?? "Por asignar" },
@@ -35,7 +44,7 @@ export function Ficho({ ficho, placa, celda, valet }: Props) {
       <div className="cd-ticket-corte" aria-hidden="true" />
       <div className="cd-ticket-pie">
         <CodigoFicho texto={`${ficho}-${placa}`} />
-        <p className="ui-texto-suave">Muéstralo en la portería para recibir tus llaves.</p>
+        <p className="ui-texto-suave">{indicacion(estado)}</p>
       </div>
     </section>
   );
