@@ -1,0 +1,68 @@
+/* Dots shared by the forecast timeline and the valet progress */
+.cd-punto {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--ink-muted);
+  background: var(--surface);
+  flex: none;
+}
+.cd-hecho .cd-punto { background: var(--libre); border-color: var(--libre); }
+.cd-linea {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.cd-linea li {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 40px;
+  position: relative;
+}
+.cd-linea li + li::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: -14px;
+  height: 28px;
+  width: 2px;
+  background: var(--hairline);
+}
+.cd-linea-texto { font-weight: 500; }
+.cd-linea-detalle { color: var(--ink-muted); font-size: 14px; }
+
+.cd-progreso { display: grid; gap: var(--space-3); }
+.cd-progreso-linea { margin: 0; font-weight: 600; }
+.cd-progreso-pasos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-1);
+}
+.cd-progreso-pasos li {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  color: var(--ink-muted);
+  position: relative;
+}
+.cd-progreso-pasos li + li::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--hairline);
+  z-index: 0;
+}
+.cd-progreso-pasos li.cd-hecho + li.cd-hecho::before { background: var(--libre); }
+.cd-progreso-pasos .cd-punto { position: relative; z-index: 1; }
+.cd-progreso-pasos .cd-hecho { color: var(--ink); font-weight: 500; }
