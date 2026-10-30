@@ -135,6 +135,8 @@ export function estadoInicial(esc: Escenario): Estado {
           celda: c.id,
           llegoEn: c.desde ?? 0,
           estacionadoEn: ocupada ? (c.desde ?? 0) : null,
+          // Cars with a reserved cell at the start are already past the gate.
+          confirmado: !ocupada,
         });
       }
       return { id: c.id, mapa: mapa.id, zona: c.zona, x: c.x, y: c.y, estado: c.estado, placa: c.placa ?? null };

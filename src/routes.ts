@@ -48,4 +48,10 @@ export const routes: PageRoute[] = [
     summary: "Pantallas de solo lectura: el lote por zonas, la zona elegida y tu celda.",
     Page: lazy(() => import("./vistas/mockups/Mockups")),
   },
+  {
+    path: "simulador",
+    name: "Simular el flujo",
+    summary: "Registra una placa, recibe el código y avanza paso a paso hasta que el carro tenga celda.",
+    Page: lazy(() => import("./vistas/simulador/Simulador")),
+  },
 ];
