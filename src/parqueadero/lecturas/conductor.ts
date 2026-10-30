@@ -1,4 +1,5 @@
 import { nombreEntrada, normalizarPlaca } from "../consultas.ts";
+import { ordenDeAtencion } from "../equidad.ts";
 import { estimarEspera, type Espera } from "../espera.ts";
 import type { Carro, Estado, EstadoCarro, Servicio, UbicacionLlave } from "../tipos.ts";
 import { carros } from "./formato.ts";
@@ -16,6 +17,9 @@ export interface VistaConductor {
   valet: string | null;
   llave: UbicacionLlave | null;
   puedePedirValet: boolean;
+  /** True when this car is next in the fairness order and a cell is free: it may pick one on the map. */
+  puedeReservar: boolean;
+  celdasLibres: string[];
   pagado: boolean;
 }
 
@@ -56,11 +60,14 @@ export function vistaConductor(estado: Estado, placaEscrita: string): VistaCondu
       valet: null,
       llave: null,
       puedePedirValet: false,
+      puedeReservar: false,
+      celdasLibres: [],
       pagado: false,
     };
   }
   const servicio = carro.servicio ? estado.servicios[carro.servicio] : null;
   const espera = carro.estado === "en fila" ? estimarEspera(estado, placa) : null;
+  const celdasLibres = estado.celdas.filter((c) => c.estado === "libre").map((c) => c.id);
   return {
     placa,
     encontrado: true,
@@ -74,6 +81,8 @@ export function vistaConductor(estado: Estado, placaEscrita: string): VistaCondu
     llave: carro.llave,
     puedePedirValet:
       carro.estado === "en fila" && !servicio && estado.valets.some((v) => v.entrada === carro.entrada && v.estado === "disponible"),
+    puedeReservar: carro.estado === "en fila" && celdasLibres.length > 0 && ordenDeAtencion(estado)[0] === placa,
+    celdasLibres,
     pagado: carro.pagado,
   };
 }
