@@ -6,6 +6,7 @@ import { Dispositivo } from "./Dispositivo";
 import { Ingreso } from "./Ingreso";
 import { PantallaConductor } from "./PantallaConductor";
 import { ListaAccesos } from "../../ui/AccesoRapido";
+import { Recorrido } from "../../ui/Recorrido";
 import "../../ui/acceso.css";
 import "../../ui/tokens.css";
 import "../../ui/texto.css";
@@ -51,6 +52,7 @@ export default function Telefono() {
       </Dispositivo>
       <aside className="tl-presentador" aria-label="Acciones rápidas">
         <h2 className="tl-presentador-titulo">Acciones rápidas</h2>
+        <Recorrido />
         <section className="ui-acceso tl-accesos">
           <ListaAccesos vista="conductor" ruta="telefono" />
         </section>
