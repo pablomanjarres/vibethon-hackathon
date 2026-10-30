@@ -1,5 +1,5 @@
 import { nombreEntrada, normalizarPlaca } from "../consultas.ts";
-import { ordenDeAtencion } from "../equidad.ts";
+import { ordenDeAtencion } from "../asignador.ts";
 import { estimarEspera, type Espera } from "../espera.ts";
 import type { Carro, Estado, EstadoCarro, Servicio, UbicacionLlave } from "../tipos.ts";
 import { carros } from "./formato.ts";
@@ -19,8 +19,27 @@ export interface VistaConductor {
   puedePedirValet: boolean;
   /** True when this car is next in the fairness order and a cell is free: it may pick one on the map. */
   puedeReservar: boolean;
+  /** The driver may still say they leave without parking. */
+  puedeSalirSinParquear: boolean;
+  sinParquear: boolean;
+  /** The gate already checked plate and reservation. */
+  confirmado: boolean;
+  /** Zone, number and route to the reserved or parked cell. */
+  destino: { zona: string; numero: string; ruta: string } | null;
+  /** A notice such as a reassigned cell, or null. */
+  aviso: string | null;
   celdasLibres: string[];
   pagado: boolean;
+}
+
+/** Position, cars ahead and the minute range, or why there is no range yet. */
+export function textoEspera(espera: Espera | null): string {
+  if (!espera) return "";
+  const puesto = `Puesto ${espera.posicion}: ${espera.carrosAdelante === 0 ? "nadie" : carros(espera.carrosAdelante)} antes que tú.`;
+  if (!espera.rango) return `${puesto} ${espera.nota}`;
+  if (espera.rango.max === 0) return `${puesto} Hay una celda libre para ti; espera la señal de la portería.`;
+  const minutos = espera.rango.min === espera.rango.max ? `${espera.rango.max} min` : `entre ${espera.rango.min} y ${espera.rango.max} min`;
+  return `${puesto} Espera estimada: ${minutos}. ${espera.nota}`;
 }
 
 function mensaje(carro: Carro, servicio: Servicio | null, espera: Espera | null): string {
@@ -30,13 +49,12 @@ function mensaje(carro: Carro, servicio: Servicio | null, espera: Espera | null)
   if (servicio?.estado === "devolución") return "Un valet está trayendo tu carro.";
   switch (carro.estado) {
     case "en espera":
-      if (!espera) return "Quedaste en la fila de espera. Entras al pasaje apenas haya cupo.";
-      return `Quedaste en la fila de espera. Hay ${carros(espera.carrosAdelante)} antes que tú. Espera estimada: ${espera.minutos} min. Entras al pasaje apenas haya cupo.`;
+      return `Quedaste en la fila de espera, afuera del pasaje. ${textoEspera(espera)} Entras al pasaje apenas haya cupo.`;
     case "en fila":
-      if (!espera || espera.minutos === 0) return "Hay una celda libre para ti. Espera la señal de la portería.";
-      return `Hay ${carros(espera.carrosAdelante)} antes que tú. Espera estimada: ${espera.minutos} min.`;
+      if (carro.sinParquear) return `Saldrás sin parquear. Conservas tu puesto hasta llegar a la portería. ${textoEspera(espera)}`;
+      return textoEspera(espera);
     case "con celda":
-      return `Ve a la celda ${carro.celda}.`;
+      return carro.confirmado ? `La portería confirmó tu reserva. Ve a la celda ${carro.celda}.` : `Tu celda es ${carro.celda}. Muestra tu placa en la portería para entrar.`;
     case "estacionado":
       return `Estás en la celda ${carro.celda}.`;
     case "en devolución":
@@ -68,6 +86,11 @@ export function vistaConductor(estado: Estado, placaEscrita: string, codigo?: st
       llave: null,
       puedePedirValet: false,
       puedeReservar: false,
+      puedeSalirSinParquear: false,
+      sinParquear: false,
+      confirmado: false,
+      destino: null,
+      aviso: null,
       celdasLibres: [],
       pagado: false,
     };
@@ -88,6 +111,11 @@ export function vistaConductor(estado: Estado, placaEscrita: string, codigo?: st
     llave: carro.llave,
     puedePedirValet: carro.estado === "con celda" && !servicio && estado.valets.some((v) => v.estado === "disponible"),
     puedeReservar: carro.estado === "en fila" && celdasLibres.length > 0 && ordenDeAtencion(estado)[0] === placa,
+    puedeSalirSinParquear: (carro.estado === "en fila" || carro.estado === "en espera") && !carro.sinParquear && !servicio,
+    sinParquear: Boolean(carro.sinParquear),
+    confirmado: Boolean(carro.confirmado),
+    destino: carro.celda ? destinoDe(estado, carro.celda, carro.entrada) : null,
+    aviso: carro.aviso ?? null,
     celdasLibres,
     pagado: carro.pagado,
   };
@@ -101,4 +129,14 @@ export function codigoDeRegistro(estado: Estado, placaEscrita: string): string |
   const carro = estado.carros[normalizarPlaca(placaEscrita)];
   if (!carro || (carro.estado !== "en fila" && carro.estado !== "en espera") || carro.llegoEn !== estado.minuto) return null;
   return carro.codigo;
+}
+
+/** Zone, stall number and a short route from the car's entrance, read from the scenario's map. */
+export function destinoDe(estado: Estado, celdaId: string, entradaId: string | null): { zona: string; numero: string; ruta: string } | null {
+  const celda = estado.celdas.find((c) => c.id === celdaId);
+  if (!celda) return null;
+  const numero = celda.id.replace(/^\D+/, "") || celda.id;
+  const lado = celda.x === 1 ? "al comienzo" : `en el puesto ${celda.x}`;
+  const entrada = entradaId ? `Entra por la portería de ${nombreEntrada(estado, entradaId)}, ` : "";
+  return { zona: celda.zona, numero, ruta: `${entrada}sigue el pasillo central hasta la zona ${celda.zona} y busca la celda ${celda.id} (fila ${celda.y}, ${lado}).` };
 }
