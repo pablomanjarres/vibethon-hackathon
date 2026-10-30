@@ -160,3 +160,26 @@
   font-weight: 600;
   font-size: 14px;
 }
+.pt-totales {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+.pt-totales > li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.pt-totales strong {
+  font-size: 22px;
+}
+.pt-entradas > li[aria-current="true"] strong {
+  text-decoration: underline;
+}
+.pt-turno-marca {
+  font-weight: 500;
+}
+.pt-cupo {
+  flex: none;
+  font-weight: 600;
+}
