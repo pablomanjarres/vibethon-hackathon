@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ScrollText, Ticket } from "lucide-react";
 import { hora } from "../../parqueadero/lecturas/formato";
 import { vistaOficina } from "../../parqueadero/lecturas/oficina";
 import { vistaPorteria } from "../../parqueadero/lecturas/porteria";
@@ -7,7 +7,8 @@ import { listaValets, vistaValet } from "../../parqueadero/lecturas/valet";
 import { href } from "../../shared/route";
 import { MapaLote } from "../../ui/MapaLote";
 import { Reloj } from "../../ui/Reloj";
-import { Cifra } from "../../ui/Tarjeta";
+import { Cifra } from "../../ui/Datos";
+import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useEstado } from "../../ui/useTienda";
 import { Bitacora, FichosActivos } from "../oficina/Registros";
 import { Pasajes } from "./Pasajes";
@@ -55,18 +56,17 @@ export default function Telefono() {
               <Cifra valor={oficina.celdas.ocupada} etiqueta="Ocupadas" />
             </div>
             {oficina.mapas.map((mapa) => (
-              <MapaLote
-                key={mapa.id}
-                nombre={mapa.nombre}
-                columnas={mapa.columnas}
-                filas={mapa.filas}
-                celdas={mapa.celdas}
-                entradas={estado.entradas}
-              />
+              <div key={mapa.id} className="tl-mapa">
+                <MapaLote nombre={mapa.nombre} celdas={mapa.celdas} entradas={estado.entradas} />
+              </div>
             ))}
             <Pasajes porterias={porterias} />
-            <Bitacora eventos={oficina.bitacora.slice(0, 8)} inicio={estado.inicio} />
-            <FichosActivos fichos={oficina.fichosActivos} />
+            <TarjetaDatos Icono={ScrollText} titulo="Bitácora">
+              <Bitacora eventos={oficina.bitacora.slice(0, 8)} inicio={estado.inicio} />
+            </TarjetaDatos>
+            <TarjetaDatos Icono={Ticket} titulo="Fichos activos">
+              <FichosActivos fichos={oficina.fichosActivos} />
+            </TarjetaDatos>
             <Valets valets={valets} />
           </main>
         </div>

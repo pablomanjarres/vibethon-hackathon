@@ -1,7 +1,8 @@
 import { CircleArrowRight, CircleDashed, Hourglass, KeyRound, ListOrdered } from "lucide-react";
 import type { VistaPorteria } from "../../parqueadero/lecturas/porteria";
 import { Pastilla, type Insignia } from "../../ui/Pastilla";
-import { Tarjeta, Vacio } from "../../ui/Tarjeta";
+import { Vacio } from "../../ui/Datos";
+import { TarjetaDatos } from "../../ui/TarjetaDatos";
 
 const TURNO: Record<"turno" | "espera" | "vacio", Insignia> = {
   turno: { texto: "De turno", Icono: CircleArrowRight, tono: "libre" },
@@ -18,7 +19,7 @@ function turno(p: VistaPorteria): Insignia {
 export function Pasajes({ porterias }: { porterias: VistaPorteria[] }) {
   const deTurno = porterias.find((p) => p.esMiTurno && p.fila.length > 0);
   return (
-    <Tarjeta titulo="Pasajes" Icono={ListOrdered}>
+    <TarjetaDatos Icono={ListOrdered} titulo="Pasajes">
       <p className="tl-turno" aria-live="polite">
         {deTurno ? `Turno de ${deTurno.nombre}: pasa ${deTurno.fila[0].placa}.` : "No hay carros esperando en los pasajes."}
       </p>
@@ -54,6 +55,6 @@ export function Pasajes({ porterias }: { porterias: VistaPorteria[] }) {
           </section>
         ))}
       </div>
-    </Tarjeta>
+    </TarjetaDatos>
   );
 }

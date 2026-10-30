@@ -172,3 +172,9 @@
   gap: 4px;
   font-size: 12px;
 }
+
+/* The lot map fills its parent; give it a frame in the phone column. */
+.tl-mapa {
+  position: relative;
+  aspect-ratio: 350 / 470;
+}
