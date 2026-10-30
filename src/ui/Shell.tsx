@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { Building2, Car, KeyRound, ShieldCheck, type LucideIcon } from "lucide-react";
 import { href } from "../shared/route";
+import { Reloj } from "./Reloj";
 import "./tokens.css";
 import "./shell.css";
 import "./texto.css";
@@ -17,7 +18,7 @@ export const VISTAS: { id: VistaId; nombre: string; Icono: LucideIcon }[] = [
 
 interface Props {
   vista: VistaId;
-  /** Right side of the bar: clock and quick controls. */
+  /** Controls beside the clock on the right of the bar. */
   extra?: ReactNode;
   /** Full-bleed map layouts drop the content width. */
   ancho?: boolean;
@@ -48,7 +49,10 @@ export function Shell({ vista, extra, ancho, children }: Props) {
             ))}
           </ul>
         </nav>
-        {extra && <div className="ui-barra-extra">{extra}</div>}
+        <div className="ui-barra-extra">
+          <Reloj />
+          {extra}
+        </div>
       </header>
       <main className={ancho ? "ui-main ui-main-ancho" : "ui-main"}>{children}</main>
     </div>
