@@ -12,6 +12,7 @@ import { DetallesConductor } from "../conductor/DetallesConductor";
 import { EstadoPaso } from "../conductor/EstadoPaso";
 import { OfertaValet } from "../conductor/OfertaValet";
 import { PasoValet } from "../conductor/PasoValet";
+import { SiguientePasoDemo } from "../conductor/SiguientePasoDemo";
 import { HojaInferior } from "./HojaInferior";
 import { Ingreso } from "./Ingreso";
 import { sinOtrasPlacas } from "./privacidad";
@@ -33,7 +34,7 @@ interface Props {
 }
 
 export function PantallaConductor({ estado, placa, codigo, registro, onRegistrada }: Props) {
-  const { aviso, enviar } = useComando();
+  const { aviso, enviar, informar } = useComando();
   const [elegida, setElegida] = useState<string | null>(null);
   const [valet, setValet] = useState<string | null>(null);
   const v = vistaConductor(estado, placa, codigo);
@@ -57,6 +58,7 @@ export function PantallaConductor({ estado, placa, codigo, registro, onRegistrad
       </div>
       <HojaInferior
         etiqueta={`Tu carro ${v.placa}`}
+        pie={<SiguientePasoDemo estado={estado} placa={v.placa} onResultado={informar} ocultar={privado} />}
         cabeza={
           <div className="tl-cabeza">
             <h1 className="tl-placa num">
