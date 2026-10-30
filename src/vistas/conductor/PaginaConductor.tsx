@@ -14,6 +14,9 @@ import { AccionesPaso } from "./AccionesPaso";
 import { DetallesConductor } from "./DetallesConductor";
 import { EstadoPaso } from "./EstadoPaso";
 import { IngresoConductor } from "./IngresoConductor";
+import { ModoDemo } from "./ModoDemo";
+import { OfertaValet } from "./OfertaValet";
+import { PasoValet } from "./PasoValet";
 import { RegistroLlegada } from "./RegistroLlegada";
 import "./conductor.css";
 
@@ -25,12 +28,15 @@ interface Props {
   /** Carried over from check-in: the new code and the engine's confirmation. */
   registro: { codigo: string; texto: string } | null;
   onRegistrada: (placa: string, codigo: string, texto: string) => void;
+  /** Demo shortcut: list every plate with its code to sign in as it. */
+  demo?: boolean;
 }
 
-export function PaginaConductor({ placa, codigo, registro, onRegistrada }: Props) {
+export function PaginaConductor({ placa, codigo, registro, onRegistrada, demo }: Props) {
   const estado = useEstado();
   const { aviso, enviar } = useComando();
   const [elegida, setElegida] = useState<string | null>(null);
+  const [valet, setValet] = useState<string | null>(null);
   const v = placa ? vistaConductor(estado, placa, codigo) : null;
   const libres = estado.celdas.filter((c) => c.estado === "libre").length;
   const contador = { valor: `${libres}/${estado.celdas.length}`, etiqueta: "Libres" };
@@ -54,11 +60,13 @@ export function PaginaConductor({ placa, codigo, registro, onRegistrada }: Props
             <IngresoConductor />
           </Acordeon>
         </div>
+        {demo && <ModoDemo estado={estado} placa={null} />}
       </Shell>
     );
   }
 
   const paso = pasoActual(v, elegida);
+  const vence = v.servicio ? estado.servicios[v.servicio.id]?.pagoVence : undefined;
   const reservable = paso.principal?.comando.tipo === "reservarCelda" ? paso.principal.comando.celda : null;
 
   return (
@@ -67,13 +75,14 @@ export function PaginaConductor({ placa, codigo, registro, onRegistrada }: Props
       <AvisoResultado aviso={aviso ?? (registro && { ok: true, texto: registro.texto })} />
       {v.encontrado ? (
         <TarjetaDatos Icono={Timer} titulo={v.espera ? "Tu turno" : "Tu carro"} contador={contador}>
-          <EstadoPaso v={v} />
+          {v.servicio ? <PasoValet servicio={v.servicio} restantes={vence != null ? Math.max(0, vence - estado.minuto) : null} /> : <EstadoPaso v={v} />}
           {registro?.codigo && (
             <p className="cd-codigo-linea">
               Tu código <strong className="num">{registro.codigo}</strong> · con tu placa entras desde otro teléfono
             </p>
           )}
           <AccionesPaso paso={paso} onEnviar={enviar} />
+          {v.oferta && !v.servicio && <OfertaValet placa={v.placa} oferta={v.oferta} elegido={valet} onElegir={setValet} onEnviar={enviar} />}
         </TarjetaDatos>
       ) : (
         <IngresoConductor placa={v.placa} />
@@ -85,6 +94,7 @@ export function PaginaConductor({ placa, codigo, registro, onRegistrada }: Props
           </Acordeon>
         </div>
       )}
+      {demo && <ModoDemo estado={estado} placa={v.placa} />}
     </Shell>
   );
 }
