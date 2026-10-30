@@ -1,46 +1,29 @@
-# Direction: <product name>
+# Dirección: Parqueadero EAFIT
 
-Copy to `docs/direction.md`. Thirty to forty minutes, before building the second screen.
+## 1. Propósito
 
-## 1. Direction in a phrase
+Reservar celdas de parqueadero y valets en el lote de EAFIT, sobre el mapa del lote. El conductor reserva como quien se inscribe a un evento: una acción clara de "Reservar" y una confirmación que se lee como un tiquete. La portería y el valet trabajan con listas tipo lista de invitados.
 
-Audience, task, tone, constraints, then one phrase. Example: "midnight precision instrument: dense rows, one bright action, status explicit".
+Frase: **mapa sereno, una acción por pantalla, estado siempre escrito.**
 
-## 2. Reference pick (Refero Styles)
+## 2. Fuentes
 
-Search https://styles.refero.design for the product's job and audience. Shortlist five or six, open their screenshots, pick the one a target user would trust. The look comes from this ONE real site: its canvas, surfaces, type, weights, radii, shadows, buttons, cards, navigation and density. Never its logo, name, mascots, illustrations, photos or text.
-
-| Candidate | Style id | Ground | Type | Radius | Accent | Trusted by the target user because | Verdict |
-|---|---|---|---|---|---|---|---|
-| Linear | 90ce5883-bb24-4466-93f7-801cd617b0d1 | Near-black #08090a | Inter 400/510/590 | 6 px controls, 12 px panels | Acid lime #e4f222 | Officers live in dense queues; Linear reads as a serious work tool | Picked |
-| | | | | | | | |
-| | | | | | | | |
-| | | | | | | | |
-| | | | | | | | |
-
-Saved to `references/refero/<site>/` (DESIGN.md, screenshots, frames): [ ]
-
-### Distinct from the other products in this build
-
-When several products ship together, each pair must differ on all four. A tie on any column means pick another reference.
-
-| Product | Reference | Ground | Type | Radius | Accent |
-|---|---|---|---|---|---|
-| Ventana | Linear | near-black | Inter | 6 to 12 px | acid lime |
-| | | | | | |
-
-Stop and re-pick if the result drifts toward either failure: pale grey ground with white rounded cards and a blue accent, or square corners, ruled ledgers, offset shadows and poster type.
-
-## 3. Record
-
-| Item | Entry |
-|---|---|
-| Chosen reference | |
-| Why it fits the user (one line) | |
-| One remaining uncertainty | |
-
-## 4. Compare (once)
-
-| # | Mismatch (property and value) | Fixed how |
+| Fuente | Qué se toma | Dónde |
 |---|---|---|
-| 1 | | |
+| Chargetrip (principal) | El aspecto: fondo crema, superficies claras, tinta casi negra, serif en títulos, botón de tinta, tarjetas de 16 px, panel flotante sobre el mapa | `references/refero/chargetrip/`, tokens en `src/ui/tokens.css` |
+| Chargetrip GO y SeatGeek | Ejemplos de distribución de app: lista a la izquierda, mapa del lote a la derecha; en teléfono, una columna | `references/refero/chargetrip/`, `references/refero/inspiration/office.jpg` |
+| Luma | Flujos de portería: lista de invitados con búsqueda y una pestaña por entrada, aviso de registro, hoja de "no encontrado" con "Intentar de nuevo" | `references/refero/inspiration/README.md`, `staff.jpg` |
+| Referencias de conductor | Espera como pronóstico, mapa de celdas, estado del valet por pasos, ficho como tiquete | `references/refero/inspiration/README.md`, `driver.jpg` |
+| Estado de pedido (Instagram) | Pantalla del valet: pasos hechos con su hora y el siguiente como único botón | `staff.jpg` |
+
+## 3. Tokens
+
+Todos viven en `src/ui/tokens.css` y ninguna vista define colores propios: `--canvas`, `--surface`, `--ink`, `--accent`, los tonos de estado (`--libre`, `--reservada`, `--ocupada`, `--peligro`) con su versión suave, radios (`--radius-control` 8 px, `--radius-card` 16 px, `--radius-pill`), sombras, espaciado de 4 a 28 px y `--control-height` de 44 px.
+
+## 4. Qué no se copia
+
+Ni el logo, ni el nombre, ni los textos, ni las imágenes o ilustraciones de Chargetrip, Luma, SeatGeek o las demás referencias. Solo estructura, flujo y estilo visual.
+
+## 5. Mapa
+
+Solo el lote de EAFIT, dibujado desde los datos del escenario (`src/ui/MapaLote.tsx`). Sin mapa de calles, sin teselas, sin red.

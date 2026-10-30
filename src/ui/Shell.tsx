@@ -4,6 +4,7 @@ import { href } from "../shared/route";
 import { Reloj } from "./Reloj";
 import "./tokens.css";
 import "./shell.css";
+import "./panel.css";
 import "./texto.css";
 
 export type VistaId = "conductor" | "porteria" | "valet" | "oficina";
