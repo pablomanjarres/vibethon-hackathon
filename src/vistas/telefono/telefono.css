@@ -96,9 +96,10 @@ a.tl-flotante {
   position: absolute;
   inset: 0;
   display: grid;
-  align-content: center;
+  align-content: safe center;
   gap: var(--space-3);
-  padding: 24px;
+  padding: 64px 24px 32px;
+  overflow-y: auto;
   background: var(--panel);
 }
 .tl-ingreso-icono {
