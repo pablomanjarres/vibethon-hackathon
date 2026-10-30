@@ -53,8 +53,9 @@
   }
 }
 .vl-asignacion {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   align-items: end;
   gap: var(--space-5);
 }
@@ -80,7 +81,12 @@
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: 0.04em;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+}
+/* Waiting for a cell is a sentence, not a cell code: smaller so the plate keeps its line. */
+.vl-celda.vl-sin-celda strong {
+  font-size: 28px;
+  line-height: 1.1;
 }
 .vl-siguiente {
   margin: 0;
@@ -185,3 +191,10 @@
 .vl-historial li { display: grid; grid-template-columns: auto auto 1fr auto; gap: 2px 8px; align-items: baseline; font-size: 0.85rem; }
 .vl-historial li > :nth-child(4) { grid-column: 2 / 4; }
 .vl-historial li > :last-child { grid-column: 4; grid-row: 1; }
+
+/* Demo tiles look secondary so they never compete with the valet's real next step. */
+.vl-demo-acciones .ui-accion.ui-accion-primaria { background: var(--panel-inner); color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink-muted); }
+.vl-demo-acciones .ui-accion.ui-accion-primaria:hover:not(:disabled) { background: var(--tile-hover); }
+.vl-demo-acciones .ui-accion.ui-accion-primaria:disabled { color: var(--ink-muted); box-shadow: inset 0 0 0 1px var(--hairline); }
+
+.vl-ficho { display: grid; gap: var(--space-3); }
