@@ -88,3 +88,21 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+.ui-recorrido-ayuda {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.85;
+}
+.ui-recorrido-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid #f0b24a;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
