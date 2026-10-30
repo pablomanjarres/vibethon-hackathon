@@ -1,0 +1,31 @@
+.vl-rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+.vl-columna {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.vl-columna > .ui-pastilla {
+  justify-self: start;
+}
+.vl-ficho {
+  font-size: 22px;
+  font-weight: 700;
+  padding: 2px 12px;
+  border-radius: var(--radius-tag);
+  background: var(--ink);
+  color: var(--surface-raised);
+}
+.vl-ficho-linea {
+  display: grid;
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .vl-rejilla {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
