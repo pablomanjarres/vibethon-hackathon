@@ -60,17 +60,7 @@ export function PantallaConductor({ estado, placa, codigo }: { estado: Estado; p
         }
       >
         <div className="tl-detalles">
-          {!v.servicio && (v.estado === "en fila" || v.estado === "en espera") && (
-            <OfertaValet
-              placa={v.placa}
-              oferta={v.oferta}
-              estado={v.estado}
-              tarifa={{ precio: estado.reglas.tarifaValet, moneda: estado.reglas.moneda }}
-              elegido={valet}
-              onElegir={setValet}
-              onEnviar={enviar}
-            />
-          )}
+          <OfertaValet v={v} tarifa={{ precio: estado.reglas.tarifaValet, moneda: estado.reglas.moneda }} elegido={valet} onElegir={setValet} onEnviar={enviar} />
           <DetallesConductor estado={estado} v={v} />
         </div>
       </HojaInferior>

@@ -1,15 +1,11 @@
 import { KeyRound } from "lucide-react";
 import type { Comando } from "../../parqueadero/motor";
 import type { VistaConductor } from "../../parqueadero/lecturas/conductor";
-import type { EstadoCarro } from "../../parqueadero/tipos";
 import { Boton } from "../../ui/Boton";
 
 interface Props {
-  placa: string;
-  /** The engine's offer, or null when the driver cannot hire one right now. */
-  oferta: VistaConductor["oferta"];
-  /** Where the car is: tells why the offer is closed. */
-  estado: EstadoCarro | null;
+  /** The driver's read model: the engine's offer (null when closed), the car's state and any active service. */
+  v: VistaConductor;
   tarifa: { precio: number; moneda: string };
   /** The valet picked on a chip (the first four free are offered); the first free one otherwise. */
   elegido: string | null;
@@ -18,7 +14,10 @@ interface Props {
 }
 
 /** The valet row of a waiting driver: the offer with chips and one button to hire, or why it is closed. */
-export function OfertaValet({ placa, oferta, estado, tarifa, elegido, onElegir, onEnviar }: Props) {
+export function OfertaValet({ v, tarifa, elegido, onElegir, onEnviar }: Props) {
+  const { placa, oferta, estado } = v;
+  // Only while waiting without a service; afterwards the valet status takes its place.
+  if (v.servicio || (estado !== "en fila" && estado !== "en espera")) return null;
   const valet = oferta && (elegido && oferta.disponibles.includes(elegido) ? elegido : oferta.disponibles[0]);
   const titulo = (
     <p className="cd-oferta-titulo">
