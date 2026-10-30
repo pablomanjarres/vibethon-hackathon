@@ -54,4 +54,10 @@ export const routes: PageRoute[] = [
     summary: "Registra una placa, recibe el código y avanza paso a paso hasta que el carro tenga celda.",
     Page: lazy(() => import("./vistas/simulador/Simulador")),
   },
+  {
+    path: "flujo",
+    name: "Flujo completo",
+    summary: "Las cuatro vistas a la vez: registra una placa y mira cómo reaccionan portería, valet y oficina.",
+    Page: lazy(() => import("./vistas/flujo/Flujo")),
+  },
 ];
