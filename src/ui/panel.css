@@ -1,0 +1,75 @@
+/* Map with a floating detail panel, the Chargetrip stations layout. */
+.ui-mapa-panel {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .ui-mapa-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.ui-panel-lateral {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-panel);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.ui-panel-cabeza {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.ui-panel-cabeza h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.ui-panel-cabeza p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+.ui-panel-icono {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-control);
+  display: grid;
+  place-items: center;
+  background: var(--tile);
+}
+.ui-panel-cerrar {
+  margin-left: auto;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--tile);
+}
+.ui-subtarjeta {
+  background: var(--surface-raised);
+  border-radius: 12px;
+  padding: var(--space-4);
+  box-shadow: 0 0 0 6px var(--tile);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.ui-reloj {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  padding: 0 var(--space-3);
+  min-height: var(--control-height);
+  border-radius: var(--radius-control);
+  background: var(--tile);
+}
