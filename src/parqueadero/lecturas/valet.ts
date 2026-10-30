@@ -21,6 +21,12 @@ export interface VistaValet {
   siguientePaso: string;
 }
 
+/** Whether this valet id and code match: the valet phone opens only then. */
+export function valetAutorizado(estado: Estado, valetId: string, codigo: string): boolean {
+  const valet = estado.valets.find((v) => v.id === valetId);
+  return Boolean(valet && valet.codigo === codigo.trim());
+}
+
 /** One valet's phone: the current service and the next step. */
 export function vistaValet(estado: Estado, valetId: string): VistaValet {
   const valet = estado.valets.find((v) => v.id === valetId);

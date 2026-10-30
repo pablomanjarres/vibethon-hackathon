@@ -1,5 +1,5 @@
 import { esperaDe } from "../consultas.ts";
-import { siguienteEntrada } from "../equidad.ts";
+import { siguienteEntrada } from "../asignador.ts";
 import { estimarEspera } from "../espera.ts";
 import type { Estado } from "../tipos.ts";
 import { hora } from "./formato.ts";
@@ -24,6 +24,10 @@ export interface VistaPorteria {
   puedeAsignar: boolean;
   celdasLibres: string[];
   valetsDisponibles: number;
+  /** The car at the gate leaves without parking: "Dejar salir" applies. */
+  puedeDejarSalir: boolean;
+  /** Cars of this entrance with a reserved cell that the gate has not confirmed yet. */
+  porConfirmar: { placa: string; celda: string }[];
 }
 
 /** One gate: its passage, whose turn it is and why, and the free cells. */
@@ -37,6 +41,7 @@ export function vistaPorteria(estado: Estado, entradaId: string): VistaPorteria 
   if (entrada.fila.length === 0) turno = "No hay carros en el pasaje.";
   else if (!esMiTurno) turno = `Turno de ${deTurno?.nombre}: su primer carro llegó antes.`;
   else if (celdasLibres.length === 0) turno = "Es tu turno, pero no hay celdas libres.";
+  else if (estado.carros[entrada.fila[0]].sinParquear) turno = `${entrada.fila[0]} sale sin parquear: déjalo salir.`;
   else turno = `Tu turno: ${entrada.fila[0]} puede pasar a la celda ${celdasLibres[0]}.`;
   return {
     entrada: entrada.id,
@@ -51,8 +56,12 @@ export function vistaPorteria(estado: Estado, entradaId: string): VistaPorteria 
     })),
     esMiTurno,
     turno,
-    puedeAsignar: esMiTurno && celdasLibres.length > 0,
+    puedeAsignar: esMiTurno && celdasLibres.length > 0 && !estado.carros[entrada.fila[0]]?.sinParquear,
     celdasLibres,
+    puedeDejarSalir: Boolean(entrada.fila[0] && estado.carros[entrada.fila[0]].sinParquear),
+    porConfirmar: Object.values(estado.carros)
+      .filter((c) => c.entrada === entrada.id && c.estado === "con celda" && !c.confirmado && c.celda)
+      .map((c) => ({ placa: c.placa, celda: c.celda as string })),
     valetsDisponibles: estado.valets.filter((v) => v.entrada === entrada.id && v.estado === "disponible").length,
   };
 }

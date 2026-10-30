@@ -148,8 +148,12 @@ export function estadoInicial(esc: Escenario): Estado {
     carro.codigo = codigoAcceso(i + 1);
   });
   const valets: Valet[] = esc.entradas.flatMap((e) =>
-    Array.from({ length: e.valets }, (_, i): Valet => ({ id: `${e.codigo}-V${i + 1}`, entrada: e.id, estado: "disponible", servicio: null })),
+    Array.from({ length: e.valets }, (_, i): Valet => ({ id: `${e.codigo}-V${i + 1}`, codigo: "", entrada: e.id, estado: "disponible", servicio: null })),
   );
+  // Valets take codes from 5001 on, far from the car codes (1, 2, 3… one per car), so none repeats.
+  valets.forEach((valet, i) => {
+    valet.codigo = codigoAcceso(5001 + i);
+  });
   return {
     escenario: esc.id,
     inicio: esc.inicio,
