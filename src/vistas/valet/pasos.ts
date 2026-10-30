@@ -29,15 +29,17 @@ const ETAPAS: Etapa[] = [
   {
     tipo: "estacionar",
     texto: "Carro estacionado",
-    accion: (s, estado) =>
-      s.celda
-        ? {
-            texto: `Ya lo estacioné en ${s.celda}`,
-            Icono: ParkingSquare,
-            comando: { tipo: "estacionar", placa: s.placa },
-            motivo: estado.carros[s.placa]?.confirmado ? null : "Espera la confirmación de la portería",
-          }
-        : null,
+    // Always shown at this step: disabled with the reason until the car has its cell and the gate confirmed it.
+    accion: (s, estado) => ({
+      texto: s.celda ? `Ya lo estacioné en ${s.celda}` : "Confirmar estacionado",
+      Icono: ParkingSquare,
+      comando: { tipo: "estacionar", placa: s.placa },
+      motivo: !s.celda
+        ? "Esperando una celda libre: se asigna sola apenas se libere una"
+        : estado.carros[s.placa]?.confirmado
+          ? null
+          : "Espera la confirmación de la portería",
+    }),
   },
   {
     tipo: "dejarLlaves",
