@@ -8,7 +8,7 @@ import { href } from "../shared/route";
 import type { VistaId } from "./Shell";
 import { useComando, useEstado } from "./useTienda";
 import { tienda } from "../parqueadero/tienda";
-import { inicioRecorrido } from "./Recorrido";
+import { escenarioLoteLleno, inicioRecorrido } from "./Recorrido";
 import "./acceso.css";
 
 const ORDEN: EstadoCarro[] = ["en espera", "en fila", "con celda", "estacionado", "en devolución"];
@@ -168,7 +168,7 @@ export function AccesoRapido({ vista }: { vista?: VistaId }) {
   }, [abierto]);
   if (!vista) return null;
   const grupos = [
-    { titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "empieza desde la semilla: conductor → valet → portería → oficina", ir: inicioRecorrido(estado), antes: () => tienda.reiniciar() }] },
+    { titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "empieza desde la semilla: conductor → valet → portería → oficina", ir: inicioRecorrido(estado), antes: () => tienda.reiniciar() }, { clave: "lleno", titulo: "Lote lleno y tiempo estimado", nota: "llena el lote, salen 3 carros y abre a SVK088 con su espera", ir: "#/conductor", antes: () => { window.location.hash = escenarioLoteLleno().replace(/^#/, ""); } }] },
     ...filasDe(vista, estado),
   ];
   const fila = (f: Fila): ReactNode => {
