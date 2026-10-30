@@ -10,13 +10,19 @@ interface Props {
   llegoEn: number;
 }
 
+/** When the gate turn may come: a clock range, "ya" with a free cell, or no time without data. */
+function turno(espera: Espera, inicio: string, minuto: number): string {
+  if (!espera.suficientesDatos || !espera.rango) return "Sin estimación aún";
+  if (espera.rango.max === 0) return "Tu turno es ya";
+  return `Entre las ${hora(inicio, minuto + espera.rango.min)} y las ${hora(inicio, minuto + espera.rango.max)}`;
+}
+
 /** The wait as a forecast: the steps from registration to the cell, with their times. */
 export function Pronostico({ espera, entrada, inicio, minuto, llegoEn }: Props) {
-  const turno = hora(inicio, minuto + espera.minutos);
   const pasos = [
     { texto: "Registro", detalle: `A las ${hora(inicio, llegoEn)}`, hecho: true },
     { texto: "Pasaje", detalle: entrada ? `En ${entrada}, ahora` : "Ahora", hecho: true },
-    { texto: "Portería", detalle: espera.minutos === 0 ? "Tu turno es ya" : `Hacia las ${turno}`, hecho: false },
+    { texto: "Portería", detalle: turno(espera, inicio, minuto), hecho: false },
     { texto: "Celda", detalle: "Justo después de la portería", hecho: false },
   ];
   return (
