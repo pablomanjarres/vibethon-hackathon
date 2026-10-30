@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Banknote, Car, KeyRound, ListOrdered, MapPin, ParkingSquare, Ticket, Timer } from "lucide-react";
 import { vistaConductor } from "../../parqueadero/lecturas/conductor";
 import { carros } from "../../parqueadero/lecturas/formato";
+import type { Estado } from "../../parqueadero/tipos";
 import { href } from "../../shared/route";
 import { Acordeon } from "../../ui/Acordeon";
 import { AvisoResultado } from "../../ui/AvisoResultado";
@@ -11,16 +12,24 @@ import { FilaAcciones, type AccionPanel } from "../../ui/FilaAcciones";
 import { PanelCabecera } from "../../ui/PanelCabecera";
 import { Shell } from "../../ui/Shell";
 import { TarjetaDatos } from "../../ui/TarjetaDatos";
-import { useComando, useEstado } from "../../ui/useTienda";
+import { useComando, useEstado, type Aviso } from "../../ui/useTienda";
 import { motivoValet, pasos, type Seccion } from "./acciones";
 import { ElegirPlaca } from "./ElegirPlaca";
+import { RegistroLlegada } from "./RegistroLlegada";
 import { Ficho } from "./Ficho";
 import { ProgresoValet } from "./ProgresoValet";
 import { Pronostico } from "./Pronostico";
 import "./conductor.css";
 
 /** The driver panel for one plate, or the plate picker when there is none. */
-export function PaginaConductor({ placa }: { placa: string | null }) {
+interface Props {
+  placa: string | null;
+  /** The check-in confirmation carried over from the registration form. */
+  avisoInicial: Aviso | null;
+  onRegistrada: (placa: string, texto: string) => void;
+}
+
+export function PaginaConductor({ placa, avisoInicial, onRegistrada }: Props) {
   const estado = useEstado();
   const { aviso, enviar } = useComando();
   const [elegida, setElegida] = useState<string | null>(null);
@@ -32,11 +41,21 @@ export function PaginaConductor({ placa }: { placa: string | null }) {
   if (!v) {
     return (
       <Shell vista="conductor" seleccion={elegida} onSeleccionar={setElegida}>
-        <PanelCabecera Icono={Car} titulo="Conductor" subtitulo="Reserva tu celda o tu valet en EAFIT" cerrar={{ href: href(""), etiqueta: "Volver al inicio" }} />
-        <ElegirPlaca estado={estado} actual={null} />
+        <PanelCabecera
+          Icono={Car}
+          titulo="Registra tu placa para guardar tu puesto"
+          subtitulo="Llegaste a EAFIT: elige tu entrada y entras a la fila."
+          cerrar={{ href: href(""), etiqueta: "Volver al inicio" }}
+        />
+        <RegistroLlegada estado={estado} onRegistrada={onRegistrada} />
         <TarjetaDatos Icono={ParkingSquare} titulo="Lote EAFIT ahora" contador={contador}>
-          <p className="ui-texto-suave">Escribe tu placa para ver tu turno, reservar una celda o pedir un valet.</p>
+          <p className="ui-texto-suave">La celda la asigna el orden de llegada entre ambas entradas: quien llegó primero, entra primero.</p>
         </TarjetaDatos>
+        <div>
+          <Acordeon Icono={ListOrdered} titulo="Ya estoy en la fila">
+            <ElegirPlaca estado={estado} actual={null} />
+          </Acordeon>
+        </div>
       </Shell>
     );
   }
@@ -47,6 +66,7 @@ export function PaginaConductor({ placa }: { placa: string | null }) {
   const libresSet = new Set(v.celdasLibres);
   const reservable = v.puedeReservar && elegida && libresSet.has(elegida) ? elegida : null;
   const minutosEstacionado = carro?.estacionadoEn != null ? estado.minuto - carro.estacionadoEn : null;
+  const lugar = lugarEnFila(estado, v.placa);
 
   const acciones: AccionPanel[] = [
     {
@@ -58,7 +78,9 @@ export function PaginaConductor({ placa }: { placa: string | null }) {
           ? `ya tienes la celda ${v.celda}.`
           : v.estado === "en fila"
             ? "aún no es tu turno de reservar."
-            : "solo se reserva desde la fila."
+            : v.estado === "en espera"
+              ? "primero entras al pasaje, apenas haya cupo."
+              : "solo se reserva desde la fila."
         : reservable
           ? null
           : "toca una celda libre (verde) en el mapa.",
@@ -101,7 +123,7 @@ export function PaginaConductor({ placa }: { placa: string | null }) {
         cerrar={{ href: href("conductor"), etiqueta: "Cambiar de placa" }}
       />
       <FilaAcciones acciones={acciones} />
-      <AvisoResultado aviso={aviso} />
+      <AvisoResultado aviso={aviso ?? avisoInicial} />
       {!v.encontrado && <ElegirPlaca estado={estado} actual={v.placa} />}
       <TarjetaDatos Icono={Timer} titulo={v.espera ? "Tu espera" : "Tu carro"} contador={contador}>
         {v.espera && (
@@ -119,6 +141,7 @@ export function PaginaConductor({ placa }: { placa: string | null }) {
         {v.encontrado && (
           <Datos
             filas={[
+              ...(lugar ? [{ etiqueta: "Tu lugar", valor: lugar }] : []),
               { etiqueta: "Celda", valor: v.celda ?? "Por asignar" },
               ...(minutosEstacionado !== null ? [{ etiqueta: "Estacionado hace", valor: `${minutosEstacionado} min` }] : []),
             ]}
@@ -156,4 +179,15 @@ export function PaginaConductor({ placa }: { placa: string | null }) {
       )}
     </Shell>
   );
+}
+
+/** Where the plate stands: its place in an entrance's passage or in the waiting line outside. */
+function lugarEnFila(estado: Estado, placa: string): string | null {
+  for (const entrada of estado.entradas) {
+    const enPasaje = entrada.fila.indexOf(placa);
+    if (enPasaje >= 0) return `${enPasaje + 1}.º en el pasaje de ${entrada.nombre}`;
+    const enEspera = (entrada.espera ?? []).indexOf(placa);
+    if (enEspera >= 0) return `${enEspera + 1}.º en la fila de espera de ${entrada.nombre}`;
+  }
+  return null;
 }
