@@ -142,9 +142,14 @@
   padding: var(--space-6);
 }
 
-/* The gate works with lists and details: a wider panel, and the map moves right to make room. */
+/* On desktop every panel gets room for lists and details; the map moves right to make room.
+   Gate and office work with the most data, so they get the widest panel. */
 @media (min-width: 900px) {
-  .ui-app[data-vista="porteria"] {
-    --panel-width: min(520px, 42vw);
+  .ui-app {
+    --panel-width: min(460px, 38vw);
+  }
+  .ui-app[data-vista="porteria"],
+  .ui-app[data-vista="oficina"] {
+    --panel-width: min(540px, 44vw);
   }
 }
