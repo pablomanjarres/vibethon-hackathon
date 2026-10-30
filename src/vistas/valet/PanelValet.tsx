@@ -10,6 +10,7 @@ import { PanelCabecera } from "../../ui/PanelCabecera";
 import { Shell } from "../../ui/Shell";
 import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useComando, useEstado } from "../../ui/useTienda";
+import { DemoAcciones } from "./DemoAcciones";
 import { DemoValets } from "./DemoValets";
 import { Equipo } from "./Equipo";
 import { Historial } from "./Historial";
@@ -22,7 +23,7 @@ import { useNuevaAsignacion } from "./useNuevaAsignacion";
 /** One valet's phone: only their assignment, its cell on the map, and the one next step. */
 export function PanelValet({ valetId }: { valetId: string }) {
   const estado = useEstado();
-  const { aviso, enviar } = useComando();
+  const { aviso, enviar, informar } = useComando();
   const v = vistaValet(estado, valetId);
   const s = v.servicio;
   const [nueva, descartar] = useNuevaAsignacion(s);
@@ -61,6 +62,14 @@ export function PanelValet({ valetId }: { valetId: string }) {
           }))}
         />
       )}
+      <DemoAcciones
+        valetId={v.id}
+        placa={s?.placa ?? null}
+        onResultado={(resultado) => {
+          descartar();
+          informar(resultado);
+        }}
+      />
       <AvisoResultado aviso={aviso} />
       {etapa && (
         <div>
