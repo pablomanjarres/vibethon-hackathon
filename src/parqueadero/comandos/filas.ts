@@ -1,4 +1,4 @@
-import { carroPorPlaca, celdaDe, entradaPorId, esperaDe, normalizarPlaca, servicioDe, valetPorId } from "../consultas.ts";
+import { carroPorPlaca, celdaDe, codigoAcceso, entradaPorId, esperaDe, normalizarPlaca, servicioDe, valetPorId } from "../consultas.ts";
 import { ordenDeAtencion, siguienteEntrada } from "../equidad.ts";
 import { cambiarCelda, cambiarValet, exigir } from "../transiciones.ts";
 import type { Carro, Celda, Entrada, Estado } from "../tipos.ts";
@@ -14,8 +14,10 @@ export function registrarLlegada(estado: Estado, placaLeida: string, entradaId: 
   const previo = estado.carros[placa];
   exigir(!previo || previo.estado === "retirado", `La placa ${placa} ya está en el parqueadero.`);
   const lleno = entrada.fila.length >= entrada.capacidadPasaje;
+  estado.consecutivos.codigo = (estado.consecutivos.codigo ?? 0) + 1;
   estado.carros[placa] = {
     placa,
+    codigo: codigoAcceso(estado.consecutivos.codigo),
     entrada: entrada.id,
     estado: lleno ? "en espera" : "en fila",
     llegoEn: estado.minuto,

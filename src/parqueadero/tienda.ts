@@ -66,7 +66,8 @@ function borrar(clave: string): void {
  * Nothing leaves the browser: no database, no network.
  */
 export function crearTienda(escenario: Escenario = ESCENARIO_INICIAL): Tienda {
-  const clave = `parqueadero:${escenario.id}`;
+  // v2: cars carry an access code; states saved before that start over from the seed.
+  const clave = `parqueadero:${escenario.id}:v2`;
   let estado = cargar(clave, escenario) ?? estadoInicial(escenario);
   const oyentes = new Set<() => void>();
   const avisar = () => {

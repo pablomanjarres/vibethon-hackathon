@@ -46,17 +46,21 @@ function mensaje(carro: Carro, servicio: Servicio | null, espera: Espera | null)
   }
 }
 
-/** The driver's phone: place in line, wait, cell, valet and ficho for one plate. */
-export function vistaConductor(estado: Estado, placaEscrita: string): VistaConductor {
+/**
+ * The driver's phone: place in line, wait, cell, valet and ficho for one plate. With `codigo`, the
+ * details appear only when it matches the car's access code; a wrong plate or code gives the same answer.
+ */
+export function vistaConductor(estado: Estado, placaEscrita: string, codigo?: string): VistaConductor {
   const placa = normalizarPlaca(placaEscrita);
-  const carro = estado.carros[placa];
+  const encontrado = estado.carros[placa];
+  const carro = codigo === undefined || encontrado?.codigo === codigo.trim() ? encontrado : undefined;
   if (!carro) {
     return {
       placa,
       encontrado: false,
       entrada: null,
       estado: null,
-      mensaje: `No encontramos la placa ${placa}. Revisa que haya pasado por el registro.`,
+      mensaje: codigo === undefined ? `No encontramos la placa ${placa}. Revisa que haya pasado por el registro.` : "Placa o código incorrectos.",
       espera: null,
       celda: null,
       ficho: null,
@@ -88,4 +92,14 @@ export function vistaConductor(estado: Estado, placaEscrita: string): VistaCondu
     celdasLibres,
     pagado: carro.pagado,
   };
+}
+
+/**
+ * The access code to show the driver right after registering from the app: only for a car that is
+ * still waiting and was registered at the current minute; null otherwise.
+ */
+export function codigoDeRegistro(estado: Estado, placaEscrita: string): string | null {
+  const carro = estado.carros[normalizarPlaca(placaEscrita)];
+  if (!carro || (carro.estado !== "en fila" && carro.estado !== "en espera") || carro.llegoEn !== estado.minuto) return null;
+  return carro.codigo;
 }

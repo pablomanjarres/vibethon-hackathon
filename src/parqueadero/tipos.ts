@@ -39,6 +39,8 @@ export interface Entrada {
 
 export interface Carro {
   placa: string;
+  /** Private access code: with the plate, it is the only way to see this car's details in the driver app. */
+  codigo: string;
   /** null for cars that were already in the lot when the scenario starts. */
   entrada: string | null;
   estado: EstadoCarro;
@@ -103,5 +105,5 @@ export interface Estado {
   servicios: Record<string, Servicio>;
   pagos: Pago[];
   bitacora: Evento[];
-  consecutivos: { servicio: number; pago: number };
+  consecutivos: { servicio: number; pago: number; codigo: number };
 }

@@ -1,3 +1,4 @@
+import { codigoAcceso } from "./consultas.ts";
 import type { Carro, Celda, Entrada, Estado, EstadoCelda, Mapa, Reglas, Valet } from "./tipos.ts";
 
 /**
@@ -109,6 +110,7 @@ export function validarEscenario(datos: unknown): Escenario {
 function carroNuevo(placa: string, datos: Partial<Carro>): Carro {
   return {
     placa,
+    codigo: "",
     entrada: null,
     estado: "en fila",
     llegoEn: 0,
@@ -142,6 +144,9 @@ export function estadoInicial(esc: Escenario): Estado {
     for (const c of e.fila) carros[c.placa] = carroNuevo(c.placa, { entrada: e.id, llegoEn: c.llegoEn });
     return { id: e.id, codigo: e.codigo, nombre: e.nombre, capacidadPasaje: e.capacidadPasaje, fila: e.fila.map((c) => c.placa), espera: [], celdasAsignadas: 0 };
   });
+  Object.values(carros).forEach((carro, i) => {
+    carro.codigo = codigoAcceso(i + 1);
+  });
   const valets: Valet[] = esc.entradas.flatMap((e) =>
     Array.from({ length: e.valets }, (_, i): Valet => ({ id: `${e.codigo}-V${i + 1}`, entrada: e.id, estado: "disponible", servicio: null })),
   );
@@ -158,6 +163,6 @@ export function estadoInicial(esc: Escenario): Estado {
     servicios: {},
     pagos: [],
     bitacora: [],
-    consecutivos: { servicio: 0, pago: 0 },
+    consecutivos: { servicio: 0, pago: 0, codigo: Object.keys(carros).length },
   };
 }
