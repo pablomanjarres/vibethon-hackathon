@@ -82,3 +82,56 @@
   --tono: var(--ink);
   --tono-suave: var(--tile);
 }
+
+/* Plate field */
+.ui-campo {
+  display: grid;
+  gap: var(--space-2);
+}
+.ui-campo label {
+  font-weight: 500;
+}
+.ui-campo-fila {
+  display: flex;
+  gap: var(--space-2);
+}
+.ui-campo input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--ink-muted);
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* Segmented choice between entrances or valets: outline pills, the active one filled. */
+.ui-opciones {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ui-opciones a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+}
+.ui-opciones a:hover {
+  background: var(--tile);
+}
+.ui-opciones a[aria-current="true"] {
+  background: var(--ink);
+  color: var(--surface-raised);
+}
