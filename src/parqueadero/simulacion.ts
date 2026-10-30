@@ -41,6 +41,8 @@ export function simularHasta(estado: Estado, escenario: Escenario, hasta: number
 export interface PasoSimulado {
   quien: string;
   comandos: Comando[];
+  /** Simulated minutes the action takes (the clock advances by this first). */
+  minutos?: number;
 }
 
 const ACTIVOS = ["pago pendiente", "pagado", "ficho emitido", "en curso", "estacionado", "llaves en oficina"];
@@ -50,6 +52,14 @@ const ACTIVOS = ["pago pendiente", "pagado", "ficho emitido", "en curso", "estac
  * along (the presenter's "next step" button). Null when the car has nothing left to wait for.
  */
 export function pasoSimulado(estado: Estado, placa: string): PasoSimulado | null {
+  const paso = siguienteAccion(estado, placa);
+  if (!paso) return null;
+  // Each simulated action takes time, so the clock moves and the wait estimate gets real data.
+  const minutos = paso.quien.startsWith("Otro conductor") ? 3 : paso.comandos[0]?.tipo === "asignarCelda" ? 2 : 1;
+  return { ...paso, minutos, comandos: [{ tipo: "avanzarReloj", minutos }, ...paso.comandos] };
+}
+
+function siguienteAccion(estado: Estado, placa: string): PasoSimulado | null {
   const carro = estado.carros[placa];
   if (!carro || carro.estado === "retirado") return null;
   const servicio = carro.servicio && ACTIVOS.includes(estado.servicios[carro.servicio]?.estado) ? estado.servicios[carro.servicio] : null;
@@ -74,7 +84,7 @@ export function pasoSimulado(estado: Estado, placa: string): PasoSimulado | null
   // Lot full: cars ahead that already have a cell finish parking first.
   const enCamino = Object.values(estado.carros).find((c) => c.estado === "con celda" && c.placa !== placa);
   if (enCamino) {
-    const otro = pasoSimulado(estado, enCamino.placa);
+    const otro = siguienteAccion(estado, enCamino.placa);
     if (otro) return { quien: `${otro.quien} (${enCamino.placa})`, comandos: otro.comandos };
   }
   // Lot full: a parked car without a valet in progress pays and leaves, freeing its cell.

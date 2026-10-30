@@ -15,6 +15,7 @@ import { DetallesConductor } from "./DetallesConductor";
 import { EstadoPaso } from "./EstadoPaso";
 import { IngresoConductor } from "./IngresoConductor";
 import { ModoDemo } from "./ModoDemo";
+import { SiguientePasoDemo } from "./SiguientePasoDemo";
 import { OfertaValet } from "./OfertaValet";
 import { PasoValet } from "./PasoValet";
 import { RegistroLlegada } from "./RegistroLlegada";
@@ -34,7 +35,7 @@ interface Props {
 
 export function PaginaConductor({ placa, codigo, registro, onRegistrada, demo }: Props) {
   const estado = useEstado();
-  const { aviso, enviar } = useComando();
+  const { aviso, enviar, informar } = useComando();
   const [elegida, setElegida] = useState<string | null>(null);
   const [valet, setValet] = useState<string | null>(null);
   const v = placa ? vistaConductor(estado, placa, codigo) : null;
@@ -94,6 +95,7 @@ export function PaginaConductor({ placa, codigo, registro, onRegistrada, demo }:
           </Acordeon>
         </div>
       )}
+      {demo && v.encontrado && <SiguientePasoDemo estado={estado} placa={v.placa} onResultado={informar} />}
       {demo && <ModoDemo estado={estado} placa={v.placa} />}
     </Shell>
   );
