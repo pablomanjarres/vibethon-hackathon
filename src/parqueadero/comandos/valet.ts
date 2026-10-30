@@ -29,7 +29,7 @@ function valetDe(estado: Estado, servicio: Servicio) {
  */
 export function contratarValet(estado: Estado, placa: string, valetId: string): string {
   const carro = carroPorPlaca(estado, placa);
-  exigir(carro.estado === "en fila", "Solo puedes contratar un valet cuando ya estás dentro del pasaje.");
+  exigir(carro.estado === "en fila" || carro.estado === "con celda", "Solo puedes contratar un valet cuando ya estás dentro del pasaje.");
   const activo = carro.servicio ? estado.servicios[carro.servicio] : null;
   exigir(!activo || activo.estado === "rechazado" || activo.estado === "vencido", `${carro.placa} ya tiene un servicio de valet.`);
   const valet = estado.valets.find((v) => v.id === valetId);
@@ -99,7 +99,7 @@ export function entregarLlaves(estado: Estado, placa: string): string {
   const carro = carroPorPlaca(estado, placa);
   const servicio = servicioDe(estado, carro);
   exigirPaso(servicio, "pagado", "entregar las llaves");
-  exigir(carro.estado === "en fila", `${carro.placa} ya salió del pasaje.`);
+  exigir(carro.estado === "en fila" || carro.estado === "con celda", `${carro.placa} ya no está esperando entrar.`);
   cambiarValet(valetDe(estado, servicio), "en servicio");
   servicio.estado = "ficho emitido";
   carro.llave = "valet";
