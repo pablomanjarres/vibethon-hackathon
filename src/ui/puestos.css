@@ -1,0 +1,51 @@
+/* Stalls: one per cell, tone + icon or availability dot + id. */
+.ui-puesto {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 0 8px;
+  border: 1px solid var(--map-line);
+  border-radius: 6px;
+  background: var(--tile);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+}
+button.ui-puesto:hover {
+  border-color: var(--ink);
+}
+.ui-puesto-punto {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--libre);
+}
+.ui-puesto-libre {
+  background: var(--libre-soft);
+  border-color: var(--libre-pin);
+}
+.ui-puesto-reservada {
+  background: var(--reservada-soft);
+  border-color: var(--reservada-pin);
+  color: var(--reservada);
+}
+.ui-puesto-ocupada {
+  background: var(--ocupada-soft);
+  color: var(--ocupada);
+}
+.ui-puesto-elegido {
+  background: var(--surface-light);
+  border-color: var(--surface-light);
+  color: var(--ink-inverse);
+  box-shadow: 0 0 0 3px rgb(244 242 238 / 0.3);
+}
+.ui-puesto-elegido .ui-puesto-punto {
+  background: #1f7a50;
+}
+.ui-puesto:focus-visible {
+  z-index: 3;
+}
