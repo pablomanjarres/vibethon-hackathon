@@ -95,46 +95,9 @@
   font-weight: 600;
 }
 
-.tl-pestanas {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  display: flex;
-  background: var(--panel);
-  border-bottom: 1px solid var(--hairline);
-}
-.tl-pestanas button {
-  flex: 1;
-  min-height: 46px;
-  border: 0;
-  border-bottom: 3px solid transparent;
-  background: none;
-  color: var(--ink-muted);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-.tl-pestanas button[aria-selected="true"] {
-  color: var(--ink);
-  border-bottom-color: var(--libre);
-}
-.tl-carril {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-.tl-carril::-webkit-scrollbar {
-  display: none;
-}
-.tl-panel {
-  flex: 0 0 100%;
-  scroll-snap-align: start;
-  display: grid;
-  align-content: start;
-  gap: var(--space-3);
-  padding: var(--space-4) 20px;
-  min-width: 0;
+.tl-detalles {
+  padding: var(--space-2) 20px var(--space-4);
+  border-top: 1px solid var(--hairline);
 }
 
 .tl-hoja-pie {
