@@ -97,6 +97,7 @@
   color: var(--ink);
   font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
   box-shadow: var(--shadow-control);
 }
 
@@ -129,6 +130,21 @@
   .ui-pila {
     flex-direction: row;
     align-items: center;
+  }
+  /* Five views, quick access and the clock share one row on a 360 px phone. */
+  .ui-pila,
+  .ui-pila ul {
+    gap: 6px;
+  }
+  .ui-pila a {
+    width: 40px;
+    height: 40px;
+  }
+  .ui-reloj {
+    padding: 0 10px;
+  }
+  .ui-reloj svg {
+    display: none;
   }
   .ui-pila-etiqueta {
     right: auto;
