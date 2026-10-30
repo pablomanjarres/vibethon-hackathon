@@ -22,6 +22,8 @@ interface Fila {
   ir?: string;
   /** Runs before following the link, e.g. resetting the lot for the walkthrough. */
   antes?: () => void;
+  /** After the commands succeed, go here (read from the updated state). */
+  luego?: (estado: Estado) => string;
   /** Commands sent in order; stops at the first rejection. */
   comandos?: Comando[];
 }
@@ -29,13 +31,28 @@ interface Fila {
 /** The quick actions of each view: sign in fast on the driver and valet phones; act fast at the gate and the office. */
 function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[] }[] {
   if (vista === "conductor") {
-    // Only the plates worth testing: first at each gate, cars already with a cell or a valet, and new registrations.
-    const primeros = new Set(estado.entradas.map((e) => e.fila[0]).filter(Boolean));
+    // Every car that came in through a gate (the cars already in the lot at the start are left out).
     const carros = Object.values(estado.carros)
-      .filter((c) => c.estado !== "retirado")
-      .filter((c) => c.entrada && (primeros.has(c.placa) || c.servicio || c.estado === "con celda" || c.estado === "estacionado" || c.llegoEn >= 0))
+      .filter((c) => c.estado !== "retirado" && c.entrada)
       .sort((a, b) => ORDEN.indexOf(a.estado) - ORDEN.indexOf(b.estado));
-    return [{ titulo: "Entrar como conductor", filas: carros.map((c) => ({ clave: c.placa, titulo: c.placa, dato: c.codigo, nota: c.estado, ir: href("conductor", { placa: c.placa, codigo: c.codigo, demo: "1" }) })) }];
+    const usadas = new Set(Object.keys(estado.carros));
+    let n = 1;
+    const nuevas: Fila[] = estado.entradas.map((e) => {
+      while (usadas.has(`PRU${String(n).padStart(3, "0")}`)) n += 1;
+      const placa = `PRU${String(n).padStart(3, "0")}`;
+      usadas.add(placa);
+      return {
+        clave: `nueva-${e.id}`,
+        titulo: `Nueva placa de prueba: ${placa}`,
+        nota: `se registra en ${e.nombre} y entras con ella`,
+        comandos: [{ tipo: "registrarLlegada", placa, entrada: e.id }],
+        luego: (actual: Estado) => href("conductor", { placa, codigo: actual.carros[placa]?.codigo ?? "", demo: "1" }),
+      };
+    });
+    return [
+      { titulo: "Registrar un carro nuevo", filas: nuevas },
+      { titulo: "Entrar como conductor", filas: carros.map((c) => ({ clave: c.placa, titulo: c.placa, dato: c.codigo, nota: c.estado, ir: href("conductor", { placa: c.placa, codigo: c.codigo, demo: "1" }) })) },
+    ];
   }
   if (vista === "valet") {
     // Demo: give a free valet the first car of their entrance that has no valet, already paid.
@@ -156,7 +173,15 @@ export function AccesoRapido({ vista }: { vista?: VistaId }) {
         {contenido}
       </a>
     ) : (
-      <button type="button" onClick={() => f.comandos?.every((c) => enviar(c))}>
+      <button
+        type="button"
+        onClick={() => {
+          if (f.comandos?.every((c) => enviar(c)) && f.luego) {
+            window.location.hash = f.luego(tienda.leer()).replace(/^#/, "");
+            setAbierto(false);
+          }
+        }}
+      >
         {contenido}
       </button>
     );
