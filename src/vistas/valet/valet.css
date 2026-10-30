@@ -76,7 +76,8 @@
   line-height: 1;
   color: var(--reservada);
 }
-.vl-placa strong {
+.vl-placa strong,
+.vl-ficho-codigo strong {
   font-size: 28px;
   font-weight: 600;
   line-height: 1.1;
@@ -199,4 +200,4 @@
 
 .vl-ficho { display: grid; gap: var(--space-3); }
 .vl-ficho-codigo { margin: 0; display: grid; gap: 2px; }
-.vl-ficho-codigo strong { font-size: 28px; font-weight: 700; letter-spacing: 0.04em; }
+
