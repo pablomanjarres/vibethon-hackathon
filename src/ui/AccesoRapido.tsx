@@ -26,8 +26,11 @@ interface Fila {
 /** The quick actions of each view: sign in fast on the driver and valet phones; act fast at the gate and the office. */
 function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[] }[] {
   if (vista === "conductor") {
+    // Only the plates worth testing: first at each gate, cars already with a cell or a valet, and new registrations.
+    const primeros = new Set(estado.entradas.map((e) => e.fila[0]).filter(Boolean));
     const carros = Object.values(estado.carros)
       .filter((c) => c.estado !== "retirado")
+      .filter((c) => c.entrada && (primeros.has(c.placa) || c.servicio || c.estado === "con celda" || c.estado === "estacionado" || c.llegoEn >= 0))
       .sort((a, b) => ORDEN.indexOf(a.estado) - ORDEN.indexOf(b.estado));
     return [{ titulo: "Entrar como conductor", filas: carros.map((c) => ({ clave: c.placa, titulo: c.placa, dato: c.codigo, nota: c.estado, ir: href("conductor", { placa: c.placa, codigo: c.codigo, demo: "1" }) })) }];
   }
@@ -56,8 +59,10 @@ function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[
     });
     return [{ titulo: "Asignar un carro a un valet", filas: asignar }, ...estado.entradas.map((e) => ({
       titulo: `Entrar como valet · ${e.nombre}`,
+      // Valets at work, plus the first free one of the entrance.
       filas: estado.valets
         .filter((v) => v.entrada === e.id)
+        .filter((v, _, todos) => v.estado !== "disponible" || v === todos.find((x) => x.estado === "disponible"))
         .map((v) => ({ clave: v.id, titulo: v.id, dato: v.codigo, nota: v.estado, ir: href("valet", { valet: v.id, codigo: v.codigo, demo: "1" }) })),
     }))];
   }
