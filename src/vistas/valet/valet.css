@@ -175,3 +175,13 @@
 .vl-demo-valet[aria-current="true"] {
   border-color: currentColor;
 }
+
+.vl-equipo + .vl-equipo { margin-top: 10px; }
+.vl-equipo-entrada { margin: 0 0 4px; font-size: 0.85rem; }
+.vl-equipo ul, .vl-historial { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.vl-equipo li { display: flex; align-items: center; gap: 8px; }
+.vl-equipo li[aria-current="true"] strong { text-decoration: underline; }
+.vl-tu { font-size: 0.8rem; }
+.vl-historial li { display: grid; grid-template-columns: auto auto 1fr auto; gap: 2px 8px; align-items: baseline; font-size: 0.85rem; }
+.vl-historial li > :nth-child(4) { grid-column: 2 / 4; }
+.vl-historial li > :last-child { grid-column: 4; grid-row: 1; }
