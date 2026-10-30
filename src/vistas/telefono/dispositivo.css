@@ -1,0 +1,97 @@
+/* The phone: full screen on a real phone; a framed device on wide screens. */
+.tl-pantalla {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: clip;
+  background: var(--map-ground);
+  color: var(--ink);
+}
+.tl-barra-estado,
+.tl-inicio {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .tl-dispositivo {
+    position: relative;
+    flex: none;
+    width: 393px;
+    height: min(852px, calc(100dvh - 48px));
+    padding: 11px;
+    border-radius: 62px;
+    background: linear-gradient(145deg, #3d3c3b, #1b1a1a 40%, #2c2b2a);
+    box-shadow:
+      0 0 0 1.5px #575553,
+      0 30px 80px rgb(0 0 0 / 0.55),
+      inset 0 0 0 2px #0b0b0b;
+    box-sizing: content-box;
+  }
+  /* Side buttons: action and volume on the left, power on the right. */
+  .tl-dispositivo::before,
+  .tl-dispositivo::after {
+    content: "";
+    position: absolute;
+    width: 4px;
+    border-radius: 2px;
+    background: #2e2d2c;
+  }
+  .tl-dispositivo::before {
+    left: -4px;
+    top: 150px;
+    height: 32px;
+    box-shadow:
+      0 64px 0 0 #2e2d2c,
+      0 64px 0 0 #2e2d2c,
+      0 140px 0 0 #2e2d2c;
+  }
+  .tl-dispositivo::after {
+    right: -4px;
+    top: 220px;
+    height: 96px;
+  }
+  .tl-pantalla {
+    height: 100%;
+    border-radius: 51px;
+  }
+  .tl-barra-estado {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 6;
+    height: 54px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0 30px 0 34px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(rgb(0 0 0 / 0.55), transparent);
+    pointer-events: none;
+  }
+  .tl-isla {
+    width: 122px;
+    height: 36px;
+    border-radius: 20px;
+    background: #000;
+  }
+  .tl-iconos {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+  }
+  .tl-inicio {
+    display: block;
+    position: absolute;
+    z-index: 7;
+    left: 50%;
+    bottom: 8px;
+    width: 134px;
+    height: 5px;
+    margin-left: -67px;
+    border-radius: 3px;
+    background: #fff;
+    pointer-events: none;
+  }
+}
