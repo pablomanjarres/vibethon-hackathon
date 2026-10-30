@@ -7,6 +7,7 @@ import type { Estado, EstadoCarro } from "../parqueadero/tipos";
 import { href } from "../shared/route";
 import type { VistaId } from "./Shell";
 import { useComando, useEstado } from "./useTienda";
+import { tienda } from "../parqueadero/tienda";
 import { inicioRecorrido } from "./Recorrido";
 import "./acceso.css";
 
@@ -19,6 +20,8 @@ interface Fila {
   nota: string;
   /** A link that opens a screen already signed in, or a command sent right here. */
   ir?: string;
+  /** Runs before following the link, e.g. resetting the lot for the walkthrough. */
+  antes?: () => void;
   /** Commands sent in order; stops at the first rejection. */
   comandos?: Comando[];
 }
@@ -131,7 +134,7 @@ export function AccesoRapido({ vista }: { vista?: VistaId }) {
   }, [abierto]);
   if (!vista) return null;
   const grupos = [
-    { titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "conductor → valet → portería → oficina", ir: inicioRecorrido(estado) }] },
+    { titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "empieza desde la semilla: conductor → valet → portería → oficina", ir: inicioRecorrido(estado), antes: () => tienda.reiniciar() }] },
     ...filasDe(vista, estado),
   ];
   const fila = (f: Fila): ReactNode => {
@@ -143,7 +146,13 @@ export function AccesoRapido({ vista }: { vista?: VistaId }) {
       </>
     );
     return f.ir ? (
-      <a href={f.ir} onClick={() => setAbierto(false)}>
+      <a
+        href={f.ir}
+        onClick={() => {
+          f.antes?.();
+          setAbierto(false);
+        }}
+      >
         {contenido}
       </a>
     ) : (
