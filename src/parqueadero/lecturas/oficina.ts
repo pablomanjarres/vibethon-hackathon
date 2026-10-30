@@ -55,6 +55,10 @@ export function vistaOficina(estado: Estado): VistaOficina {
       total: estado.pagos.reduce((suma, p) => suma + p.monto, 0),
       moneda: estado.reglas.moneda,
     },
-    bitacora: estado.bitacora.slice(-12).reverse(),
+    // The clock already shows the time, so clock ticks would only push real events out of view.
+    bitacora: estado.bitacora
+      .filter((e) => e.tipo !== "avanzarReloj")
+      .slice(-12)
+      .reverse(),
   };
 }
