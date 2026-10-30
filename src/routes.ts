@@ -36,4 +36,10 @@ export const routes: PageRoute[] = [
     summary: "Todo el lote en vivo: entradas, celdas, fichos, llaves, pagos y bitácora.",
     Page: lazy(() => import("./vistas/oficina/Oficina")),
   },
+  {
+    path: "mockups",
+    name: "Mockups",
+    summary: "Pantallas de solo lectura: el lote por zonas, la zona elegida y tu celda.",
+    Page: lazy(() => import("./vistas/mockups/Mockups")),
+  },
 ];

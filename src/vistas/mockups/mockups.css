@@ -1,0 +1,86 @@
+/* Read-only phone mockups. Page layout and sheet contents. */
+.mk-pagina {
+  min-height: 100vh;
+  padding: var(--space-6) var(--space-4);
+  display: grid;
+  gap: var(--space-6);
+  justify-items: center;
+}
+.mk-intro {
+  text-align: center;
+}
+.mk-intro p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.mk-intro h1 {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 34px;
+}
+.mk-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  justify-content: center;
+}
+.mk-resumen {
+  margin: 0;
+  font-weight: 600;
+}
+.mk-leyenda {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: var(--space-3);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.mk-oferta {
+  display: flex;
+  gap: var(--space-3);
+}
+.mk-oferta > div:last-child {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  justify-items: start;
+}
+.mk-miniatura {
+  width: 84px;
+  height: 84px;
+  flex: none;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+}
+.mk-sub {
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+.mk-precio {
+  font-size: 16px;
+}
+.mk-precio span {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.mk-datos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+.mk-datos li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

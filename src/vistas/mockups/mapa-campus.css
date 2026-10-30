@@ -1,0 +1,97 @@
+/* Seat-map look: light lot, grey streets, green dots, black pill. */
+.mk-mapa {
+  position: absolute;
+  top: 116px;
+  left: 0;
+  width: 100%;
+  height: 360px;
+  font-family: var(--font-sans);
+}
+.mk-suelo {
+  fill: var(--canvas);
+}
+.mk-via {
+  fill: #c9ced6;
+}
+.mk-quebrada {
+  fill: none;
+  stroke: #8fd3ee;
+  stroke-width: 3;
+}
+.mk-calle text {
+  fill: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+.mk-lote {
+  fill: var(--tile);
+}
+.mk-pasillo {
+  fill: var(--canvas);
+}
+.mk-entrada rect {
+  fill: var(--ink);
+}
+.mk-entrada text {
+  fill: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+.mk-seccion rect {
+  fill: var(--surface-raised);
+  stroke: var(--hairline);
+}
+.mk-seccion line {
+  stroke: var(--hairline);
+}
+.mk-seccion-id {
+  font-size: 9px;
+  font-weight: 600;
+  fill: var(--ink-muted);
+}
+.mk-libre .mk-punto {
+  fill: var(--libre);
+  stroke: var(--libre);
+}
+.mk-pocas .mk-punto {
+  fill: var(--reservada);
+  stroke: var(--reservada);
+}
+.mk-llena rect {
+  fill: var(--ocupada-soft);
+}
+.mk-elegida rect {
+  fill: var(--peligro-soft);
+  stroke: var(--peligro);
+}
+.mk-elegida .mk-punto {
+  fill: var(--peligro);
+  stroke: var(--peligro);
+}
+.mk-globo rect,
+.mk-globo path {
+  fill: var(--ink);
+}
+.mk-globo text {
+  fill: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+.mk-celda rect {
+  fill: var(--ink);
+}
+.mk-celda text {
+  fill: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.mk-miniatura .mk-mapa {
+  position: static;
+  width: 100%;
+  height: 100%;
+}
