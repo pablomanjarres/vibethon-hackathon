@@ -1,4 +1,4 @@
-import { Banknote, CircleAlert, KeyRound, LogOut, MapPin, ParkingSquare, Ticket, type LucideIcon } from "lucide-react";
+import { Banknote, CircleAlert, LogOut, MapPin, ParkingSquare, Ticket, type LucideIcon } from "lucide-react";
 import type { Comando } from "../../parqueadero/motor";
 import type { VistaConductor } from "../../parqueadero/lecturas/conductor";
 
@@ -31,33 +31,30 @@ export function pasoActual(v: VistaConductor, elegida: string | null): PasoActua
     switch (s.estado) {
       case "pago pendiente":
         return {
-          principal: { texto: `Pagar valet ${s.precio}`, Icono: Banknote, comando: { tipo: "pagarValet", servicio: s.id, aprobado: true } },
+          principal: { texto: "Pagar (aprobado)", Icono: Banknote, comando: { tipo: "pagarValet", servicio: s.id, aprobado: true } },
           instruccion: null,
-          secundario: { texto: "Cancelar pago", Icono: CircleAlert, comando: { tipo: "pagarValet", servicio: s.id, aprobado: false } },
+          secundario: { texto: "Simular rechazo", Icono: CircleAlert, comando: { tipo: "pagarValet", servicio: s.id, aprobado: false } },
         };
       case "pagado":
-        return { ...NADA, instruccion: `${s.valet} va hacia tu carro en el pasaje` };
+        return { ...NADA, instruccion: `${s.valet} llega a tu carro en el pasaje: entrégale las llaves` };
       case "ficho emitido":
-        return { ...NADA, principal: { texto: `Confirmar ficho ${s.ficho}`, Icono: Ticket, comando: { tipo: "confirmarFicho", placa, ficho: s.ficho } } };
+        return { ...NADA, principal: { texto: "Confirmar ficho", Icono: Ticket, comando: { tipo: "confirmarFicho", placa, ficho: s.ficho } } };
       case "llaves en oficina":
         return { ...NADA, instruccion: `Reclama tus llaves en la oficina con el ficho ${s.ficho}` };
       default:
-        return { ...NADA, instruccion: "Ve a clase: el valet se encarga de tu carro" };
+        return { ...NADA, instruccion: "El valet se encarga de tu carro" };
     }
   }
   switch (v.estado) {
     case "en fila":
     case "en espera": {
       const celda = v.puedeReservar ? (elegida && v.celdasLibres.includes(elegida) ? elegida : v.celdasLibres[0]) : null;
-      const valet = v.oferta?.disponibles[0];
-      const contratar: Paso | null = v.puedePedirValet && valet
-        ? { texto: `Contratar valet (${v.oferta?.precio} ${v.oferta?.moneda})`, Icono: KeyRound, comando: { tipo: "contratarValet", placa, valet } }
-        : null;
       const salir: Paso | null = v.puedeSalirSinParquear ? { texto: "Salir sin parquear", Icono: LogOut, comando: { tipo: "salirSinParquear", placa } } : null;
       return {
         principal: celda ? { texto: `Reservar celda ${celda}`, Icono: MapPin, comando: { tipo: "reservarCelda", placa, celda } } : null,
         instruccion: null,
-        secundario: contratar ?? salir,
+        // Hiring a valet is offered beside this step (OfertaValet).
+        secundario: salir,
       };
     }
     case "con celda": {
