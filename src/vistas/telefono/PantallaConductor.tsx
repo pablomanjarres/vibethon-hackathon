@@ -5,10 +5,10 @@ import { href } from "../../shared/route";
 import { MapaLote } from "../../ui/MapaLote";
 import { pasoActual } from "../conductor/acciones";
 import { AccionesPaso } from "../conductor/AccionesPaso";
+import { DetallesConductor } from "../conductor/DetallesConductor";
 import { EstadoPaso } from "../conductor/EstadoPaso";
 import { HojaInferior } from "./HojaInferior";
 import { Ingreso } from "./Ingreso";
-import { PestanasConductor } from "./PestanasConductor";
 import { Recorrido } from "./Recorrido";
 import "../conductor/conductor.css";
 
@@ -18,7 +18,7 @@ import "../conductor/conductor.css";
  */
 export function PantallaConductor({ estado, placa, codigo }: { estado: Estado; placa: string; codigo: string }) {
   const v = vistaConductor(estado, placa, codigo);
-  if (!v.encontrado) return <Ingreso error={v.mensaje} />;
+  if (!v.encontrado) return <Ingreso placa={v.placa} error={v.mensaje} />;
 
   const mapa = estado.mapas[0];
   const paso = pasoActual(v, null);
@@ -65,7 +65,9 @@ export function PantallaConductor({ estado, placa, codigo }: { estado: Estado; p
           </div>
         }
       >
-        <PestanasConductor estado={estado} v={v} />
+        <div className="tl-detalles">
+          <DetallesConductor estado={estado} v={v} />
+        </div>
       </HojaInferior>
     </>
   );
