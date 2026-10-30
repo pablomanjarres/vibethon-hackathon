@@ -55,6 +55,23 @@ function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[
     ];
   }
   if (vista === "valet") {
+    // Demo: when the lot is full, a parked car without a valet in progress leaves so a cell frees up.
+    const activosValet = ["pago pendiente", "pagado", "ficho emitido", "en curso", "estacionado", "llaves en oficina"];
+    const sale = Object.values(estado.carros).find(
+      (c) => c.estado === "estacionado" && (!c.servicio || !activosValet.includes(estado.servicios[c.servicio]?.estado)),
+    );
+    const liberar: Fila[] =
+      sale && !estado.celdas.some((c) => c.estado === "libre")
+        ? [
+            {
+              clave: "valet-liberar",
+              titulo: `Liberar ${sale.celda}`,
+              dato: sale.placa,
+              nota: "lote lleno: sale un carro y la celda se asigna sola",
+              comandos: [...(sale.pagado ? [] : [{ tipo: "pagar", placa: sale.placa } as Comando]), { tipo: "salir", placa: sale.placa }],
+            },
+          ]
+        : [];
     // Demo: give a free valet the first car of their entrance that has no valet, already paid.
     const asignar: Fila[] = estado.entradas.flatMap((e) => {
       const valet = estado.valets.find((v) => v.entrada === e.id && v.estado === "disponible");
@@ -77,7 +94,7 @@ function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[
         },
       ];
     });
-    return [{ titulo: "Asignar un carro a un valet", filas: asignar }, ...estado.entradas.map((e) => ({
+    return [{ titulo: "Lote", filas: liberar }, { titulo: "Asignar un carro a un valet", filas: asignar }, ...estado.entradas.map((e) => ({
       titulo: `Entrar como valet · ${e.nombre}`,
       // Valets at work, plus the first free one of the entrance.
       filas: estado.valets
