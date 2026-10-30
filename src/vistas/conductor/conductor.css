@@ -1,0 +1,42 @@
+.cd-rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+.cd-columna {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 480px;
+  width: 100%;
+}
+.cd-acciones {
+  display: grid;
+  gap: var(--space-2);
+}
+.cd-ficho {
+  font-size: 22px;
+  font-weight: 700;
+  padding: 2px 12px;
+  border-radius: var(--radius-tag);
+  background: var(--ink);
+  color: var(--surface-raised);
+}
+.cd-sugeridas {
+  display: grid;
+  gap: var(--space-2);
+}
+.cd-cambiar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-height);
+  color: var(--ink);
+  font-weight: 500;
+  justify-self: start;
+}
+@media (max-width: 900px) {
+  .cd-rejilla {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,52 @@
+/* The one set of design tokens, taken from the Chargetrip reference (references/refero/chargetrip). */
+:root {
+  --canvas: #efece6;
+  --surface: #fbfaf6;
+  --surface-raised: #ffffff;
+  --tile: #e8e5de;
+  --tile-hover: #dedad1;
+  --ink: #1d1c1a;
+  --ink-hover: #3a3936;
+  --ink-muted: #5c5954;
+  --hairline: #e3dfd7;
+  --accent: #c2410c;
+  --accent-dot: #f2541b;
+
+  /* Status tones: always paired with a text label and an icon. */
+  --libre: #146c42;
+  --libre-soft: #dcefe4;
+  --reservada: #9a5b00;
+  --reservada-soft: #fbecd2;
+  --ocupada: #4b4a47;
+  --ocupada-soft: #e4e1da;
+  --peligro: #b42318;
+  --peligro-soft: #fde4e1;
+
+  --font-serif: "Newsreader", Georgia, serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+
+  --radius-control: 8px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
+  --radius-tag: 6px;
+  --shadow-panel: 0 4px 24px rgb(0 0 0 / 0.12);
+  --shadow-control: 0 1px 2px rgb(0 0 0 / 0.08);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 28px;
+  --control-height: 44px;
+
+  --focus-color: #1d4ed8;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+}

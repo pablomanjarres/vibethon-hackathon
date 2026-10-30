@@ -1,0 +1,27 @@
+Refero references for the EAFIT parking app
+
+Main style: Chargetrip
+  Screen   https://refero.design/pages/f1a3a607-cdec-4361-8226-590419fb0c76  (chargetrip.com/rental)
+  Site     https://refero.design/websites/798
+  Image    chargetrip/rental-desktop.jpg
+           https://images.refero.design/screenshots/chargetrip.com/desktop/fa90cf88-5d01-45f9-b4ee-db514690bd65_preview.jpg
+
+App layout: Chargetrip stations app (map with a side detail panel, status pill, pins, zoom controls)
+  Screen   https://refero.design/pages/2c20bab9-b7de-4e52-8b72-061a090f6706
+  Images   chargetrip/stations-detail.jpg  (light map, panel, toast)
+           https://images.refero.design/screenshots/chargetrip.com/desktop/5d3abb2f-7f64-4ed7-8d9e-6a22b795cdec_preview.jpg
+           chargetrip/stations-panel.jpg   (dark map, "2/2 Available" pill)
+           https://images.refero.design/screenshots/chargetrip.com/desktop/478c2cf2-991b-4a8c-a379-b9d44a65013d_preview.jpg
+           chargetrip/stations-map.jpg
+           https://images.refero.design/screenshots/chargetrip.com/desktop/4a0d2f69-7b52-48ec-bcfe-4d369a0a819a_preview.jpg
+
+App layout: SeatGeek parking (list on the left, map on the right, highlighted lots with tooltips)
+  Screen   https://refero.design/pages/bea987b6-775d-4d2b-8a11-80fff2a7a0d3
+  Images   seatgeek/parking-list-map.jpg
+           https://images.refero.design/screenshots/seatgeek.com/desktop/3f51b03a-117b-497a-86a5-ce709f942432_preview.jpg
+           seatgeek/parking-tooltip.jpg
+           https://images.refero.design/screenshots/seatgeek.com/desktop/8ad8e885-c0a4-4f93-8744-3743301a881b_preview.jpg
+
+The Refero style document (DESIGN.md) could not be downloaded in this session. chargetrip/DESIGN.md
+holds the system as measured from the screenshots above; replace it with the Refero original when
+it can be fetched.
