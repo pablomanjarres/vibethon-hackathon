@@ -19,7 +19,7 @@ interface Props {
  */
 export function HojaInferior({ etiqueta, cabeza, pie, children }: Props) {
   const hoja = useRef<HTMLElement>(null);
-  const [parada, setParada] = useState(0);
+  const [parada, setParada] = useState(1);
   const [arrastre, setArrastre] = useState<number | null>(null);
   const inicio = useRef<{ y: number; movio: boolean } | null>(null);
 

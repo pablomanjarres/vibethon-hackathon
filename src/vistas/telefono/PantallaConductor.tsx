@@ -12,7 +12,6 @@ import { DetallesConductor } from "../conductor/DetallesConductor";
 import { EstadoPaso } from "../conductor/EstadoPaso";
 import { OfertaValet } from "../conductor/OfertaValet";
 import { PasoValet } from "../conductor/PasoValet";
-import { SiguientePasoDemo } from "../conductor/SiguientePasoDemo";
 import { HojaInferior } from "./HojaInferior";
 import { Ingreso } from "./Ingreso";
 import { sinOtrasPlacas } from "./privacidad";
@@ -34,7 +33,8 @@ interface Props {
 }
 
 export function PantallaConductor({ estado, placa, codigo, registro, onRegistrada }: Props) {
-  const { aviso, enviar, informar } = useComando();
+  const { aviso, enviar } = useComando();
+  const [elegida, setElegida] = useState<string | null>(null);
   const [valet, setValet] = useState<string | null>(null);
   const v = vistaConductor(estado, placa, codigo);
   if (!v.encontrado) return <Ingreso estado={estado} onRegistrada={onRegistrada} placa={v.placa} error={v.mensaje} />;
@@ -42,7 +42,8 @@ export function PantallaConductor({ estado, placa, codigo, registro, onRegistrad
   const privado = (texto: string) => sinOtrasPlacas(texto, estado, v.placa);
   const resultado = aviso ?? (registro && { ok: true, texto: registro.texto });
   const mapa = estado.mapas[0];
-  const paso = pasoActual(v, null);
+  const paso = pasoActual(v, elegida);
+  const reservable = paso.principal?.comando.tipo === "reservarCelda" ? paso.principal.comando.celda : null;
 
   return (
     <>
@@ -56,13 +57,6 @@ export function PantallaConductor({ estado, placa, codigo, registro, onRegistrad
       </div>
       <HojaInferior
         etiqueta={`Tu carro ${v.placa}`}
-        pie={
-          <>
-            <AvisoResultado aviso={resultado && { ...resultado, texto: privado(resultado.texto) }} />
-            <AccionesPaso paso={paso} onEnviar={enviar} />
-            <SiguientePasoDemo estado={estado} placa={v.placa} onResultado={informar} ocultar={privado} />
-          </>
-        }
         cabeza={
           <div className="tl-cabeza">
             <h1 className="tl-placa num">
@@ -75,11 +69,13 @@ export function PantallaConductor({ estado, placa, codigo, registro, onRegistrad
         }
       >
         <div className="tl-detalles">
+          <AvisoResultado aviso={resultado && { ...resultado, texto: privado(resultado.texto) }} />
           {registro?.codigo && (
             <p className="cd-codigo-linea">
               Tu código <strong className="num">{registro.codigo}</strong> · con tu placa entras desde otro teléfono
             </p>
           )}
+          <AccionesPaso paso={paso} onEnviar={enviar} />
           <OfertaValet v={v} tarifa={{ precio: estado.reglas.tarifaValet, moneda: estado.reglas.moneda }} elegido={valet} onElegir={setValet} onEnviar={enviar} />
           <DetallesConductor estado={estado} v={v} />
         </div>
@@ -90,7 +86,8 @@ export function PantallaConductor({ estado, placa, codigo, registro, onRegistrad
             nombre={mapa.nombre}
             celdas={estado.celdas.filter((c) => c.mapa === mapa.id).map((c) => ({ ...c, placa: c.id === v.celda ? v.placa : null }))}
             entradas={estado.entradas.map((e) => ({ ...e, fila: e.fila.map(() => "") }))}
-            seleccion={v.celda}
+            seleccion={reservable ?? v.celda}
+            onSeleccionar={setElegida}
             enfoque={v.celda}
           />
         </div>
