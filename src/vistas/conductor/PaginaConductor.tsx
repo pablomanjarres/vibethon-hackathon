@@ -83,17 +83,7 @@ export function PaginaConductor({ placa, codigo, registro, onRegistrada, demo }:
             </p>
           )}
           <AccionesPaso paso={paso} onEnviar={enviar} />
-          {!v.servicio && (v.estado === "en fila" || v.estado === "en espera") && (
-            <OfertaValet
-              placa={v.placa}
-              oferta={v.oferta}
-              estado={v.estado}
-              tarifa={{ precio: estado.reglas.tarifaValet, moneda: estado.reglas.moneda }}
-              elegido={valet}
-              onElegir={setValet}
-              onEnviar={enviar}
-            />
-          )}
+          <OfertaValet v={v} tarifa={{ precio: estado.reglas.tarifaValet, moneda: estado.reglas.moneda }} elegido={valet} onElegir={setValet} onEnviar={enviar} />
         </TarjetaDatos>
       ) : (
         <IngresoConductor placa={v.placa} />
