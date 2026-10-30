@@ -1,9 +1,12 @@
 /* Presenter shortcut: a round button in the view stack and a scrolling list of plates and valets with codes. */
-.ui-acceso-boton {
+.ui-acceso-boton,
+.ui-pila .ui-acceso-boton {
   display: grid;
   place-items: center;
   width: 44px;
+  min-width: 44px;
   height: 44px;
+  flex: none;
   border: 0;
   border-radius: 50%;
   background: var(--surface-light);
