@@ -1,4 +1,5 @@
-import { ArrowLeft, ArrowRight, CheckCircle2, Circle, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Circle, RotateCcw, X } from "lucide-react";
+import { tienda } from "../parqueadero/tienda";
 import type { Estado, EstadoServicio } from "../parqueadero/tipos";
 import { href, useRoute } from "../shared/route";
 import { useEstado } from "./useTienda";
@@ -92,6 +93,9 @@ export function Recorrido() {
             Siguiente: {PASOS[n].quien} <ArrowRight size={16} aria-hidden="true" />
           </a>
         ) : null}
+        <a href={inicioRecorrido(estado)} onClick={() => tienda.reiniciar()} aria-label="Empezar el recorrido de nuevo">
+          <RotateCcw size={16} aria-hidden="true" /> De nuevo
+        </a>
         <a href={href(paso.vista, paso.params(estado))} aria-label="Salir del recorrido">
           <X size={16} aria-hidden="true" />
         </a>
