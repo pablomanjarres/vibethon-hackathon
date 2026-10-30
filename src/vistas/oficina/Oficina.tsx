@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Building2, CarFront, ScrollText, SlidersHorizontal } from "lucide-react";
+import { Building2, CarFront, KeyRound, ScrollText, SlidersHorizontal, Wallet } from "lucide-react";
 import { hora } from "../../parqueadero/lecturas/formato";
 import { detalleCarro, detalleCelda } from "../../parqueadero/lecturas/registro";
 import { href, useRoute } from "../../shared/route";
@@ -12,6 +12,8 @@ import { Bitacora } from "./Bitacora";
 import { ControlesSimulacion } from "./ControlesSimulacion";
 import { DetalleCarro } from "./DetalleCarro";
 import { DetalleCelda } from "./DetalleCelda";
+import { IngresosValet } from "./IngresosValet";
+import { LlavesOficina } from "./LlavesOficina";
 import { ListaCarros } from "./ListaCarros";
 import { ResumenOficina } from "./ResumenOficina";
 import { resumenOficina } from "./resumen";
@@ -34,6 +36,7 @@ export default function Oficina() {
   const celda = seleccion?.tipo === "celda" ? detalleCelda(estado, seleccion.id) : null;
   const detalle = useRef<HTMLDivElement>(null);
   const moneda = estado.reglas.moneda;
+  const llaves = Object.values(estado.servicios).filter((s) => s.estado === "llaves en oficina");
 
   useEffect(() => {
     if (seleccion) detalle.current?.scrollIntoView({ block: "start", behavior: "smooth" });
@@ -68,6 +71,12 @@ export default function Oficina() {
         celdas={{ libres: estado.celdas.filter((c) => c.estado === "libre").length, total: estado.celdas.length }}
       />
       <div>
+        <Acordeon Icono={KeyRound} titulo="Llaves" extra={llaves.length || undefined}>
+          <LlavesOficina esperando={llaves} />
+        </Acordeon>
+        <Acordeon Icono={Wallet} titulo="Ingresos de valet" extra={estado.ingresos?.length || undefined}>
+          <IngresosValet estado={estado} />
+        </Acordeon>
         <Acordeon Icono={CarFront} titulo="Carros" extra={resumen.carros.length} inicial>
           <ListaCarros
             carros={resumen.carros}

@@ -83,3 +83,25 @@
   font-size: 22px;
   white-space: nowrap;
 }
+
+/* Keys waiting at the office and valet incomes: one compact line each. */
+.of-lineas {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+.of-lineas li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: var(--panel-inner);
+}
+.of-lineas .of-total {
+  border-style: dashed;
+}

@@ -5,6 +5,7 @@ import { AvisoResultado } from "../../ui/AvisoResultado";
 import { Boton } from "../../ui/Boton";
 import { PanelCabecera } from "../../ui/PanelCabecera";
 import { Shell } from "../../ui/Shell";
+import { DemoValets } from "./DemoValets";
 
 /** First open on a phone: the valet signs in with their id and code once; the link keeps both from then on. */
 export function ElegirValet({ rechazado }: { rechazado: boolean }) {
@@ -55,6 +56,7 @@ export function ElegirValet({ rechazado }: { rechazado: boolean }) {
           Entrar
         </Boton>
       </form>
+      <DemoValets />
     </Shell>
   );
 }
