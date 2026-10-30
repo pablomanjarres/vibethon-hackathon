@@ -1,31 +1,6 @@
-.vl-columna {
-  display: grid;
-  gap: var(--space-4);
-  width: min(100%, 520px);
-  margin-inline: auto;
-  min-width: 0;
-}
-.vl-cabeza {
-  display: grid;
-  gap: var(--space-3);
-  justify-items: start;
-}
-.vl-ficho {
-  font-size: 22px;
-  font-weight: 700;
-  padding: 2px 12px;
-  border-radius: var(--radius-tag);
-  background: var(--ink);
-  color: var(--surface-raised);
-}
-.vl-celda {
+/* Valet panel: next-step line and the order-status steps. */
+.vl-siguiente {
   margin: 0;
-}
-.vl-espera {
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-control);
-  background: var(--tile);
   font-weight: 500;
 }
 .vl-pasos {
@@ -62,7 +37,7 @@
   place-items: center;
   border-radius: 50%;
   border: 2px solid var(--hairline);
-  background: var(--surface-raised);
+  background: var(--panel-inner);
 }
 .vl-hecho {
   color: var(--ink);
@@ -70,7 +45,7 @@
 .vl-hecho .vl-punto {
   border-color: var(--libre);
   background: var(--libre);
-  color: #fff;
+  color: #0f2a1d;
 }
 .vl-actual {
   color: var(--ink);
@@ -81,22 +56,4 @@
 }
 .vl-paso-hora {
   font-size: 14px;
-}
-.vl-elegir {
-  display: grid;
-  gap: var(--space-1);
-  font-weight: 500;
-}
-.vl-elegir select {
-  min-height: var(--control-height);
-  padding: 0 var(--space-3);
-  border: 1px solid var(--ink);
-  border-radius: var(--radius-control);
-  background: var(--surface-raised);
-  color: var(--ink);
-  font: inherit;
-}
-.vl-elegir select:focus-visible {
-  outline: 2px solid var(--focus-color);
-  outline-offset: 2px;
 }
