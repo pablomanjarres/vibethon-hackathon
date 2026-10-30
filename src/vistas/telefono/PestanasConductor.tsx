@@ -1,7 +1,6 @@
 import type { VistaConductor } from "../../parqueadero/lecturas/conductor";
 import type { Estado } from "../../parqueadero/tipos";
 import { Datos, Vacio } from "../../ui/Datos";
-import { motivoValet } from "../conductor/acciones";
 import { Ficho } from "../conductor/Ficho";
 import { ProgresoValet } from "../conductor/ProgresoValet";
 import { Pronostico } from "../conductor/Pronostico";
@@ -13,7 +12,6 @@ export function PestanasConductor({ estado, v }: { estado: Estado; v: VistaCondu
   const servicio = carro.servicio ? estado.servicios[carro.servicio] : null;
   const libres = estado.celdas.filter((c) => c.estado === "libre").length;
   const minutosEstacionado = carro.estacionadoEn != null ? estado.minuto - carro.estacionadoEn : null;
-  const valet = motivoValet(v);
   return (
     <Deslizable
       pestanas={[
@@ -40,7 +38,7 @@ export function PestanasConductor({ estado, v }: { estado: Estado; v: VistaCondu
               <Ficho ficho={v.ficho} placa={v.placa} celda={v.celda} valet={v.valet} />
             </>
           ) : (
-            <Vacio>Sin ficho. {valet ? `Reservar valet: ${valet}` : "Puedes reservar un valet ahora."}</Vacio>
+            <Vacio>Sin ficho. El valet se reserva cuando tienes una celda.</Vacio>
           ),
         },
         {

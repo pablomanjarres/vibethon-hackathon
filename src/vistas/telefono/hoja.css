@@ -64,37 +64,6 @@
 .tl-placa span {
   letter-spacing: 0;
 }
-.tl-mensaje {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-}
-.tl-metricas {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  margin: 0;
-  border-radius: 14px;
-  background: var(--panel-inner);
-}
-.tl-metricas div {
-  display: grid;
-  gap: 2px;
-  padding: 10px 14px;
-}
-.tl-metricas div + div {
-  border-left: 1px solid var(--hairline);
-}
-.tl-metricas dt {
-  font-size: 12px;
-  color: var(--ink-muted);
-}
-.tl-metricas dd {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-}
 
 .tl-recorrido ol {
   list-style: none;
@@ -176,17 +145,6 @@
   border-top: 1px solid var(--hairline);
   background: var(--panel);
   border-radius: 0;
-}
-.tl-acciones {
-  display: flex;
-  gap: var(--space-2);
-}
-.tl-acciones .ui-boton {
-  flex: 1;
-  min-width: 0;
-  min-height: 52px;
-  border-radius: var(--radius-pill);
-  font-weight: 600;
 }
 .tl-nota {
   display: flex;

@@ -1,10 +1,11 @@
-import { Eye, KeyRound, LogOut, MapPin } from "lucide-react";
+import { Eye, LogOut } from "lucide-react";
 import { vistaConductor } from "../../parqueadero/lecturas/conductor";
 import type { Estado } from "../../parqueadero/tipos";
 import { href } from "../../shared/route";
-import { Boton } from "../../ui/Boton";
 import { MapaLote } from "../../ui/MapaLote";
-import { pasos } from "../conductor/acciones";
+import { pasoActual } from "../conductor/acciones";
+import { AccionesPaso } from "../conductor/AccionesPaso";
+import { EstadoPaso } from "../conductor/EstadoPaso";
 import { HojaInferior } from "./HojaInferior";
 import { Ingreso } from "./Ingreso";
 import { PestanasConductor } from "./PestanasConductor";
@@ -20,11 +21,7 @@ export function PantallaConductor({ estado, placa, codigo }: { estado: Estado; p
   if (!v.encontrado) return <Ingreso error={v.mensaje} />;
 
   const mapa = estado.mapas[0];
-  const acciones = [
-    ...(v.puedeReservar ? [{ texto: "Reservar celda", Icono: MapPin }] : []),
-    ...(v.puedePedirValet ? [{ texto: "Reservar valet", Icono: KeyRound }] : []),
-    ...pasos(v),
-  ].slice(0, 2);
+  const paso = pasoActual(v, null);
 
   return (
     <>
@@ -51,15 +48,7 @@ export function PantallaConductor({ estado, placa, codigo }: { estado: Estado; p
         etiqueta={`Tu carro ${v.placa}`}
         pie={
           <>
-            {acciones.length > 0 && (
-              <div className="tl-acciones">
-                {acciones.map((a, i) => (
-                  <Boton key={a.texto} Icono={a.Icono} variante={i === 0 ? "primario" : "secundario"} aria-describedby="tl-vista-previa">
-                    {a.texto}
-                  </Boton>
-                ))}
-              </div>
-            )}
+            <AccionesPaso paso={paso} describedBy="tl-vista-previa" />
             <p id="tl-vista-previa" className="tl-nota">
               <Eye size={14} aria-hidden="true" /> Vista previa: los botones no envían nada.
             </p>
@@ -71,23 +60,7 @@ export function PantallaConductor({ estado, placa, codigo }: { estado: Estado; p
               {v.placa}
               {v.entrada && <span> · Entrada {v.entrada}</span>}
             </p>
-            <p className="tl-mensaje" aria-live="polite">
-              {v.mensaje}
-            </p>
-            <dl className="tl-metricas">
-              <div>
-                <dt>Espera</dt>
-                <dd className="num">{v.espera ? `${v.espera.minutos} min` : "—"}</dd>
-              </div>
-              <div>
-                <dt>Adelante</dt>
-                <dd className="num">{v.espera ? v.espera.carrosAdelante : "—"}</dd>
-              </div>
-              <div>
-                <dt>Celda</dt>
-                <dd className="num">{v.celda ?? "—"}</dd>
-              </div>
-            </dl>
+            <EstadoPaso v={v} />
             {v.estado && <Recorrido estado={v.estado} />}
           </div>
         }
