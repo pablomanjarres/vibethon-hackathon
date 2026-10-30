@@ -1,11 +1,7 @@
-/* Gate panel: turn line, passage search and rows, check-in banner. */
+/* Gate panel: turn line, plate search, passage rows and the one open detail. */
 .pt-turno {
   margin: 0;
   font-weight: 500;
-}
-.pt-cuenta {
-  margin-left: var(--space-1);
-  font-weight: 700;
 }
 .pt-oculto {
   position: absolute;
@@ -59,14 +55,96 @@
   min-width: 0;
   flex: 1;
 }
-.pt-filapasaje {
-  display: grid;
-  gap: var(--space-3);
-}
 .pt-valet {
   display: inline-flex;
   align-items: center;
   min-height: 40px;
   color: var(--ink);
   font-weight: 600;
+}
+.pt-seccion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.pt-seccion .num {
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+.pt-buscador {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+/* A whole row is one button: plate, times and state badge. */
+.pt-placa-fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  margin: 0 calc(var(--space-2) * -1);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: content-box;
+}
+.pt-placa-fila:hover,
+.pt-placa-fila[aria-pressed="true"] {
+  background: var(--panel-inner);
+}
+.pt-placa-fila:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 0;
+}
+.pt-placas > li,
+.pt-fila > li {
+  padding: 2px 0;
+}
+.pt-detalle {
+  position: relative;
+}
+.pt-detalle .ui-td-cabeza {
+  padding-right: 40px;
+}
+.pt-ancla {
+  scroll-margin: var(--space-4);
+}
+.pt-cerrar {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+.pt-cerrar:hover {
+  color: var(--ink);
+  background: var(--hairline);
+}
+.pt-cerrar:focus-visible {
+  outline: 2px solid var(--focus-color);
+}
+.pt-historial > li {
+  justify-content: flex-start;
+  align-items: baseline;
+  font-size: 14px;
+}
+.pt-hora {
+  flex: none;
+  color: var(--ink-muted);
 }
