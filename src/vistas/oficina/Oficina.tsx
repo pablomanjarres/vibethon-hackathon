@@ -14,6 +14,7 @@ import { DetalleCarro } from "./DetalleCarro";
 import { DetalleCelda } from "./DetalleCelda";
 import { IngresosValet } from "./IngresosValet";
 import { LlavesOficina } from "./LlavesOficina";
+import { fichosRecibidos } from "./llaves";
 import { ListaCarros } from "./ListaCarros";
 import { ResumenOficina } from "./ResumenOficina";
 import { resumenOficina } from "./resumen";
@@ -36,7 +37,8 @@ export default function Oficina() {
   const celda = seleccion?.tipo === "celda" ? detalleCelda(estado, seleccion.id) : null;
   const detalle = useRef<HTMLDivElement>(null);
   const moneda = estado.reglas.moneda;
-  const llaves = Object.values(estado.servicios).filter((s) => s.estado === "llaves en oficina");
+  const fichos = fichosRecibidos(estado, entradaId ? new Set(resumen.carros.map((c) => c.placa)) : null);
+  const pendientes = fichos.filter((f) => f.llave !== "entregadas").length;
 
   useEffect(() => {
     if (seleccion) detalle.current?.scrollIntoView({ block: "start", behavior: "smooth" });
@@ -71,8 +73,8 @@ export default function Oficina() {
         celdas={{ libres: estado.celdas.filter((c) => c.estado === "libre").length, total: estado.celdas.length }}
       />
       <div>
-        <Acordeon Icono={KeyRound} titulo="Llaves" extra={llaves.length || undefined}>
-          <LlavesOficina esperando={llaves} />
+        <Acordeon Icono={KeyRound} titulo="Llaves y fichos" extra={pendientes || undefined}>
+          <LlavesOficina fichos={fichos} />
         </Acordeon>
         <Acordeon Icono={Wallet} titulo="Ingresos de valet" extra={estado.ingresos?.length || undefined}>
           <IngresosValet estado={estado} />

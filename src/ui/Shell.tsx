@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from "react";
 import { Building2, Car, House, KeyRound, ShieldCheck, type LucideIcon } from "lucide-react";
 import { href } from "../shared/route";
 import { MapaLote } from "./MapaLote";
+import { AccesoRapido } from "./AccesoRapido";
 import { Reloj } from "./Reloj";
 import { useEstado } from "./useTienda";
 import "./tokens.css";
@@ -72,6 +73,7 @@ export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, privado
             </li>
           ))}
         </ul>
+        <AccesoRapido vista={vista} />
         <Reloj />
       </nav>
     </div>

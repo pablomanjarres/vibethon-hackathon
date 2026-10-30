@@ -1,0 +1,120 @@
+/* Presenter shortcut: a round button in the view stack and a scrolling list of plates and valets with codes. */
+.ui-acceso-boton {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-light);
+  color: var(--ink-inverse);
+  cursor: pointer;
+}
+.ui-acceso {
+  position: fixed;
+  z-index: 30;
+  top: 12px;
+  right: 72px;
+  width: min(340px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  padding: 12px 14px 16px;
+  border-radius: 16px;
+  background: var(--panel, #232120);
+  color: var(--ink);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.45);
+}
+.ui-acceso header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ui-acceso h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.ui-acceso header button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+}
+.ui-acceso h3 {
+  margin: 14px 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+}
+.ui-acceso ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ui-acceso a {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  min-height: 40px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: var(--tile, rgb(255 255 255 / 0.06));
+  color: inherit;
+  text-decoration: none;
+}
+.ui-acceso a small {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  opacity: 0.75;
+}
+.ui-acceso a:hover {
+  background: var(--panel-inner, rgb(255 255 255 / 0.12));
+}
+@media (max-width: 899px) {
+  .ui-acceso {
+    right: 12px;
+    top: 64px;
+  }
+}
+.ui-acceso li > button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--tile, rgb(255 255 255 / 0.06));
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ui-acceso li > button small {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  opacity: 0.75;
+}
+.ui-acceso-ok,
+.ui-acceso-error,
+.ui-acceso-vacio {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+.ui-acceso-ok {
+  color: var(--libre, #5bd08d);
+}
+.ui-acceso-error {
+  color: var(--peligro, #ff8a80);
+}
+.ui-acceso-vacio {
+  opacity: 0.75;
+}
