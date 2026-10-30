@@ -10,15 +10,23 @@ import { PanelCabecera } from "../../ui/PanelCabecera";
 import { Shell } from "../../ui/Shell";
 import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useComando, useEstado } from "../../ui/useTienda";
+import { ConfirmarFicho } from "./ConfirmarFicho";
 import { DemoAcciones } from "./DemoAcciones";
 import { DemoValets } from "./DemoValets";
 import { Equipo } from "./Equipo";
 import { Historial } from "./Historial";
 import { NotiAsignacion } from "./NotiAsignacion";
-import { celdaOcupada, etapasDe, type AccionValet } from "./pasos";
+import { celdaOcupada, etapasDe, type AccionValet, type Servicio } from "./pasos";
 import { Progreso } from "./Progreso";
 import { TarjetaAsignacion } from "./TarjetaAsignacion";
 import { useNuevaAsignacion } from "./useNuevaAsignacion";
+
+/** Next-step wording for the steps where the valet checks the driver's ficho. */
+const SIGUIENTE: Partial<Record<string, (s: Servicio) => string>> = {
+  "pago pendiente": () => "Apartado: esperando el pago",
+  pagado: (s) => `Ve al pasaje de ${s.entrada}, pide el ficho al conductor de ${s.placa} y confírmalo para recibir las llaves.`,
+  "ficho emitido": (s) => `Pide el ficho al conductor de ${s.placa} y confírmalo para recibir las llaves.`,
+};
 
 /** One valet's phone: only their assignment, its cell on the map, and the one next step. */
 export function PanelValet({ valetId }: { valetId: string }) {
@@ -42,12 +50,22 @@ export function PanelValet({ valetId }: { valetId: string }) {
       {s ? (
         <>
           <TarjetaAsignacion servicio={s} />
-          <p className="vl-siguiente">{s.estado === "pago pendiente" ? "Apartado: esperando el pago" : v.siguientePaso}</p>
+          <p className="vl-siguiente">{SIGUIENTE[s.estado]?.(s) ?? v.siguientePaso}</p>
         </>
       ) : (
         <TarjetaDatos Icono={BellOff} titulo="Tu asignación">
           <Vacio>Sin asignación. Te avisamos cuando llegue una.</Vacio>
         </TarjetaDatos>
+      )}
+      {s && (s.estado === "pagado" || s.estado === "ficho emitido") && (
+        <ConfirmarFicho
+          key={s.id}
+          servicio={s}
+          onResultado={(resultado) => {
+            descartar();
+            informar(resultado);
+          }}
+        />
       )}
       {acciones.length > 0 && (
         <FilaAcciones
