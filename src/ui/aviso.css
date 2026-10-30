@@ -1,0 +1,16 @@
+/* Command result notice and the toast-like confirmation. */
+.ui-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: 12px;
+  background: var(--tono-suave);
+  color: var(--tono);
+  font-weight: 500;
+  margin: 0;
+}
+.ui-aviso svg {
+  flex: none;
+  margin-top: 2px;
+}
