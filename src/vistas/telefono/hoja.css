@@ -96,7 +96,10 @@
 }
 
 .tl-detalles {
-  padding: var(--space-2) 20px var(--space-4);
+  display: grid;
+  gap: var(--space-4);
+  /* Room under the last item so the home bar never covers it. */
+  padding: var(--space-4) 20px 40px;
   border-top: 1px solid var(--hairline);
 }
 
