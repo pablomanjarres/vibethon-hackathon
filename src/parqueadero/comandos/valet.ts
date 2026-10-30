@@ -93,5 +93,6 @@ export function entregarCarro(estado: Estado, ficho: string): string {
   servicio.estado = "entregado";
   carro.llave = "conductor";
   carro.estado = "retirado";
+  carro.salioEn = estado.minuto;
   return `${carro.placa} fue entregado con el ficho ${servicio.ficho}.`;
 }

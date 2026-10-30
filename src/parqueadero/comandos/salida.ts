@@ -27,6 +27,7 @@ export function salir(estado: Estado, placa: string): string {
   celda.placa = null;
   carro.celda = null;
   carro.estado = "retirado";
+  carro.salioEn = estado.minuto;
   return `${carro.placa} salió; la celda ${celda.id} quedó libre.`;
 }
 
