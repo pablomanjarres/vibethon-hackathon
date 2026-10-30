@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle, RotateCcw, Timer, X } from "lucide-react";
 import { useEffect } from "react";
 import { tienda } from "../parqueadero/tienda";
+import { vistaConductor } from "../parqueadero/lecturas/conductor";
 import type { Estado, EstadoServicio } from "../parqueadero/tipos";
 import { href, useRoute } from "../shared/route";
 import { useEstado } from "./useTienda";
@@ -73,7 +74,7 @@ export function escenarioLoteLleno(): string {
     tienda.ejecutar({ tipo: "salir", placa });
   }
   const estado = tienda.leer();
-  return href("conductor", { placa: PLACA_ESPERA, codigo: estado.carros[PLACA_ESPERA]?.codigo ?? "", demo: "1" });
+  return href("conductor", { placa: PLACA_ESPERA, codigo: estado.carros[PLACA_ESPERA]?.codigo ?? "", demo: "1", recorrido: "lleno" });
 }
 
 /** Link that starts the walkthrough at its first step. */
@@ -85,10 +86,54 @@ export function inicioRecorrido(estado: Estado): string {
  * Presenter bar for the guided walkthrough (only with ?recorrido=N): which step this is, who acts and
  * what to press, whether the engine already recorded it, and a link to the screen of the next step.
  */
+/** A parked car with no valet service in progress pays and leaves; the freed cell is assigned on its own. */
+function liberarUnaCelda(): string {
+  const estado = tienda.leer();
+  const activos = ["pago pendiente", "pagado", "ficho emitido", "en curso", "estacionado", "llaves en oficina"];
+  const sale = Object.values(estado.carros).find(
+    (c) => c.estado === "estacionado" && (!c.servicio || !activos.includes(estado.servicios[c.servicio]?.estado)),
+  );
+  if (!sale) return "No hay carros estacionados que puedan salir.";
+  tienda.ejecutar({ tipo: "avanzarReloj", minutos: 3 });
+  if (!sale.pagado) tienda.ejecutar({ tipo: "pagar", placa: sale.placa });
+  const r = tienda.ejecutar({ tipo: "salir", placa: sale.placa });
+  return r.ok ? r.evento.detalle : r.motivo;
+}
+
+/** Bar for the full-lot option: the waiting car's live estimate and the one action that moves the line. */
+function BarraLoteLleno({ estado }: { estado: Estado }) {
+  const v = vistaConductor(estado, PLACA_ESPERA);
+  const libres = estado.celdas.filter((c) => c.estado === "libre").length;
+  return (
+    <aside className="ui-recorrido" aria-label="Lote lleno y tiempo estimado">
+      <p className="ui-recorrido-paso">
+        Lote lleno · {libres}/{estado.celdas.length} libres · <strong>{PLACA_ESPERA}</strong>
+      </p>
+      <p className="ui-recorrido-texto">
+        <Timer size={18} aria-hidden="true" />
+        <span>{v.mensaje}</span>
+      </p>
+      <p className="ui-recorrido-ayuda">Siguiente: libera una celda. Sale un carro estacionado (+3 min), la celda se asigna sola al que sigue y la espera se recalcula.</p>
+      <nav className="ui-recorrido-nav">
+        <button type="button" className="ui-recorrido-siguiente ui-recorrido-boton" onClick={() => liberarUnaCelda()}>
+          Liberar una celda <ArrowRight size={16} aria-hidden="true" />
+        </button>
+        <a href={inicioRecorrido(estado)} onClick={() => tienda.reiniciar()}>
+          <RotateCcw size={16} aria-hidden="true" /> Recorrido normal
+        </a>
+        <a href={href("conductor", { placa: PLACA_ESPERA, codigo: estado.carros[PLACA_ESPERA]?.codigo ?? "", demo: "1" })} aria-label="Salir">
+          <X size={16} aria-hidden="true" />
+        </a>
+      </nav>
+    </aside>
+  );
+}
+
 export function Recorrido() {
   const estado = useEstado();
   const { path, params } = useRoute();
-  const activo = params.has("recorrido");
+  const lleno = params.get("recorrido") === "lleno";
+  const activo = params.has("recorrido") && !lleno;
   // The step shown is the first one the engine has not recorded yet, so the bar follows the real process.
   const pendiente = PASOS.findIndex((p) => !p.hecho(estado));
   const n = pendiente < 0 ? PASOS.length : pendiente + 1;
@@ -102,6 +147,7 @@ export function Recorrido() {
     }, 700);
     return () => window.clearTimeout(t);
   }, [activo, n, path, destino]);
+  if (lleno) return <BarraLoteLleno estado={estado} />;
   if (!activo) return null;
   const paso = PASOS[n - 1];
   const hecho = paso.hecho(estado);
