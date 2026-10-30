@@ -29,7 +29,7 @@ interface Fila {
 }
 
 /** The quick actions of each view: sign in fast on the driver and valet phones; act fast at the gate and the office. */
-function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[] }[] {
+function filasDe(vista: VistaId, estado: Estado, ruta: string): { titulo: string; filas: Fila[] }[] {
   if (vista === "conductor") {
     // Every car that came in through a gate (the cars already in the lot at the start are left out).
     const carros = Object.values(estado.carros)
@@ -46,12 +46,12 @@ function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[
         titulo: `Nueva placa de prueba: ${placa}`,
         nota: `se registra en ${e.nombre} y entras con ella`,
         comandos: [{ tipo: "registrarLlegada", placa, entrada: e.id }],
-        luego: (actual: Estado) => href("conductor", { placa, codigo: actual.carros[placa]?.codigo ?? "", demo: "1" }),
+        luego: (actual: Estado) => href(ruta, { placa, codigo: actual.carros[placa]?.codigo ?? "", demo: "1" }),
       };
     });
     return [
       { titulo: "Registrar un carro nuevo", filas: nuevas },
-      { titulo: "Entrar como conductor", filas: carros.map((c) => ({ clave: c.placa, titulo: c.placa, dato: c.codigo, nota: c.estado, ir: href("conductor", { placa: c.placa, codigo: c.codigo, demo: "1" }) })) },
+      { titulo: "Entrar como conductor", filas: carros.map((c) => ({ clave: c.placa, titulo: c.placa, dato: c.codigo, nota: c.estado, ir: href(ruta, { placa: c.placa, codigo: c.codigo, demo: "1" }) })) },
     ];
   }
   if (vista === "valet") {
@@ -157,8 +157,6 @@ function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[
 
 /** Quick actions for the presenter, specific to the view on screen (hidden where a view has none). */
 export function AccesoRapido({ vista }: { vista?: VistaId }) {
-  const estado = useEstado();
-  const { aviso, enviar } = useComando();
   const [abierto, setAbierto] = useState(false);
   useEffect(() => {
     if (!abierto) return;
@@ -167,42 +165,6 @@ export function AccesoRapido({ vista }: { vista?: VistaId }) {
     return () => window.removeEventListener("keydown", cerrar);
   }, [abierto]);
   if (!vista) return null;
-  const grupos = [
-    { titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "empieza desde la semilla: conductor → valet → portería → oficina", ir: inicioRecorrido(estado), antes: () => tienda.reiniciar() }, { clave: "lleno", titulo: "Lote lleno y tiempo estimado", nota: "llena el lote, salen 3 carros y abre a SVK088 con su espera", comandos: [], luego: () => escenarioLoteLleno() }] },
-    ...filasDe(vista, estado),
-  ];
-  const fila = (f: Fila): ReactNode => {
-    const contenido = (
-      <>
-        <strong className="num">{f.titulo}</strong>
-        {f.dato && <span className="num">{f.dato}</span>}
-        <small>{f.nota}</small>
-      </>
-    );
-    return f.ir ? (
-      <a
-        href={f.ir}
-        onClick={() => {
-          f.antes?.();
-          setAbierto(false);
-        }}
-      >
-        {contenido}
-      </a>
-    ) : (
-      <button
-        type="button"
-        onClick={() => {
-          if (f.comandos?.every((c) => enviar(c)) && f.luego) {
-            window.location.hash = f.luego(tienda.leer()).replace(/^#/, "");
-            setAbierto(false);
-          }
-        }}
-      >
-        {contenido}
-      </button>
-    );
-  };
   return (
     <>
       <button type="button" className="ui-acceso-boton" aria-expanded={abierto} aria-label="Acciones rápidas de esta vista" onClick={() => setAbierto(!abierto)}>
@@ -217,28 +179,75 @@ export function AccesoRapido({ vista }: { vista?: VistaId }) {
                 <X size={18} aria-hidden="true" />
               </button>
             </header>
-            {aviso && (
-              <p className={aviso.ok ? "ui-acceso-ok" : "ui-acceso-error"} role="status">
-                {aviso.texto}
-              </p>
-            )}
-            {grupos.map((g) => (
-              <div key={g.titulo}>
-                <h3>{g.titulo}</h3>
-                {g.filas.length ? (
-                  <ul>
-                    {g.filas.map((f) => (
-                      <li key={f.clave}>{fila(f)}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="ui-acceso-vacio">Nada por hacer ahora.</p>
-                )}
-              </div>
-            ))}
+            <ListaAccesos vista={vista} onIr={() => setAbierto(false)} />
           </section>,
           document.body,
         )}
+    </>
+  );
+}
+
+/** The quick-action groups of a view; `ruta` is the screen the sign-in links open (the phone opens its own). */
+export function ListaAccesos({ vista, ruta = vista, onIr }: { vista: VistaId; ruta?: string; onIr?: () => void }) {
+  const estado = useEstado();
+  const { aviso, enviar } = useComando();
+  const grupos = [
+    { titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "empieza desde la semilla: conductor → valet → portería → oficina", ir: inicioRecorrido(estado), antes: () => tienda.reiniciar() }, { clave: "lleno", titulo: "Lote lleno y tiempo estimado", nota: "llena el lote, salen 3 carros y abre a SVK088 con su espera", comandos: [], luego: () => escenarioLoteLleno() }] },
+    ...filasDe(vista, estado, ruta),
+  ];
+  const fila = (f: Fila): ReactNode => {
+    const contenido = (
+      <>
+        <strong className="num">{f.titulo}</strong>
+        {f.dato && <span className="num">{f.dato}</span>}
+        <small>{f.nota}</small>
+      </>
+    );
+    return f.ir ? (
+      <a
+        href={f.ir}
+        onClick={() => {
+          f.antes?.();
+          onIr?.();
+        }}
+      >
+        {contenido}
+      </a>
+    ) : (
+      <button
+        type="button"
+        onClick={() => {
+          if (f.comandos?.every((c) => enviar(c)) && f.luego) {
+            window.location.hash = f.luego(tienda.leer()).replace(/^#/, "");
+            onIr?.();
+          }
+        }}
+      >
+        {contenido}
+      </button>
+    );
+  };
+  return (
+    <>
+      {aviso && (
+        <p className={aviso.ok ? "ui-acceso-ok" : "ui-acceso-error"} role="status">
+          {aviso.texto}
+        </p>
+      )}
+      {grupos.map((g) => (
+        <div key={g.titulo}>
+          <h3>{g.titulo}</h3>
+          {g.filas.length ? (
+            <ul>
+              {g.filas.map((f) => (
+                <li key={f.clave}>{fila(f)}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="ui-acceso-vacio">Nada por hacer ahora.</p>
+          )}
+        </div>
+      ))}
     </>
   );
 }
