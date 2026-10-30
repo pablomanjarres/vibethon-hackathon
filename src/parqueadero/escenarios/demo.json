@@ -1,0 +1,70 @@
+{
+  "id": "demo",
+  "nombre": "Hora pico de ejemplo",
+  "inicio": "06:40",
+  "reglas": {
+    "minutosPorLiberacion": 3,
+    "tarifaPorMinuto": 60,
+    "tarifaValet": 3000,
+    "moneda": "COP"
+  },
+  "mapas": [
+    {
+      "id": "lote-ejemplo",
+      "nombre": "Lote de ejemplo",
+      "columnas": 6,
+      "filas": 2,
+      "celdas": [
+        { "id": "A01", "zona": "A", "x": 1, "y": 1, "estado": "ocupada", "placa": "HKM214", "desde": -95 },
+        { "id": "A02", "zona": "A", "x": 2, "y": 1, "estado": "ocupada", "placa": "JRT508", "desde": -80 },
+        { "id": "A03", "zona": "A", "x": 3, "y": 1, "estado": "reservada", "placa": "PLX733" },
+        { "id": "A04", "zona": "A", "x": 4, "y": 1, "estado": "libre" },
+        { "id": "A05", "zona": "A", "x": 5, "y": 1, "estado": "ocupada", "placa": "DWN161", "desde": -70 },
+        { "id": "A06", "zona": "A", "x": 6, "y": 1, "estado": "ocupada", "placa": "GTB902", "desde": -64 },
+        { "id": "B01", "zona": "B", "x": 1, "y": 2, "estado": "ocupada", "placa": "KVC377", "desde": -58 },
+        { "id": "B02", "zona": "B", "x": 2, "y": 2, "estado": "ocupada", "placa": "MZR645", "desde": -52 },
+        { "id": "B03", "zona": "B", "x": 3, "y": 2, "estado": "ocupada", "placa": "TFA219", "desde": -45 },
+        { "id": "B04", "zona": "B", "x": 4, "y": 2, "estado": "ocupada", "placa": "QNS880", "desde": -38 },
+        { "id": "B05", "zona": "B", "x": 5, "y": 2, "estado": "ocupada", "placa": "BYE524", "desde": -31 },
+        { "id": "B06", "zona": "B", "x": 6, "y": 2, "estado": "reservada", "placa": "RCU416" }
+      ]
+    }
+  ],
+  "entradas": [
+    {
+      "id": "las-vegas",
+      "codigo": "LV",
+      "nombre": "Las Vegas",
+      "capacidadPasaje": 4,
+      "valets": 8,
+      "fila": [
+        { "placa": "FRS112", "llegoEn": -11 },
+        { "placa": "HUO845", "llegoEn": -8 },
+        { "placa": "KPA391", "llegoEn": -5 },
+        { "placa": "ZTE627", "llegoEn": -2 }
+      ]
+    },
+    {
+      "id": "regional",
+      "codigo": "RG",
+      "nombre": "Regional",
+      "capacidadPasaje": 6,
+      "valets": 8,
+      "fila": [
+        { "placa": "CXM540", "llegoEn": -12 },
+        { "placa": "NBD218", "llegoEn": -10 },
+        { "placa": "WQL903", "llegoEn": -7 },
+        { "placa": "EAF276", "llegoEn": -6 },
+        { "placa": "UJR615", "llegoEn": -4 },
+        { "placa": "SVK088", "llegoEn": -1 }
+      ]
+    }
+  ],
+  "eventos": [
+    { "minuto": 2, "tipo": "salida", "placa": "HKM214" },
+    { "minuto": 4, "tipo": "llegada", "placa": "MAT471", "entrada": "las-vegas" },
+    { "minuto": 5, "tipo": "salida", "placa": "DWN161" },
+    { "minuto": 7, "tipo": "llegada", "placa": "OLP350", "entrada": "regional" },
+    { "minuto": 9, "tipo": "salida", "placa": "TFA219" }
+  ]
+}
