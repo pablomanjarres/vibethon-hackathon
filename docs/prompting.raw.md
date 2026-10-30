@@ -42,3 +42,47 @@ work in the macmini then. everything there and make the commits into a private r
 ```text
 do that with parallel agents in the background, let's move to another stage of the project
 ```
+
+## 7 · 30/10/2026, 1:38 p. m.
+
+```text
+@"/Users/pablo/.claude/uploads/local_1a853e07-d694-4b71-bd13-f430be5e2830/VIBETHON-EAFIT-Judges-and-Strategy.pdf"
+
+
+in ~/Projects/vivethon-hackthon we're building the EAFIT parking challenge, this first step is the plan and the shared state, no screens yet. the problem: at rush hour drivers come in through two entrances, Las Vegas and Regional, both feed the same lot but nobody coordinates them, so cells get handed out twice or unfairly and ppl sit in line not knowing how long theyll wait, students end up late to class. the app has to show each driver their wait, split the cells fairly between both entrances, and let a student hand the car to a valet and walk to class.
+what I want exactly:
+
+* one module that owns every state change for cars, both lines, cells, valets, services, payments, fichos (the key claim tickets) and keys, so the driver, porteria (the gate), valet and office views can never disagree
+* cell states libre, reservada, ocupada and valet states disponible, reservado, en servicio, only valid transitions allowed
+* seed data in local json: Las Vegas has a passage of 4 cars between registration and the gate and starts full, with 8 valets, Regional has 6 cars, also full, with 8 valets, and a demo lot of 12 cells, A01 to A06 and B01 to B06, A03 and B06 reservada, A04 libre, the rest ocupada
+* capacities, maps and events read from that data, never hardcoded in the ui, cause the organizers give every team the same two maps, starting conditions and simulation events and we swap them in when they show up
+* small commands and read models the four views will use later
+* tests for the transitions, theres no test runner rn so add the smallest one that fits vite
+
+also everything stays local, memory or local files like json, txt or logs, no database, no cloud, no deploy. cameras, plate registration, arrivals, exits and payments are all simulated. the 12 cells are an example, not the real capacity. check the rubric at universonext.com/vibethon and map each scored thing to a feature. show me the plan, the file boundaries and the build order in a few lines before you write code. done means the app starts from one repeatable seed, `npm run check` and the tests pass, and you show me the starting snapshot.
+
+
+/dev-h  use the research on the judges to create this project. remember using refero
+```
+
+## 8 · 30/10/2026, 1:45 p. m.
+
+```text
+https://refero.design/pages/f1a3a607-cdec-4361-8226-590419fb0c76
+https://refero.design/pages/2c20bab9-b7de-4e52-8b72-061a090f6706
+https://refero.design/pages/bea987b6-775d-4d2b-8a11-80fff2a7a0d3
+
+Use chargetrip as the main source for the UI and the other 2 as good examples of how it would look the app UI and make sure the map gets limited to EAFIT parking spots
+```
+
+## 9 · 30/10/2026, 1:45 p. m.
+
+```text
+run that in a parallel agent in charge of that task (it is important that those agents deploy their own)
+```
+
+## 10 · 30/10/2026, 1:50 p. m.
+
+```text
+make sure the prompts gets saved, in the repo rn
+```
