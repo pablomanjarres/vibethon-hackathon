@@ -1,27 +1,75 @@
-/* Presenter index and app messages: neutral system type, never mistaken for product UI. */
+/* Entry page and app messages, on the app's tokens. */
 .index-page,
 .app-message {
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 48px 20px;
-  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
-  color: #1c1d1f;
+  padding: 56px 20px;
+  font: 16px/1.5 var(--font-sans);
+  color: var(--ink);
+}
+.index-ceja {
+  margin: 0 0 var(--space-2);
+  color: var(--accent);
+  font-weight: 500;
 }
 .index-page h1 {
-  margin: 0 0 24px;
-  font-size: 28px;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(32px, 5vw, 46px);
+  line-height: 1.1;
+}
+.index-intro {
+  margin: var(--space-3) 0 var(--space-6);
+  color: var(--ink-muted);
 }
 .index-page ul {
   display: grid;
-  gap: 16px;
+  gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .index-page a {
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-control);
+  color: var(--ink);
+  text-decoration: none;
 }
-.index-page p {
-  margin: 4px 0 0;
-  color: #5d6066;
+.index-page a:hover {
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-panel);
+}
+.index-page a:focus-visible,
+.app-message a:focus-visible {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
+}
+.index-icono {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-control);
+  background: var(--tile);
+}
+.index-texto {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.index-texto span {
+  color: var(--ink-muted);
+  font-size: 15px;
+}
+.app-message a {
+  color: var(--ink);
+  font-weight: 600;
 }
