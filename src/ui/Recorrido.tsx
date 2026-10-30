@@ -57,6 +57,10 @@ const PASOS: Paso[] = [
   { quien: "Conductor", vista: "conductor", params: conductor, texto: () => "Llaves de vuelta. Fin del recorrido.", hecho: (e) => llego(e, "entregado") },
 ];
 
+/** The driver's screen: the desktop page, or the phone when the walkthrough started there (?cel). */
+const pantalla = (paso: Paso, cel: boolean) => (cel && paso.vista === "conductor" ? "telefono" : paso.vista);
+const marca = (cel: boolean): Record<string, string> => (cel ? { cel: "1" } : {});
+
 /** The car the full-lot option shows: last in Regional, so it has the longest wait. */
 const PLACA_ESPERA = "SVK088";
 
@@ -65,7 +69,7 @@ const PLACA_ESPERA = "SVK088";
  * different minutes (each freed cell goes to the next car), so the lot ends full and the wait
  * estimate has real data. Returns the driver screen of a car at the back of the line.
  */
-export function escenarioLoteLleno(): string {
+export function escenarioLoteLleno(cel = false): string {
   tienda.reiniciar();
   tienda.ejecutar({ tipo: "avanzarReloj", minutos: 1 });
   for (const [minutos, placa] of [[3, "HKM214"], [4, "JRT508"], [2, "DWN161"]] as const) {
@@ -74,12 +78,12 @@ export function escenarioLoteLleno(): string {
     tienda.ejecutar({ tipo: "salir", placa });
   }
   const estado = tienda.leer();
-  return href("conductor", { placa: PLACA_ESPERA, codigo: estado.carros[PLACA_ESPERA]?.codigo ?? "", demo: "1", recorrido: "lleno" });
+  return href(cel ? "telefono" : "conductor", { placa: PLACA_ESPERA, codigo: estado.carros[PLACA_ESPERA]?.codigo ?? "", demo: "1", recorrido: "lleno", ...marca(cel) });
 }
 
 /** Link that starts the walkthrough at its first step. */
-export function inicioRecorrido(estado: Estado): string {
-  return href(PASOS[0].vista, { ...PASOS[0].params(estado), recorrido: "1" });
+export function inicioRecorrido(estado: Estado, cel = false): string {
+  return href(pantalla(PASOS[0], cel), { ...PASOS[0].params(estado), recorrido: "1", ...marca(cel) });
 }
 
 /**
@@ -101,7 +105,7 @@ function liberarUnaCelda(): string {
 }
 
 /** Bar for the full-lot option: the waiting car's live estimate and the one action that moves the line. */
-function BarraLoteLleno({ estado }: { estado: Estado }) {
+function BarraLoteLleno({ estado, cel }: { estado: Estado; cel: boolean }) {
   const v = vistaConductor(estado, PLACA_ESPERA);
   const libres = estado.celdas.filter((c) => c.estado === "libre").length;
   return (
@@ -118,10 +122,10 @@ function BarraLoteLleno({ estado }: { estado: Estado }) {
         <button type="button" className="ui-recorrido-siguiente ui-recorrido-boton" onClick={() => liberarUnaCelda()}>
           Liberar una celda <ArrowRight size={16} aria-hidden="true" />
         </button>
-        <a href={inicioRecorrido(estado)} onClick={() => tienda.reiniciar()}>
+        <a href={inicioRecorrido(estado, cel)} onClick={() => tienda.reiniciar()}>
           <RotateCcw size={16} aria-hidden="true" /> Recorrido normal
         </a>
-        <a href={href("conductor", { placa: PLACA_ESPERA, codigo: estado.carros[PLACA_ESPERA]?.codigo ?? "", demo: "1" })} aria-label="Salir">
+        <a href={href(cel ? "telefono" : "conductor", { placa: PLACA_ESPERA, codigo: estado.carros[PLACA_ESPERA]?.codigo ?? "", demo: "1" })} aria-label="Salir">
           <X size={16} aria-hidden="true" />
         </a>
       </nav>
@@ -134,20 +138,21 @@ export function Recorrido() {
   const { path, params } = useRoute();
   const lleno = params.get("recorrido") === "lleno";
   const activo = params.has("recorrido") && !lleno;
+  const cel = params.has("cel");
   // The step shown is the first one the engine has not recorded yet, so the bar follows the real process.
   const pendiente = PASOS.findIndex((p) => !p.hecho(estado));
   const n = pendiente < 0 ? PASOS.length : pendiente + 1;
-  const ir = (i: number) => href(PASOS[i - 1].vista, { ...PASOS[i - 1].params(estado), recorrido: String(i) });
+  const ir = (i: number) => href(pantalla(PASOS[i - 1], cel), { ...PASOS[i - 1].params(estado), recorrido: String(i), ...marca(cel) });
   const destino = ir(n);
   // When the next step happens on another screen, go there on its own, a moment after the action.
   useEffect(() => {
-    if (!activo || PASOS[n - 1].vista === path) return;
+    if (!activo || pantalla(PASOS[n - 1], cel) === path) return;
     const t = window.setTimeout(() => {
       window.location.hash = destino.replace(/^#/, "");
     }, 700);
     return () => window.clearTimeout(t);
-  }, [activo, n, path, destino]);
-  if (lleno) return <BarraLoteLleno estado={estado} />;
+  }, [activo, n, path, destino, cel]);
+  if (lleno) return <BarraLoteLleno estado={estado} cel={cel} />;
   if (!activo) return null;
   const paso = PASOS[n - 1];
   const hecho = paso.hecho(estado);
@@ -172,13 +177,13 @@ export function Recorrido() {
             Siguiente: {PASOS[n].quien} <ArrowRight size={16} aria-hidden="true" />
           </a>
         ) : null}
-        <button type="button" className="ui-recorrido-lleno" onClick={() => (window.location.hash = escenarioLoteLleno().replace(/^#/, ""))}>
+        <button type="button" className="ui-recorrido-lleno" onClick={() => (window.location.hash = escenarioLoteLleno(cel).replace(/^#/, ""))}>
           <Timer size={16} aria-hidden="true" /> Lote lleno y espera
         </button>
-        <a href={inicioRecorrido(estado)} onClick={() => tienda.reiniciar()} aria-label="Empezar el recorrido de nuevo">
+        <a href={inicioRecorrido(estado, cel)} onClick={() => tienda.reiniciar()} aria-label="Empezar el recorrido de nuevo">
           <RotateCcw size={16} aria-hidden="true" /> De nuevo
         </a>
-        <a href={href(paso.vista, paso.params(estado))} aria-label="Salir del recorrido">
+        <a href={href(pantalla(paso, cel), paso.params(estado))} aria-label="Salir del recorrido">
           <X size={16} aria-hidden="true" />
         </a>
       </nav>

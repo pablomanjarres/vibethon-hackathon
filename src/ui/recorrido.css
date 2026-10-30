@@ -43,8 +43,12 @@
 }
 .ui-recorrido-nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   justify-content: flex-end;
+}
+.ui-recorrido-nav > * {
+  white-space: nowrap;
 }
 .ui-recorrido-nav a {
   display: inline-flex;

@@ -9,6 +9,12 @@
   gap: var(--space-3);
   padding: 24px 16px;
 }
+/* The walkthrough bar sits at the top of the panel instead of over the phone. */
+.tl-presentador .ui-recorrido {
+  position: static;
+  transform: none;
+  width: auto;
+}
 .tl-accesos {
   position: static;
   width: auto;
