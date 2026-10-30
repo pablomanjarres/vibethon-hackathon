@@ -37,6 +37,12 @@ export const routes: PageRoute[] = [
     Page: lazy(() => import("./vistas/oficina/Oficina")),
   },
   {
+    path: "telefono",
+    name: "Teléfono",
+    summary: "Solo lectura: el lote, los pasajes, la bitácora, los fichos y los valets, en vivo.",
+    Page: lazy(() => import("./vistas/telefono/Telefono")),
+  },
+  {
     path: "mockups",
     name: "Mockups",
     summary: "Pantallas de solo lectura: el lote por zonas, la zona elegida y tu celda.",
