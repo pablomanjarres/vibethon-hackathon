@@ -1,118 +1,99 @@
-import { Banknote, Car, Eye, KeyRound, ListOrdered, MapPin, Ticket, Timer } from "lucide-react";
+import { Eye, KeyRound, LogOut, MapPin } from "lucide-react";
 import { vistaConductor } from "../../parqueadero/lecturas/conductor";
-import { carros } from "../../parqueadero/lecturas/formato";
 import type { Estado } from "../../parqueadero/tipos";
+import { href } from "../../shared/route";
 import { Boton } from "../../ui/Boton";
-import { Datos, Vacio } from "../../ui/Datos";
-import { FilaAcciones } from "../../ui/FilaAcciones";
 import { MapaLote } from "../../ui/MapaLote";
-import { PanelCabecera } from "../../ui/PanelCabecera";
-import { TarjetaDatos } from "../../ui/TarjetaDatos";
-import { motivoValet, pasos } from "../conductor/acciones";
-import { Ficho } from "../conductor/Ficho";
-import { ProgresoValet } from "../conductor/ProgresoValet";
-import { Pronostico } from "../conductor/Pronostico";
+import { pasos } from "../conductor/acciones";
+import { HojaInferior } from "./HojaInferior";
+import { Ingreso } from "./Ingreso";
+import { PestanasConductor } from "./PestanasConductor";
+import { Recorrido } from "./Recorrido";
 import "../conductor/conductor.css";
 
 /**
- * What one driver sees on their phone, drawn from the same read model as the driver view. It is a
- * preview: the actions the driver has right now are shown, but none of them sends a command.
+ * The driver app on a phone for one plate and access code: the lot map behind, the driver's details
+ * in a bottom sheet. Other drivers' plates never show. A preview: the buttons send nothing.
  */
-export function PantallaConductor({ estado, placa }: { estado: Estado; placa: string }) {
-  const v = vistaConductor(estado, placa);
-  const carro = estado.carros[v.placa];
-  const servicio = carro?.servicio ? estado.servicios[carro.servicio] : null;
-  const mapa = estado.mapas[0];
-  const libres = estado.celdas.filter((c) => c.estado === "libre").length;
-  const minutosEstacionado = carro?.estacionadoEn != null ? estado.minuto - carro.estacionadoEn : null;
-  const siguientes = pasos(v);
+export function PantallaConductor({ estado, placa, codigo }: { estado: Estado; placa: string; codigo: string }) {
+  const v = vistaConductor(estado, placa, codigo);
+  if (!v.encontrado) return <Ingreso error={v.mensaje} />;
 
-  if (!v.encontrado)
-    return (
-      <div className="tl-seccion">
-        <PanelCabecera Icono={Car} titulo={v.placa} subtitulo="Conductor" />
-        <Vacio>{v.mensaje}</Vacio>
-      </div>
-    );
+  const mapa = estado.mapas[0];
+  const acciones = [
+    ...(v.puedeReservar ? [{ texto: "Reservar celda", Icono: MapPin }] : []),
+    ...(v.puedePedirValet ? [{ texto: "Reservar valet", Icono: KeyRound }] : []),
+    ...pasos(v),
+  ].slice(0, 2);
 
   return (
     <>
-      <div className="tl-seccion">
-        <PanelCabecera Icono={Car} titulo={v.placa} subtitulo={v.entrada ? `Entrada ${v.entrada}` : "Conductor"} />
-        <FilaAcciones
-          acciones={[
-            {
-              texto: "Reservar celda",
-              Icono: MapPin,
-              motivo: v.puedeReservar ? null : v.celda ? `ya tienes la celda ${v.celda}.` : "aún no es tu turno de reservar.",
-            },
-            { texto: "Reservar valet", Icono: KeyRound, motivo: motivoValet(v) },
-            { texto: "Mi ficho", Icono: Ticket, motivo: v.ficho ? null : "aún no tienes ficho; llega al pedir un valet." },
-          ]}
-        />
-        <TarjetaDatos Icono={Timer} titulo={v.espera ? "Tu espera" : "Tu carro"} contador={{ valor: `${libres}/${estado.celdas.length}`, etiqueta: "Libres" }}>
-          {v.espera && (
-            <p className="cd-espera num">
-              {v.espera.minutos}
-              <span> min</span>
-            </p>
-          )}
-          <p className="cd-mensaje">{v.mensaje}</p>
-          {v.espera && (
-            <p className="ui-texto-suave">
-              {v.espera.carrosAdelante === 0 ? "Eres el siguiente en la fila." : `${carros(v.espera.carrosAdelante)} antes que tú, contando ambas entradas.`}
-            </p>
-          )}
-          <Datos
-            filas={[
-              { etiqueta: "Celda", valor: v.celda ?? "Por asignar" },
-              ...(minutosEstacionado !== null ? [{ etiqueta: "Estacionado hace", valor: `${minutosEstacionado} min` }] : []),
-            ]}
-          />
-        </TarjetaDatos>
-      </div>
       {mapa && (
         <div className="tl-mapa">
           <MapaLote
             nombre={mapa.nombre}
-            celdas={estado.celdas.filter((c) => c.mapa === mapa.id)}
-            entradas={estado.entradas}
+            celdas={estado.celdas.filter((c) => c.mapa === mapa.id).map((c) => ({ ...c, placa: c.id === v.celda ? v.placa : null }))}
+            entradas={estado.entradas.map((e) => ({ ...e, fila: e.fila.map(() => "") }))}
             seleccion={v.celda}
             enfoque={v.celda}
           />
         </div>
       )}
-      <div className="tl-seccion">
-        <h2 className="tl-titulo">
-          <ListOrdered size={18} aria-hidden="true" /> Turno y pasos
-        </h2>
-        {v.espera && carro ? (
-          <Pronostico espera={v.espera} entrada={v.entrada} inicio={estado.inicio} minuto={estado.minuto} llegoEn={carro.llegoEn} />
-        ) : (
-          <p className="ui-texto-suave">{v.mensaje}</p>
-        )}
-        {servicio && <ProgresoValet estado={servicio.estado} />}
-        <h2 className="tl-titulo">
-          <Ticket size={18} aria-hidden="true" /> Ficho y llaves
-        </h2>
-        {v.ficho ? <Ficho ficho={v.ficho} placa={v.placa} celda={v.celda} valet={v.valet} /> : <Vacio>Sin ficho. Pide un valet y tu ficho aparece aquí.</Vacio>}
-        <h2 className="tl-titulo">
-          <Banknote size={18} aria-hidden="true" /> Pago y salida
-        </h2>
-        <Datos filas={[{ etiqueta: "Pago", valor: v.pagado ? "Pagado" : "Pendiente" }]} />
-        {siguientes.length > 0 && (
-          <div className="cd-botones">
-            {siguientes.map((paso) => (
-              <Boton key={paso.texto} Icono={paso.Icono} ancho aria-describedby="tl-vista-previa">
-                {paso.texto}
-              </Boton>
-            ))}
-          </div>
-        )}
-        <p className="tl-nota" id="tl-vista-previa">
-          <Eye size={16} aria-hidden="true" /> Vista previa: los botones muestran lo que puede hacer el conductor, pero no envían nada.
-        </p>
+      <div className="tl-flotantes">
+        <a className="tl-flotante" href={href("telefono")} aria-label="Salir">
+          <LogOut size={18} aria-hidden="true" />
+        </a>
+        <span className="tl-flotante tl-vivo">
+          <span className="tl-punto" aria-hidden="true" /> En vivo
+        </span>
       </div>
+      <HojaInferior
+        etiqueta={`Tu carro ${v.placa}`}
+        pie={
+          <>
+            {acciones.length > 0 && (
+              <div className="tl-acciones">
+                {acciones.map((a, i) => (
+                  <Boton key={a.texto} Icono={a.Icono} variante={i === 0 ? "primario" : "secundario"} aria-describedby="tl-vista-previa">
+                    {a.texto}
+                  </Boton>
+                ))}
+              </div>
+            )}
+            <p id="tl-vista-previa" className="tl-nota">
+              <Eye size={14} aria-hidden="true" /> Vista previa: los botones no envían nada.
+            </p>
+          </>
+        }
+        cabeza={
+          <div className="tl-cabeza">
+            <p className="tl-placa num">
+              {v.placa}
+              {v.entrada && <span> · Entrada {v.entrada}</span>}
+            </p>
+            <p className="tl-mensaje" aria-live="polite">
+              {v.mensaje}
+            </p>
+            <dl className="tl-metricas">
+              <div>
+                <dt>Espera</dt>
+                <dd className="num">{v.espera ? `${v.espera.minutos} min` : "—"}</dd>
+              </div>
+              <div>
+                <dt>Adelante</dt>
+                <dd className="num">{v.espera ? v.espera.carrosAdelante : "—"}</dd>
+              </div>
+              <div>
+                <dt>Celda</dt>
+                <dd className="num">{v.celda ?? "—"}</dd>
+              </div>
+            </dl>
+            {v.estado && <Recorrido estado={v.estado} />}
+          </div>
+        }
+      >
+        <PestanasConductor estado={estado} v={v} />
+      </HojaInferior>
     </>
   );
 }

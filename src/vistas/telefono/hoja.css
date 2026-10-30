@@ -1,0 +1,199 @@
+/* Bottom sheet, its header, the swipe tabs and the fixed action bar. */
+.tl-hoja {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--visible) * 100%);
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -8px 28px rgb(0 0 0 / 0.45);
+  transition: height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tl-hoja-arrastre {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tl-hoja {
+    transition: none;
+  }
+}
+.tl-hoja-agarre {
+  flex: none;
+  touch-action: none;
+  cursor: grab;
+  padding: 0 20px 12px;
+}
+.tl-hoja-asa {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 40px;
+  margin-bottom: -8px;
+  border: 0;
+  background: none;
+  cursor: inherit;
+}
+.tl-hoja-asa span {
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--ink-muted);
+}
+.tl-hoja-cuerpo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.tl-cabeza {
+  display: grid;
+  gap: var(--space-3);
+}
+.tl-placa {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+.tl-placa span {
+  letter-spacing: 0;
+}
+.tl-mensaje {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.tl-metricas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  border-radius: 14px;
+  background: var(--panel-inner);
+}
+.tl-metricas div {
+  display: grid;
+  gap: 2px;
+  padding: 10px 14px;
+}
+.tl-metricas div + div {
+  border-left: 1px solid var(--hairline);
+}
+.tl-metricas dt {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.tl-metricas dd {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.tl-recorrido ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+.tl-recorrido li {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+.tl-tramo {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--tile);
+}
+.tl-hecha .tl-tramo {
+  background: var(--libre-pin);
+}
+.tl-ahora .tl-tramo {
+  background: var(--reservada);
+}
+.tl-ahora .tl-etapa {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.tl-pestanas {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  background: var(--panel);
+  border-bottom: 1px solid var(--hairline);
+}
+.tl-pestanas button {
+  flex: 1;
+  min-height: 46px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--ink-muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tl-pestanas button[aria-selected="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--libre);
+}
+.tl-carril {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.tl-carril::-webkit-scrollbar {
+  display: none;
+}
+.tl-panel {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-4) 20px;
+  min-width: 0;
+}
+
+.tl-hoja-pie {
+  flex: none;
+  display: grid;
+  gap: var(--space-2);
+  padding: 12px 16px 28px;
+  border-top: 1px solid var(--hairline);
+  background: var(--panel);
+  border-radius: 0;
+}
+.tl-acciones {
+  display: flex;
+  gap: var(--space-2);
+}
+.tl-acciones .ui-boton {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+.tl-nota {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-muted);
+}

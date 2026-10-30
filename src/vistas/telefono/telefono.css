@@ -1,63 +1,94 @@
-/* Driver phone preview: full screen on a phone; on wider screens a phone frame beside the plate picker. */
+/* The page around the phone, the map behind the sheet, and the sign-in screen. */
 .tl-escena {
   min-height: 100dvh;
   background: var(--canvas);
   color: var(--ink);
 }
-.tl-pantalla {
-  background: var(--panel);
-}
 .tl-presentador {
-  display: grid;
-  align-content: start;
-  gap: var(--space-3);
-  padding: var(--space-5) var(--space-4) var(--space-6);
+  display: none;
 }
 @media (min-width: 760px) {
   .tl-escena {
-    display: grid;
-    grid-template-columns: auto minmax(0, 340px);
+    display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--space-6);
-    padding: var(--space-6) var(--space-4);
-  }
-  .tl-marco {
-    width: 414px;
-    height: min(868px, calc(100dvh - 56px));
-    border: 12px solid #0d0c0c;
-    border-radius: 48px;
-    overflow: hidden;
-    box-shadow: var(--shadow-panel);
-  }
-  .tl-pantalla {
-    height: 100%;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    gap: 56px;
+    padding: 24px;
   }
   .tl-presentador {
-    padding: 0;
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    width: min(360px, 100%);
   }
 }
-
-.tl-estado {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-2) var(--space-4);
-  background: var(--panel);
-  border-bottom: 1px solid var(--hairline);
+.tl-presentador-titulo {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
 }
-.tl-vivo {
+.tl-grupo {
+  display: grid;
+  gap: var(--space-2);
+}
+.tl-grupo h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.tl-chip-codigo {
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+.ui-chip[aria-current] .tl-chip-codigo {
+  color: inherit;
+}
+
+/* Map behind the sheet: fills the part of the screen the peeking sheet leaves free. */
+.tl-mapa {
+  position: absolute;
+  inset: 0 0 50% 0;
+}
+.tl-mapa .ui-mapa-vista {
+  padding-top: 64px;
+}
+.tl-flotantes {
+  position: absolute;
+  z-index: 4;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+@media (min-width: 760px) {
+  .tl-flotantes {
+    top: 60px;
+  }
+  .tl-mapa .ui-mapa-vista {
+    padding-top: 110px;
+  }
+}
+.tl-flotante {
+  pointer-events: auto;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: rgb(20 19 18 / 0.88);
+  color: var(--ink);
+  box-shadow: var(--shadow-control);
   font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-muted);
+  font-weight: 600;
+}
+a.tl-flotante {
+  padding: 0;
 }
 .tl-punto {
   width: 8px;
@@ -77,50 +108,57 @@
   }
 }
 
-.tl-seccion {
+/* Sign-in */
+.tl-ingreso {
+  position: absolute;
+  inset: 0;
   display: grid;
+  align-content: center;
   gap: var(--space-3);
-  padding: var(--space-4);
+  padding: 24px;
+  background: var(--panel);
 }
-.tl-mapa {
-  height: 340px;
-  border-block: 1px solid var(--hairline);
+.tl-ingreso-icono {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--tile);
 }
-.tl-mapa .ui-mapa {
-  height: 100%;
+.tl-ingreso h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
-.tl-titulo {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: var(--space-2) 0 0;
+.tl-ingreso-form {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+.tl-ingreso-form input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  background: var(--panel-inner);
+  color: var(--ink);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+}
+.tl-ingreso-form .ui-boton {
+  min-height: 52px;
+  border-radius: var(--radius-pill);
   font-size: 16px;
   font-weight: 600;
 }
-.tl-nota {
-  display: flex;
-  gap: var(--space-2);
+.tl-ingreso-error {
   margin: 0;
-  font-size: 13px;
-  color: var(--ink-muted);
-}
-.tl-nota svg {
-  flex: none;
-  margin-top: 2px;
-}
-
-.tl-presentador-titulo {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 600;
-}
-.tl-grupo {
-  display: grid;
-  gap: var(--space-2);
-}
-.tl-grupo h2 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink-muted);
+  padding: var(--space-3);
+  border-radius: 12px;
+  background: var(--peligro-soft);
+  color: var(--peligro);
+  font-weight: 500;
 }
