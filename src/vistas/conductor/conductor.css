@@ -136,6 +136,14 @@
   border-radius: var(--radius-card);
   background: var(--panel-inner);
 }
+.cd-oferta-cerrada {
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+}
+.cd-oferta-cerrada .cd-oferta-titulo,
+.cd-oferta-cerrada p {
+  margin: 0;
+}
 .cd-oferta-sugerida {
   box-shadow: inset 0 0 0 2px var(--surface-light);
 }
