@@ -111,9 +111,16 @@ export function reasignar(estado: Estado, carro: Carro): string {
   }
   const entrada = estado.entradas.find((e) => e.id === carro.entrada);
   carro.celda = null;
-  carro.estado = "en fila";
   carro.confirmado = false;
-  entrada?.fila.unshift(carro.placa);
-  carro.aviso = `La celda ${anterior.id} estaba ocupada y no hay otra libre. Sigues primero en la fila.`;
-  return `${anterior.id} estaba ocupada y no hay otra libre; ${carro.placa} vuelve al frente de su pasaje.`;
+  // The passage never goes over capacity: with room the car is first in it, otherwise first outside.
+  if (entrada && entrada.fila.length < entrada.capacidadPasaje) {
+    carro.estado = "en fila";
+    entrada.fila.unshift(carro.placa);
+    carro.aviso = `La celda ${anterior.id} estaba ocupada y no hay otra libre. Sigues primero en la fila.`;
+    return `${anterior.id} estaba ocupada y no hay otra libre; ${carro.placa} vuelve al frente de su pasaje.`;
+  }
+  carro.estado = "en espera";
+  if (entrada) entrada.espera = [carro.placa, ...esperaDe(entrada)];
+  carro.aviso = `La celda ${anterior.id} estaba ocupada y no hay otra libre. Eres el primero en entrar cuando haya cupo.`;
+  return `${anterior.id} estaba ocupada y no hay otra libre; ${carro.placa} queda primero en la fila de espera, sin pasar el cupo del pasaje.`;
 }

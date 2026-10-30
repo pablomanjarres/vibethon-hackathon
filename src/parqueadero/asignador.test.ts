@@ -96,4 +96,13 @@ describe("reasignación", () => {
     expect(estado.carros.CXM540).toMatchObject({ estado: "en fila", celda: null });
     expect(estado.carros.CXM540.aviso).toMatch(/no hay otra libre/);
   });
+
+  it("sin otra libre y con el pasaje lleno, espera primero afuera sin pasar el cupo", () => {
+    let estado = correr(semilla(), { tipo: "asignarCelda", entrada: "regional" }, { tipo: "registrarLlegada", placa: "OLP350", entrada: "regional" });
+    expect(estado.entradas[1].fila).toHaveLength(6);
+    estado = correr(estado, { tipo: "reportarCeldaOcupada", placa: "CXM540" });
+    expect(estado.entradas[1].fila).toHaveLength(6);
+    expect(estado.entradas[1].espera?.[0]).toBe("CXM540");
+    expect(estado.carros.CXM540).toMatchObject({ estado: "en espera", celda: null });
+  });
 });
