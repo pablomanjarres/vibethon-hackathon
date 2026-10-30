@@ -132,28 +132,6 @@ a.tl-flotante {
   font-weight: 700;
   letter-spacing: -0.02em;
 }
-.tl-ingreso-form {
-  display: grid;
-  gap: var(--space-4);
-  margin-top: var(--space-3);
-}
-.tl-ingreso-form input {
-  width: 100%;
-  min-height: 52px;
-  padding: 0 var(--space-4);
-  border: 1px solid var(--hairline);
-  border-radius: 14px;
-  background: var(--panel-inner);
-  color: var(--ink);
-  font-size: 18px;
-  letter-spacing: 0.08em;
-}
-.tl-ingreso-form .ui-boton {
-  min-height: 52px;
-  border-radius: var(--radius-pill);
-  font-size: 16px;
-  font-weight: 600;
-}
 .tl-ingreso-error {
   margin: 0;
   padding: var(--space-3);
