@@ -1,18 +1,19 @@
-import { CircleArrowRight, Hourglass, KeyRound, ParkingSquare, ScanLine } from "lucide-react";
+import { CircleArrowRight, Hourglass, ParkingSquare } from "lucide-react";
 import { vistaPorteria } from "../../parqueadero/lecturas/porteria";
 import { href, useRoute } from "../../shared/route";
 import { AvisoResultado } from "../../ui/AvisoResultado";
 import { Boton } from "../../ui/Boton";
-import { CampoPlaca } from "../../ui/CampoPlaca";
 import { MapaLote } from "../../ui/MapaLote";
 import { Opciones } from "../../ui/Opciones";
 import { Pastilla } from "../../ui/Pastilla";
 import { Shell } from "../../ui/Shell";
-import { Cifra, Tarjeta, Vacio } from "../../ui/Tarjeta";
+import { Cifra } from "../../ui/Tarjeta";
 import { useComando, useEstado } from "../../ui/useTienda";
+import { FilaPasaje } from "./FilaPasaje";
+import { Registro } from "./Registro";
 import "./porteria.css";
 
-/** One gate: its passage line, whose turn it is and why, and the button that hands out the next cell. */
+/** One gate as a guest list: whose turn it is and why, the plate camera, the passage line and the lot. */
 export default function Porteria() {
   const estado = useEstado();
   const { params } = useRoute();
@@ -26,59 +27,48 @@ export default function Porteria() {
 
   return (
     <Shell vista="porteria" ancho>
-      <Opciones
-        etiqueta="Entradas"
-        actual={entradaId}
-        opciones={estado.entradas.map((e) => ({ id: e.id, texto: `Portería ${e.nombre}`, href: href("porteria", { entrada: e.id }) }))}
-      />
       <div className="ui-mapa-panel pt-rejilla">
         <div className="ui-panel-lateral">
           <div>
             <p className="ui-ceja">Portería</p>
             <h1 className="ui-titulo">{v.nombre}</h1>
           </div>
-          <div className="ui-subtarjeta">
-            <Pastilla {...turno} grande />
-            <p className="pt-turno">{v.turno}</p>
-            <Boton Icono={ParkingSquare} ancho onClick={() => enviar({ tipo: "asignarCelda", entrada: v.entrada })}>
-              Asignar celda
-            </Boton>
-          </div>
-          <AvisoResultado aviso={aviso} />
+          <Opciones
+            etiqueta="Entradas"
+            actual={entradaId}
+            opciones={estado.entradas.map((e) => ({
+              id: e.id,
+              texto: (
+                <>
+                  {e.nombre} <span className="num pt-cuenta">{e.fila.length}</span>
+                </>
+              ),
+              href: href("porteria", { entrada: e.id }),
+            }))}
+          />
           <div className="ui-cifras">
             <Cifra valor={`${v.pasaje.ocupados}/${v.pasaje.capacidad}`} etiqueta="Pasaje" />
             <Cifra valor={v.celdasLibres.length} etiqueta="Celdas libres" />
             <Cifra valor={v.valetsDisponibles} etiqueta="Valets libres" />
           </div>
-          <Tarjeta titulo="Fila del pasaje" extra={<span className="ui-texto-suave num">Primero en la puerta</span>}>
-            {v.fila.length === 0 ? (
-              <Vacio>No hay carros en el pasaje. Registra la placa cuando llegue el siguiente.</Vacio>
-            ) : (
-              <ol className="ui-lista pt-fila">
-                {v.fila.map((carro, i) => (
-                  <li key={carro.placa}>
-                    <span className="pt-pos num">{i + 1}</span>
-                    <span className="pt-placa">
-                      <strong className="num">{carro.placa}</strong>
-                      <span className="ui-texto-suave num">
-                        Llegó {carro.llego} · espera {carro.esperaMinutos} min
-                      </span>
-                    </span>
-                    {carro.conValet && <Pastilla texto="Valet" Icono={KeyRound} tono="neutro" />}
-                  </li>
-                ))}
-              </ol>
-            )}
-          </Tarjeta>
-          <CampoPlaca
-            etiqueta="Registrar llegada al pasaje"
-            accion="Registrar"
-            Icono={ScanLine}
-            onEnviar={(placa) => enviar({ tipo: "registrarLlegada", placa, entrada: v.entrada })}
-          />
-          <p className="ui-texto-suave pt-libres num">
-            Libres: {v.celdasLibres.length ? v.celdasLibres.join(", ") : "ninguna"}
-          </p>
+          <div className="ui-subtarjeta">
+            <Pastilla {...turno} grande />
+            <p className="pt-turno" id="pt-turno">
+              {v.turno}
+            </p>
+            <Boton
+              Icono={ParkingSquare}
+              ancho
+              disabled={!v.puedeAsignar}
+              aria-describedby="pt-turno"
+              onClick={() => enviar({ tipo: "asignarCelda", entrada: v.entrada })}
+            >
+              {v.puedeAsignar ? `Asignar celda ${v.celdasLibres[0]}` : "Asignar celda"}
+            </Boton>
+            <AvisoResultado aviso={aviso} />
+          </div>
+          <Registro v={v} />
+          <FilaPasaje fila={v.fila} capacidad={v.pasaje.capacidad} />
         </div>
         {mapa && (
           <MapaLote

@@ -1,16 +1,14 @@
-.vl-rejilla {
-  display: grid;
-  grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
-  gap: var(--space-4);
-  align-items: start;
-}
 .vl-columna {
   display: grid;
   gap: var(--space-4);
+  width: min(100%, 520px);
+  margin-inline: auto;
   min-width: 0;
 }
-.vl-columna > .ui-pastilla {
-  justify-self: start;
+.vl-cabeza {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
 }
 .vl-ficho {
   font-size: 22px;
@@ -20,12 +18,85 @@
   background: var(--ink);
   color: var(--surface-raised);
 }
-.vl-ficho-linea {
-  display: grid;
-  min-width: 0;
+.vl-celda {
+  margin: 0;
 }
-@media (max-width: 900px) {
-  .vl-rejilla {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.vl-espera {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--tile);
+  font-weight: 500;
+}
+.vl-pasos {
+  list-style: none;
+  margin: var(--space-2) 0;
+  padding: 0;
+  display: grid;
+}
+.vl-pasos > li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2) 0;
+  color: var(--ink-muted);
+}
+.vl-pasos > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: calc(50% + 14px);
+  height: calc(100% - 28px);
+  width: 2px;
+  background: var(--hairline);
+}
+.vl-pasos > li.vl-hecho::after {
+  background: var(--libre);
+}
+.vl-punto {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--hairline);
+  background: var(--surface-raised);
+}
+.vl-hecho {
+  color: var(--ink);
+}
+.vl-hecho .vl-punto {
+  border-color: var(--libre);
+  background: var(--libre);
+  color: #fff;
+}
+.vl-actual {
+  color: var(--ink);
+  font-weight: 600;
+}
+.vl-actual .vl-punto {
+  border-color: var(--ink);
+}
+.vl-paso-hora {
+  font-size: 14px;
+}
+.vl-elegir {
+  display: grid;
+  gap: var(--space-1);
+  font-weight: 500;
+}
+.vl-elegir select {
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font: inherit;
+}
+.vl-elegir select:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
 }
