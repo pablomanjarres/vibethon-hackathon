@@ -1,0 +1,27 @@
+/* Presenter index and app messages: neutral system type, never mistaken for product UI. */
+.index-page,
+.app-message {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px 20px;
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #1c1d1f;
+}
+.index-page h1 {
+  margin: 0 0 24px;
+  font-size: 28px;
+}
+.index-page ul {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.index-page a {
+  font-weight: 600;
+}
+.index-page p {
+  margin: 4px 0 0;
+  color: #5d6066;
+}
