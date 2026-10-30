@@ -39,7 +39,7 @@ export const routes: PageRoute[] = [
   {
     path: "telefono",
     name: "Teléfono",
-    summary: "Solo lectura: el lote, los pasajes, la bitácora, los fichos y los valets, en vivo.",
+    summary: "Cómo ve la app un conductor en su teléfono, en vivo y de solo lectura.",
     Page: lazy(() => import("./vistas/telefono/Telefono")),
   },
   {
