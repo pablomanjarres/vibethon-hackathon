@@ -81,7 +81,7 @@ function conAsignacionAutomatica(estado: Estado): Estado {
 
 export function crearTienda(escenario: Escenario = ESCENARIO_INICIAL): Tienda {
   // v3: cars and valets carry access codes and the valet service has its steps; older saved states start over from the seed.
-  const clave = `parqueadero:${escenario.id}:v3`;
+  const clave = `parqueadero:${escenario.id}:v4`;
   let estado = cargar(clave, escenario) ?? estadoInicial(escenario);
   const oyentes = new Set<() => void>();
   const avisar = () => {
