@@ -15,7 +15,7 @@
   height: 660px;
   border-radius: 40px;
   border: 10px solid var(--ink);
-  background: #f4f2ee;
+  background: var(--canvas);
   overflow: hidden;
   box-shadow: var(--shadow-panel);
 }

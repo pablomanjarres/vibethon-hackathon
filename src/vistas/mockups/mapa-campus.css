@@ -8,7 +8,7 @@
   font-family: var(--font-sans);
 }
 .mk-suelo {
-  fill: #f4f2ee;
+  fill: var(--canvas);
 }
 .mk-via {
   fill: #c9ced6;
@@ -25,10 +25,10 @@
   text-anchor: middle;
 }
 .mk-lote {
-  fill: #e6e3dc;
+  fill: var(--tile);
 }
 .mk-pasillo {
-  fill: #f4f2ee;
+  fill: var(--canvas);
 }
 .mk-entrada rect {
   fill: var(--ink);
@@ -40,11 +40,11 @@
   text-anchor: middle;
 }
 .mk-seccion rect {
-  fill: #fff;
-  stroke: #cfcac0;
+  fill: var(--surface-raised);
+  stroke: var(--hairline);
 }
 .mk-seccion line {
-  stroke: #e3dfd7;
+  stroke: var(--hairline);
 }
 .mk-seccion-id {
   font-size: 9px;
@@ -52,23 +52,23 @@
   fill: var(--ink-muted);
 }
 .mk-libre .mk-punto {
-  fill: #5cc04a;
-  stroke: #3a8f2c;
+  fill: var(--libre);
+  stroke: var(--libre);
 }
 .mk-pocas .mk-punto {
-  fill: #e7b52f;
-  stroke: #b08414;
+  fill: var(--reservada);
+  stroke: var(--reservada);
 }
 .mk-llena rect {
-  fill: #ebe8e2;
+  fill: var(--ocupada-soft);
 }
 .mk-elegida rect {
-  fill: #f6b6b0;
-  stroke: #d64535;
+  fill: var(--peligro-soft);
+  stroke: var(--peligro);
 }
 .mk-elegida .mk-punto {
-  fill: #d64535;
-  stroke: #9e2b1f;
+  fill: var(--peligro);
+  stroke: var(--peligro);
 }
 .mk-globo rect,
 .mk-globo path {
