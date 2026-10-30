@@ -1,4 +1,4 @@
-import { CarFront, KeyRound, OctagonAlert, ParkingSquare, type LucideIcon } from "lucide-react";
+import { CarFront, OctagonAlert, ParkingSquare, type LucideIcon } from "lucide-react";
 import type { Comando } from "../../parqueadero/motor";
 import { hora } from "../../parqueadero/lecturas/formato";
 import type { VistaValet } from "../../parqueadero/lecturas/valet";
@@ -21,15 +21,11 @@ interface Etapa {
   accion?: (s: Servicio, estado: Estado) => AccionValet | null;
 }
 
-/** One service: paid, the valet takes the car in the passage, parks it, and leaves the keys at the office. */
+/** One service: paid, the valet confirms the driver's ficho and takes the keys, parks the car, and leaves the keys at the office. */
 const ETAPAS: Etapa[] = [
   { tipo: "pagarValet", texto: "Pago aprobado" },
-  {
-    tipo: "entregarLlaves",
-    texto: "Carro recibido y ficho entregado",
-    accion: (s) => ({ texto: "Recibí el carro", Icono: KeyRound, comando: { tipo: "entregarLlaves", placa: s.placa } }),
-  },
-  { tipo: "confirmarFicho", texto: "Ficho confirmado por el conductor" },
+  { tipo: "entregarLlaves", texto: "Llegaste al carro" },
+  { tipo: "confirmarFicho", texto: "Ficho confirmado y llaves recibidas" },
   {
     tipo: "estacionar",
     texto: "Carro estacionado",
