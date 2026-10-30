@@ -1,11 +1,16 @@
-import { useState, type KeyboardEvent } from "react";
-import { DoorOpen, Minus, Plus } from "lucide-react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { ESTADO_CELDA, type EstadoCeldaUi } from "./estados";
 import { Pastilla } from "./Pastilla";
+import { distribuir, H, LOTE, PASILLO, PUERTAS, W } from "./distribuirLote";
+import { PuestoCelda } from "./PuestoCelda";
+import { ZoomMapa } from "./ZoomMapa";
 import "./mapa.css";
+
+const ZOOM_MAX = 2;
 
 export interface CeldaMapa {
   id: string;
+  zona: string;
   x: number;
   y: number;
   estado: EstadoCeldaUi;
@@ -22,147 +27,81 @@ export interface EntradaMapa {
 
 interface Props {
   nombre: string;
-  columnas: number;
-  filas: number;
   celdas: CeldaMapa[];
   entradas: EntradaMapa[];
   seleccion?: string | null;
   onSeleccionar?: (id: string) => void;
+  /** A cell to zoom into, e.g. the driver's reserved or assigned cell. */
+  enfoque?: string | null;
 }
 
-// Drawing units; the SVG scales to its container through the viewBox.
-const CELDA_W = 72;
-const CELDA_H = 96;
-const HUECO = 8;
-const CARRIL = 56;
-const MARGEN = 24;
-const PUESTO_W = 52;
-const PUESTO_H = 40;
-const PASAJE_H = 132;
+const pct = (valor: number, total: number) => `${(valor / total) * 100}%`;
 
 /**
- * The EAFIT lot drawn from the scenario: cells at their (x, y), and below them each entrance with
- * its passage slots. Nothing outside the lot is drawn and zoom stays inside this frame.
+ * The EAFIT lot drawn like a seat map from the state: streets with their names, the lot and its aisle,
+ * one stall per cell grouped by zone, and each entrance with the cars waiting in its passage.
  */
-export function MapaLote({ nombre, columnas, filas, celdas, entradas, seleccion, onSeleccionar }: Props) {
+export function MapaLote({ nombre, celdas, entradas, seleccion, onSeleccionar, enfoque }: Props) {
   const [zoom, setZoom] = useState(1);
-  const loteW = columnas * (CELDA_W + HUECO) - HUECO;
-  const loteH = filas * CELDA_H + (filas - 1) * CARRIL;
-  const pasajes = entradas.map((e) => e.capacidadPasaje * (PUESTO_W + 6) - 6);
-  const pasajesW = pasajes.reduce((a, b) => a + b, 0) + Math.max(0, entradas.length - 1) * 48;
-  const ancho = Math.max(loteW, pasajesW) + MARGEN * 2;
-  const alto = MARGEN * 2 + loteH + CARRIL + PASAJE_H;
-  const loteX = (ancho - loteW) / 2;
-  const sueloY = MARGEN + loteH + CARRIL;
+  const vista = useRef<HTMLDivElement>(null);
+  const { puestos, zonas } = distribuir(celdas);
+  const elegido = puestos.find((p) => p.celda.id === seleccion) ?? null;
 
-  const xCelda = (c: CeldaMapa) => loteX + (c.x - 1) * (CELDA_W + HUECO);
-  const yCelda = (c: CeldaMapa) => MARGEN + (c.y - 1) * (CELDA_H + CARRIL);
-
-  let cursor = (ancho - pasajesW) / 2;
-  const posiciones = entradas.map((entrada, i) => {
-    const x = cursor;
-    cursor += pasajes[i] + 48;
-    return { entrada, x, w: pasajes[i] };
-  });
-
-  const teclado = (id: string) => (event: KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onSeleccionar?.(id);
-    }
-  };
+  useEffect(() => {
+    if (!enfoque) return;
+    setZoom(ZOOM_MAX);
+    const id = requestAnimationFrame(() =>
+      vista.current?.querySelector(`[data-celda="${CSS.escape(enfoque)}"]`)?.scrollIntoView({ block: "center", inline: "center" }),
+    );
+    return () => cancelAnimationFrame(id);
+  }, [enfoque]);
 
   return (
-    <div className="ui-mapa">
-      <div className="ui-mapa-lienzo">
-        <svg
-          viewBox={`0 0 ${ancho} ${alto}`}
-          style={{ width: `${zoom * 100}%` }}
-          role="group"
-          aria-label={`Mapa de ${nombre}`}
-        >
-          <rect x={4} y={4} width={ancho - 8} height={alto - 8} rx={20} className="ui-mapa-lote" />
-          {Array.from({ length: filas }, (_, i) => (
-            <rect
-              key={i}
-              x={loteX - 10}
-              y={MARGEN + i * (CELDA_H + CARRIL) + CELDA_H + 10}
-              width={loteW + 20}
-              height={CARRIL - 20}
-              rx={8}
-              className="ui-mapa-carril"
-            />
-          ))}
-          {celdas.map((celda) => {
-            const meta = ESTADO_CELDA[celda.estado];
-            const elegida = celda.id === seleccion;
-            const x = xCelda(celda);
-            const y = yCelda(celda);
-            return (
-              <g
-                key={celda.id}
-                className={`ui-celda ui-tono-${meta.tono}${elegida ? " ui-celda-elegida" : ""}`}
-                role={onSeleccionar ? "button" : "img"}
-                tabIndex={onSeleccionar ? 0 : undefined}
-                aria-pressed={onSeleccionar ? elegida : undefined}
-                aria-label={`Celda ${celda.id}, ${meta.texto}${celda.placa ? `, ${celda.placa}` : ""}`}
-                onClick={onSeleccionar ? () => onSeleccionar(celda.id) : undefined}
-                onKeyDown={onSeleccionar ? teclado(celda.id) : undefined}
-              >
-                <rect x={x} y={y} width={CELDA_W} height={CELDA_H} rx={10} className="ui-celda-fondo" />
-                <text x={x + CELDA_W / 2} y={y + 22} className="ui-celda-id">
-                  {celda.id}
-                </text>
-                <meta.Icono x={x + CELDA_W / 2 - 11} y={y + 32} width={22} height={22} strokeWidth={2.2} aria-hidden="true" />
-                <text x={x + CELDA_W / 2} y={y + 74} className="ui-celda-estado">
-                  {meta.texto}
-                </text>
-                {celda.placa && (
-                  <text x={x + CELDA_W / 2} y={y + 88} className="ui-celda-placa">
-                    {celda.placa}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-          {posiciones.map(({ entrada, x, w }) => (
-            <g key={entrada.id} aria-label={`Entrada ${entrada.nombre}: ${entrada.fila.length} de ${entrada.capacidadPasaje} puestos en el pasaje`} role="img">
-              <rect x={x - 8} y={sueloY - 8} width={w + 16} height={PASAJE_H - 8} rx={12} className="ui-mapa-pasaje" />
-              <DoorOpen x={x} y={sueloY} width={18} height={18} aria-hidden="true" className="ui-mapa-puerta" />
-              <text x={x + 24} y={sueloY + 14} className="ui-mapa-entrada">
-                {entrada.nombre}
-              </text>
-              {Array.from({ length: entrada.capacidadPasaje }, (_, i) => {
-                const placa = entrada.fila[i];
-                const px = x + i * (PUESTO_W + 6);
-                return (
-                  <g key={i} className={placa ? "ui-puesto ui-puesto-lleno" : "ui-puesto"}>
-                    <rect x={px} y={sueloY + 30} width={PUESTO_W} height={PUESTO_H} rx={6} />
-                    <text x={px + PUESTO_W / 2} y={sueloY + 54}>
-                      {placa ? placa.slice(0, 3) : i + 1}
-                    </text>
-                    {placa && (
-                      <text x={px + PUESTO_W / 2} y={sueloY + 66} className="ui-puesto-sub">
-                        {placa.slice(3)}
-                      </text>
-                    )}
-                  </g>
-                );
-              })}
-              <text x={x} y={sueloY + 94} className="ui-mapa-nota">
-                Pasaje {entrada.fila.length}/{entrada.capacidadPasaje}
-              </text>
+    <div className="ui-mapa" role="region" aria-label={`Mapa de ${nombre}`}>
+      <div className="ui-mapa-vista" ref={vista}>
+        <div className="ui-mapa-lote" style={{ "--proporcion": W / H, "--zoom": zoom } as CSSProperties}>
+          <svg viewBox={`0 0 ${W} ${H}`} aria-hidden="true" className="ui-mapa-trazo">
+            <path d="M0 0 L350 0 L350 34 Q200 52 0 30 Z" className="ui-mapa-via" />
+            <rect x="0" y="0" width="34" height="470" className="ui-mapa-via" />
+            <rect x="316" y="0" width="34" height="470" className="ui-mapa-via" />
+            <path d="M0 448 L350 412 L350 470 L0 470 Z" className="ui-mapa-via" />
+            <path d="M260 470 C 280 380, 330 320, 350 300" className="ui-mapa-quebrada" />
+            <g className="ui-mapa-calle">
+              <text x="110" y="20">Av. Regional</text>
+              <text transform="translate(21 360) rotate(-90)">Avenida Las Vegas</text>
+              <text transform="translate(333 200) rotate(90)">Carrera 48</text>
+              <text transform="translate(175 452) rotate(-6)">Calle 5 Sur</text>
             </g>
+            <rect x={LOTE.x} y={LOTE.y} width={LOTE.w} height={LOTE.h} rx="18" className="ui-mapa-borde" />
+            <rect x={PASILLO.x} y={LOTE.y + 6} width={PASILLO.w} height={LOTE.h - 12} rx="6" className="ui-mapa-pasillo" />
+            {zonas.map((z) => (
+              <text key={z.id} x={z.x + 2} y={z.y + 11} className="ui-mapa-zona">
+                Zona {z.id}
+              </text>
+            ))}
+          </svg>
+          {entradas.slice(0, PUERTAS.length).map((entrada, i) => (
+            <div
+              key={entrada.id}
+              className="ui-mapa-entrada"
+              style={{ left: pct(PUERTAS[i].x, W), top: pct(PUERTAS[i].y, H) }}
+              role="img"
+              aria-label={`Entrada ${entrada.nombre}: ${entrada.fila.length} de ${entrada.capacidadPasaje} carros esperando en el pasaje`}
+            >
+              <span className="ui-mapa-codigo">{entrada.codigo}</span>
+              <span className="ui-mapa-cuenta num">{entrada.fila.length}</span>
+            </div>
           ))}
-        </svg>
-      </div>
-      <div className="ui-mapa-controles" role="group" aria-label="Zoom del mapa">
-        <button type="button" aria-label="Acercar" disabled={zoom >= 2} onClick={() => setZoom((z) => Math.min(2, z + 0.5))}>
-          <Plus size={18} aria-hidden="true" />
-        </button>
-        <button type="button" aria-label="Alejar" disabled={zoom <= 1} onClick={() => setZoom((z) => Math.max(1, z - 0.5))}>
-          <Minus size={18} aria-hidden="true" />
-        </button>
+          {puestos.map((puesto) => (
+            <PuestoCelda key={puesto.celda.id} puesto={puesto} elegido={puesto.celda.id === seleccion} onSeleccionar={onSeleccionar} />
+          ))}
+          {elegido && (
+            <div className="ui-mapa-globo" style={{ left: pct(elegido.x + elegido.w / 2, W), top: pct(elegido.y, H) }} role="status">
+              <strong className="num">{elegido.celda.id}</strong> · {ESTADO_CELDA[elegido.celda.estado].texto}
+              {elegido.celda.placa && <span className="num"> · {elegido.celda.placa}</span>}
+            </div>
+          )}
+        </div>
       </div>
       <ul className="ui-mapa-leyenda" aria-label="Leyenda">
         {Object.values(ESTADO_CELDA).map((meta) => (
@@ -171,6 +110,7 @@ export function MapaLote({ nombre, columnas, filas, celdas, entradas, seleccion,
           </li>
         ))}
       </ul>
+      <ZoomMapa zoom={zoom} max={ZOOM_MAX} onCambiar={setZoom} />
     </div>
   );
 }
