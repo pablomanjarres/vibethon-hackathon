@@ -28,12 +28,14 @@ interface Props {
   onSeleccionar?: (celda: string) => void;
   /** A cell the map zooms into, such as the driver's own. */
   enfoque?: string | null;
+  /** Driver views: the map never shows other people's plates. */
+  privado?: boolean;
   /** Panel content: header, tiles, chips, card and sections. */
   children: ReactNode;
 }
 
 /** Map-first frame shared by every page: the lot behind, the floating panel, the view stack. */
-export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, children }: Props) {
+export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, privado = false, children }: Props) {
   const estado = useEstado();
   const nombre = VISTAS.find((item) => item.id === vista)?.nombre;
   useEffect(() => {
@@ -46,7 +48,7 @@ export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, childre
         {mapa && (
           <MapaLote
             nombre={mapa.nombre}
-            celdas={estado.celdas.filter((c) => c.mapa === mapa.id)}
+            celdas={estado.celdas.filter((c) => c.mapa === mapa.id).map((c) => (privado ? { ...c, placa: null } : c))}
             entradas={estado.entradas}
             seleccion={seleccion}
             onSeleccionar={onSeleccionar}
