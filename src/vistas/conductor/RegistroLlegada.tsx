@@ -1,6 +1,7 @@
 import { useId, useRef, useState, type FormEvent } from "react";
 import { MapPinned } from "lucide-react";
 import { normalizarPlaca } from "../../parqueadero/consultas";
+import { codigoDeRegistro } from "../../parqueadero/lecturas/conductor";
 import { tienda } from "../../parqueadero/tienda";
 import type { Estado } from "../../parqueadero/tipos";
 import { Hoja } from "../../ui/Hoja";
@@ -8,8 +9,8 @@ import { useComando } from "../../ui/useTienda";
 
 interface Props {
   estado: Estado;
-  /** Called with the plate and the engine's confirmation once the car is in line. */
-  onRegistrada: (placa: string, texto: string) => void;
+  /** Called with the plate, its access code and the engine's confirmation once the car is in line. */
+  onRegistrada: (placa: string, codigo: string, texto: string) => void;
 }
 
 /** Self check-in on arrival: plate, entrance from the state and one primary action that saves the spot in line. */
@@ -25,7 +26,8 @@ export function RegistroLlegada({ estado, onRegistrada }: Props) {
     event.preventDefault();
     const normalizada = normalizarPlaca(placa);
     if (enviar({ tipo: "registrarLlegada", placa: normalizada, entrada })) {
-      onRegistrada(normalizada, tienda.leer().bitacora.at(-1)?.detalle ?? `${normalizada} quedó registrada.`);
+      const despues = tienda.leer();
+      onRegistrada(normalizada, codigoDeRegistro(despues, normalizada) ?? "", despues.bitacora.at(-1)?.detalle ?? `${normalizada} quedó registrada.`);
     } else setRechazo(true);
   };
   const reintentar = () => {
@@ -57,8 +59,7 @@ export function RegistroLlegada({ estado, onRegistrada }: Props) {
             <label key={e.id} className="ui-chip cd-entrada">
               <input type="radio" name={`${id}-entrada`} value={e.id} checked={entrada === e.id} onChange={() => setEntrada(e.id)} />
               {e.nombre}
-              <span className="num cd-entrada-cuenta">{e.fila.length + (e.espera?.length ?? 0)}</span>
-            </label>
+                          </label>
           ))}
         </div>
       </fieldset>
