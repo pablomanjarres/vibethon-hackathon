@@ -86,8 +86,7 @@ export function vistaConductor(estado: Estado, placaEscrita: string, codigo?: st
     ficho: servicio?.ficho ?? null,
     valet: servicio?.valet ?? null,
     llave: carro.llave,
-    puedePedirValet:
-      carro.estado === "en fila" && !servicio && estado.valets.some((v) => v.entrada === carro.entrada && v.estado === "disponible"),
+    puedePedirValet: carro.estado === "con celda" && !servicio && estado.valets.some((v) => v.estado === "disponible"),
     puedeReservar: carro.estado === "en fila" && celdasLibres.length > 0 && ordenDeAtencion(estado)[0] === placa,
     celdasLibres,
     pagado: carro.pagado,

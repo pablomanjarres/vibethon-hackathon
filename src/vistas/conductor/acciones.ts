@@ -29,6 +29,7 @@ export function pasos(v: VistaConductor): Paso[] {
 export function motivoValet(v: VistaConductor): string | null {
   if (v.puedePedirValet) return null;
   if (v.ficho) return `ya tienes el ficho ${v.ficho}.`;
-  if (v.estado !== "en fila") return "se pide mientras esperas en la fila.";
-  return "no hay valets disponibles en tu entrada.";
+  if (v.estado === "en fila" || v.estado === "en espera") return "primero reserva tu celda: el valet necesita saber dónde estacionar.";
+  if (v.estado !== "con celda") return "se pide cuando tienes una celda reservada.";
+  return "no hay valets disponibles ahora.";
 }

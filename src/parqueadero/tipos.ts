@@ -48,6 +48,8 @@ export interface Carro {
   celda: string | null;
   servicio: string | null;
   estacionadoEn: number | null;
+  /** Minute the car left the lot (older saved states have none). */
+  salioEn?: number | null;
   llave: UbicacionLlave;
   pagado: boolean;
 }
@@ -76,6 +78,8 @@ export interface Servicio {
   ficho: string;
   valet: string | null;
   estado: EstadoServicio;
+  /** Minute the current valet got this job (the request, or the return). */
+  asignadoEn?: number;
 }
 
 export interface Pago {

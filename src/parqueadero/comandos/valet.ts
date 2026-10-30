@@ -2,13 +2,18 @@ import { carroPorPlaca, celdaDe, nombreEntrada, servicioDe, servicioPorFicho, va
 import { cambiarCelda, cambiarValet, exigir } from "../transiciones.ts";
 import type { Estado, Servicio } from "../tipos.ts";
 
-/** A driver waiting in a passage asks for a valet of that entrance; the service gets its ficho. */
+/**
+ * A driver whose cell is already reserved asks for a valet, so the valet always knows where to park.
+ * A valet of the car's entrance takes it (any free valet if none there); the service gets its ficho.
+ */
 export function pedirValet(estado: Estado, placa: string): string {
   const carro = carroPorPlaca(estado, placa);
-  exigir(carro.estado === "en fila", "Solo un carro que espera en el pasaje puede pedir valet.");
+  exigir(carro.estado === "con celda", "Primero reserva tu celda: el valet necesita saber dónde estacionar.");
   exigir(!carro.servicio, `${carro.placa} ya tiene un valet asignado.`);
-  const valet = estado.valets.find((v) => v.entrada === carro.entrada && v.estado === "disponible");
-  exigir(valet, `No hay valets disponibles en ${nombreEntrada(estado, carro.entrada)}. Sigue en la fila.`);
+  const valet =
+    estado.valets.find((v) => v.entrada === carro.entrada && v.estado === "disponible") ??
+    estado.valets.find((v) => v.estado === "disponible");
+  exigir(valet, `No hay valets disponibles en ${nombreEntrada(estado, carro.entrada)}. Puedes estacionar tú mismo en la celda ${carro.celda}.`);
   estado.consecutivos.servicio += 1;
   const numero = estado.consecutivos.servicio;
   const servicio: Servicio = {
@@ -17,12 +22,13 @@ export function pedirValet(estado: Estado, placa: string): string {
     ficho: `F-${String(numero).padStart(3, "0")}`,
     valet: valet.id,
     estado: "solicitado",
+    asignadoEn: estado.minuto,
   };
   estado.servicios[servicio.id] = servicio;
   cambiarValet(valet, "reservado");
   valet.servicio = servicio.id;
   carro.servicio = servicio.id;
-  return `${valet.id} va hacia ${carro.placa}. Ficho ${servicio.ficho}.`;
+  return `${valet.id} va hacia ${carro.placa} para llevarlo a la celda ${carro.celda}. Ficho ${servicio.ficho}.`;
 }
 
 /** The driver hands over the keys and walks to class; the car keeps its place in the line. */
@@ -53,6 +59,7 @@ export function pedirDevolucion(estado: Estado, ficho: string): string {
   valet.servicio = servicio.id;
   servicio.valet = valet.id;
   servicio.estado = "devolución";
+  servicio.asignadoEn = estado.minuto;
   return `${valet.id} va por ${carro.placa} (ficho ${servicio.ficho}).`;
 }
 
@@ -86,5 +93,6 @@ export function entregarCarro(estado: Estado, ficho: string): string {
   servicio.estado = "entregado";
   carro.llave = "conductor";
   carro.estado = "retirado";
+  carro.salioEn = estado.minuto;
   return `${carro.placa} fue entregado con el ficho ${servicio.ficho}.`;
 }

@@ -230,3 +230,6 @@ a.ui-chip:hover {
   display: grid;
   gap: var(--space-3);
 }
+.ui-acordeon-cuerpo[hidden] {
+  display: none;
+}
