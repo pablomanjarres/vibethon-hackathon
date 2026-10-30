@@ -55,6 +55,12 @@
   --panel-width: 380px;
 
   --focus-color: #8ab4ff;
+
+  /* Older names still read by the mockups page. */
+  --canvas: #2b2928;
+  --surface: var(--panel);
+  --surface-raised: var(--tile);
+  --font-serif: var(--font-sans);
 }
 
 body {
