@@ -73,7 +73,7 @@ export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, privado
             </li>
           ))}
         </ul>
-        <AccesoRapido />
+        <AccesoRapido vista={vista} />
         <Reloj />
       </nav>
     </div>
