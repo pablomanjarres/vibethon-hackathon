@@ -1,5 +1,6 @@
 import { carroPorPlaca, celdaDe, nombreEntrada, servicioDe, servicioPorFicho, valetPorId } from "../consultas.ts";
-import { cambiarCelda, cambiarValet, exigir } from "../transiciones.ts";
+import { liberarCelda } from "../asignador.ts";
+import { cambiarValet, exigir } from "../transiciones.ts";
 import type { Estado, Servicio } from "../tipos.ts";
 
 /**
@@ -72,8 +73,7 @@ export function recogerCarro(estado: Estado, ficho: string): string {
   const valet = valetPorId(estado, servicio.valet);
   cambiarValet(valet, "en servicio");
   const celda = celdaDe(estado, carro);
-  cambiarCelda(celda, "libre");
-  celda.placa = null;
+  liberarCelda(estado, celda);
   carro.celda = null;
   carro.estado = "en devolución";
   carro.llave = "valet";

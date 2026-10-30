@@ -1,5 +1,6 @@
 import { carroPorPlaca, celdaDe } from "../consultas.ts";
-import { cambiarCelda, exigir } from "../transiciones.ts";
+import { liberarCelda } from "../asignador.ts";
+import { exigir } from "../transiciones.ts";
 import type { Estado } from "../tipos.ts";
 
 /** Simulated payment: minutes parked times the scenario rate, plus the valet fee when there was one. */
@@ -23,8 +24,7 @@ export function salir(estado: Estado, placa: string): string {
   exigir(carro.estado === "estacionado", `${carro.placa} no está estacionado.`);
   exigir(carro.pagado, `Falta el pago de ${carro.placa}.`);
   const celda = celdaDe(estado, carro);
-  cambiarCelda(celda, "libre");
-  celda.placa = null;
+  liberarCelda(estado, celda);
   carro.celda = null;
   carro.estado = "retirado";
   carro.salioEn = estado.minuto;
