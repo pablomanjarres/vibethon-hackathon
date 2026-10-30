@@ -4,3 +4,4 @@ shots
 .env*
 .private
 references/**/*.mp4
+.claude
