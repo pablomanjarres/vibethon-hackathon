@@ -98,3 +98,33 @@ make sure the prompts gets saved, in the repo rn
 ```text
 check the prompts in the repo, the repo is in github therefore
 ```
+
+## 13 · 30/10/2026, 1:53 p. m.
+
+```text
+dont write tests of anykind
+```
+
+## 14 · 30/10/2026, 1:56 p. m.
+
+```text
+give me the list of inspiration from refero to do the website
+```
+
+## 15 · 30/10/2026, 1:58 p. m.
+
+```text
+Luma and Driver are also going to drive the development of the app. make sure also to relay that the purpose is like making an app that you can reserve the parking spots and valets, like using the map and similar UI to luma. relay this to the agents in charge of building the app and website
+```
+
+## 16 · 30/10/2026, 2:02 p. m.
+
+```text
+make sure some agents run in smaller models of opus like opus 5.5 mid or high in order to increase the speed
+```
+
+## 17 · 30/10/2026, 2:03 p. m.
+
+```text
+remeber no running review rounds, or code reviews
+```

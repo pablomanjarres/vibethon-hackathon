@@ -1,42 +1,69 @@
-# Prompt log: <product name>
+# Registro de prompts: parqueadero EAFIT en hora pico
 
-Copy to `docs/prompting.md` in the first hour and keep it current. Real prompts and real failures only; never write one after the fact that did not happen. Write it in the challenge's language.
+Los prompts escritos, tal cual y en orden, están en [`prompting.raw.md`](prompting.raw.md). Esta página explica los que definieron el trabajo, las correcciones después de un fallo visto y cómo se comprobó cada una. Solo hay fallos que ocurrieron.
 
-## 1. The prompt you were given
+## 1. El prompt del reto
 
-Paste it as sent, even when it is one line.
+Es el prompt 7 de `prompting.raw.md`. Lo esencial, tal como se escribió:
 
 ```text
-<the prompt as sent>
+the problem: at rush hour drivers come in through two entrances, Las Vegas and Regional, both feed the same lot but nobody coordinates them, so cells get handed out twice or unfairly and ppl sit in line not knowing how long theyll wait, students end up late to class. the app has to show each driver their wait, split the cells fairly between both entrances, and let a student hand the car to a valet and walk to class.
 ```
 
-## 2. The build prompt (the spec that drives the work)
+## 2. El prompt de construcción
 
-Before any code, turn the challenge pack into the prompt the build follows, and follow it. Judges score this text: a generic one-liner loses points, a labelled spec gets them. Every field filled, in the challenge's words:
+> **Problema:** a hora pico los carros entran por Las Vegas y por Regional a un mismo lote sin coordinación; las celdas se entregan dos veces o de forma injusta, la gente espera sin saber cuánto y los estudiantes llegan tarde a clase.
+> **Usuario:** el estudiante que llega en carro; también la portería de cada entrada, los valets y la oficina.
+> **Objetivo:** que el conductor sepa su espera, reserve en el mapa la celda que le toca o reserve un valet y camine a clase, sin que nadie reciba una celda ya entregada.
+> **Requisitos obligatorios:** (1) mostrar a cada conductor su espera; (2) repartir las celdas con justicia entre las dos entradas; (3) entregar el carro a un valet e ir a clase; (4) un solo módulo dueño de todo cambio de estado; (5) celdas libre, reservada, ocupada y valets disponible, reservado, en servicio, solo con transiciones válidas; (6) semilla en JSON local: Las Vegas 4 y Regional 6, ambas llenas, 8 valets cada una, 12 celdas de ejemplo; (7) capacidades, mapas y eventos leídos de los datos; (8) comandos y lecturas pequeños para las cuatro vistas.
+> **Restricciones:** todo local, sin base de datos, sin nube, sin despliegue; cámaras, placas, llegadas, salidas y pagos simulados; las 12 celdas son un ejemplo; interfaz en español.
+> **Decisiones:** un motor que trabaja sobre una copia y rechaza con motivo, para que un error nunca deje el estado a medias; la siguiente celda va al carro que llegó primero sin importar la entrada, porque es justo para cada conductor y se explica en una frase; el escenario se valida al cargar, para que el mapa de los organizadores falle con un mensaje claro y no en plena demo; el mapa se dibuja solo con las celdas del escenario, limitado al lote de EAFIT.
+> **Verificación:** `npm run check`, `npm run build`, `npm run foto` dos veces con la misma salida, y cada flujo ejecutado contra el motor.
 
-> **Problema:** who has the problem and what goes wrong today.
-> **Usuario:** the person who benefits, and where and how they use it.
-> **Objetivo:** what they can do with the product that they cannot do today.
-> **Requisitos obligatorios:** every one from the challenge, numbered as in the challenge.
-> **Restricciones:** the challenge's conditions (limits, data, language, devices, deliverables).
-> **Decisiones:** the three to five decisions that follow from the above, each with its reason.
-> **Verificación:** how each requirement will be checked (sweep, click-through, screenshot).
+## 3. Correcciones
 
-## 3. Corrections (three or more)
+### Corrección 1: la referencia visual la eligió la ejecución, no el equipo
 
-One entry per failure you saw. A failure is something observed: the sweep, a screenshot, a click-through or a judge question showed it. At least one must be a behavior or rule mistake (a wrong limit, a wrong order, a lost input), not only layout. Paste the check's real output (the sweep or click-through lines), not just "passed".
-
-### Correction 1
-
-| Step | Content |
+| Paso | Contenido |
 |---|---|
-| Observed failure | What happened, where, how it was noticed (sweep output, screenshot, console error) |
-| Cause | Why the prompt let it happen (missing requirement, vague wording, no check asked for) |
-| Corrected prompt | The instruction you gave to fix it, quoted as a prompt ("Las tres pestañas deben caber a 390 px...") |
-| Check after the fix | The command, click path or screenshot that proves it is fixed, run on the built site, and its result. Claim only what that check saw |
+| Fallo observado | La primera búsqueda de referencias en Refero eligió Zendesk por su cuenta y guardó `references/refero/zendesk/`. El equipo ya quería Chargetrip |
+| Causa | El prompt pedía buscar y escoger un sitio, sin nombrar las referencias del equipo ni el límite del mapa |
+| Prompt corregido | "Use chargetrip as the main source for the UI and the other 2 as good examples of how it would look the app UI and make sure the map gets limited to EAFIT parking spots" (prompt 8), con las tres páginas de Refero |
+| Comprobación | Se borró la carpeta de Zendesk. `references/refero/chargetrip/` quedó guardada y `src/ui/MapaLote.tsx` dibuja solo las celdas y entradas del escenario (PR #4) |
 
-## 4. How we know the result meets the challenge
+### Corrección 2: un solo prompt para toda la interfaz no alcanzó
 
-| Requirement or rubric item | Checked how | Result |
+| Paso | Contenido |
+|---|---|
+| Fallo observado | La ejecución de la interfaz se detuvo por límite de turnos (`error_max_turns` tras 41 turnos). Dejó vistas sin guardar en git y una copia propia de `src/parqueadero/` |
+| Causa | Un prompt pedía referencias, tokens, mapa y las cuatro vistas de una vez, sin presupuesto ni entregas parciales |
+| Prompt corregido | Tres prompts pequeños, uno por área (oficina; conductor; portería y valet), cada uno con sus archivos y esta regla: "You have a hard limit of about 35 tool calls: land a working version in a merged PR by your ~20th call" |
+| Comprobación | La copia de `src/parqueadero/` se comparó archivo por archivo con `main` (19 de 19 iguales) antes de borrarla; las vistas guardadas pasaron `npm run check` y `npm run build` y entraron en el PR #4 |
+
+### Corrección 3: el conductor no podía reservar su celda
+
+| Paso | Contenido |
+|---|---|
+| Fallo observado | Con el primer motor, solo la portería asignaba celdas; el conductor esperaba sin poder elegir ni reservar nada en el mapa |
+| Causa | El prompt del reto pedía mostrar la espera y repartir con justicia, pero no decía que la app fuera para reservar |
+| Prompt corregido | "make sure also to relay that the purpose is like making an app that you can reserve the parking spots and valets, like using the map and similar UI to luma" (prompt 12) |
+| Comprobación | Nuevo comando `reservarCelda`: solo el carro al que le toca puede reservar, y solo una celda libre. Ejecución contra el motor (PR #5): |
+
+```text
+NO  reservarCelda FRS112: Todavía no es tu turno: hay 1 carro antes que tú.
+NO  reservarCelda CXM540: La celda A01 está ocupada. Elige una libre.
+ok  reservarCelda CXM540: CXM540 reservó la celda A04.
+ok  estacionar CXM540: CXM540 se estacionó en A04.
+```
+
+## 4. Cómo sabemos que cumple
+
+| Requisito o ítem | Cómo se comprobó | Resultado |
 |---|---|---|
-| | | |
+| Semilla repetible | `npm run foto` dos veces y `cmp` de las salidas | Iguales: 1 libre, 2 reservadas, 9 ocupadas; Las Vegas 4/4, Regional 6/6; 8 valets disponibles por entrada |
+| Reparto justo | Ejecución contra el motor | "Es el turno de Regional: su primer carro llegó antes." para Las Vegas; Regional entrega A04 a CXM540 |
+| Ninguna celda dos veces | Ejecución contra el motor | Segunda asignación rechazada mientras no haya celdas libres |
+| Valet y clase | Ejecución contra el motor | "SVK088 quedó con RG-V1. Guarda el ficho F-001 y ve a clase."; el carro conserva su turno |
+| Salida con pago | Ejecución contra el motor | "Falta el pago de HKM214." antes de pagar |
+| Eventos del escenario | `simularHasta(10)` | "Minuto 4: El pasaje de Las Vegas está lleno (4 de 4). El carro espera afuera." |
+| Tipos y build | `npm run check`, `npm run build` | Pasan |
