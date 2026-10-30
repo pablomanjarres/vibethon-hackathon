@@ -28,7 +28,6 @@ export function TarjetaAsignacion({ servicio: s }: { servicio: Servicio }) {
           { etiqueta: "Entrada", valor: s.entrada },
           { etiqueta: "Turno", valor: turno === null ? "Ya pasó la fila" : `Puesto ${turno}` },
           { etiqueta: "Pago", valor: s.estado === "pago pendiente" ? "Pendiente" : "Aprobado" },
-          { etiqueta: "Celda", valor: s.celda ? `Asignada: ${s.celda}` : "Esperando celda de la portería" },
         ]}
       />
     </TarjetaDatos>
