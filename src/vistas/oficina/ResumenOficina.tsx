@@ -17,12 +17,12 @@ export function ResumenOficina({ resumen: r, moneda, celdas }: Props) {
   const lleno = r.capacidad > 0 && r.enPasaje >= r.capacidad;
   return (
     <TarjetaDatos Icono={LayoutDashboard} titulo="Ahora" contador={{ valor: `${celdas.libres}/${celdas.total}`, etiqueta: "Celdas libres" }}>
-      <div className="ui-cifras">
+      <div className="ui-cifras of-cifras">
         <Cifra valor={`${r.enPasaje}/${r.capacidad}`} etiqueta="En el pasaje" detalle={lleno ? "Pasaje lleno" : undefined} />
         <Cifra valor={r.afuera} etiqueta="Esperando afuera" />
         <Cifra valor={r.estacionados} etiqueta="Estacionados" />
       </div>
-      <div className="ui-cifras">
+      <div className="ui-cifras of-cifras">
         <Cifra valor={r.celdasEntregadas} etiqueta="Celdas entregadas" />
         <Cifra valor={r.salidas} etiqueta="Salidas hoy" />
         <Cifra valor={dinero(r.pagos.total, moneda)} etiqueta={r.pagos.cantidad === 1 ? "1 pago" : `${r.pagos.cantidad} pagos`} />
