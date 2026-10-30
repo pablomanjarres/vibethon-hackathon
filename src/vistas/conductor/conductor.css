@@ -1,8 +1,4 @@
 /* Driver panel: plate picker, wait figure and the follow-up buttons inside sections. */
-.cd-elegir {
-  display: grid;
-  gap: var(--space-3);
-}
 .cd-espera {
   margin: 0;
   font-size: 40px;
@@ -71,4 +67,16 @@
   min-height: var(--control-height);
   font-size: 15px;
   font-weight: 600;
+}
+.cd-ingreso {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-3);
+}
+.cd-codigo-acceso {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
 }
