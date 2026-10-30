@@ -1,142 +1,55 @@
-/* Lot map */
+/* The lot as a dark map: warm gray ground, light lines, pins and road labels. */
 .ui-mapa {
   position: relative;
-  background: var(--surface);
-  border-radius: var(--radius-card);
-  padding: var(--space-3);
-  display: grid;
-  gap: var(--space-3);
-  min-width: 0;
+  width: 100%;
+  height: 100%;
 }
-.ui-mapa-lienzo {
+.ui-mapa-vista {
+  position: absolute;
+  inset: 0;
   overflow: auto;
-  border-radius: 12px;
-  overscroll-behavior: contain;
-}
-.ui-mapa-lienzo svg {
-  max-width: none;
-  height: auto;
-  font-family: var(--font-sans);
+  display: flex;
+  padding: 16px 72px 16px 24px;
+  container-type: size;
 }
 .ui-mapa-lote {
-  fill: var(--tile);
+  position: relative;
+  flex: none;
+  margin: auto;
+  width: calc(min(100cqw, 100cqh * var(--proporcion)) * var(--zoom));
+  aspect-ratio: var(--proporcion);
 }
-.ui-mapa-carril {
-  fill: var(--surface);
-  opacity: 0.7;
+.ui-mapa-trazo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
 }
-.ui-celda {
-  cursor: default;
+.ui-mapa-via {
+  fill: #5a5754;
 }
-.ui-celda[role="button"] {
-  cursor: pointer;
-}
-.ui-celda-fondo {
-  fill: var(--tono-suave);
-  stroke: var(--tono);
-  stroke-width: 1.5;
-}
-.ui-celda[role="button"]:hover .ui-celda-fondo {
+.ui-mapa-quebrada {
+  fill: none;
+  stroke: #5b8fa3;
   stroke-width: 3;
 }
-.ui-celda-elegida .ui-celda-fondo {
-  stroke: var(--ink);
-  stroke-width: 4;
-}
-.ui-celda:focus-visible {
-  outline: none;
-}
-.ui-celda:focus-visible .ui-celda-fondo {
-  stroke: var(--focus-color);
-  stroke-width: 4;
-}
-.ui-celda svg {
-  color: var(--tono);
-}
-.ui-celda text {
-  text-anchor: middle;
-  fill: var(--tono);
-}
-.ui-celda-id {
-  font-size: 14px;
-  font-weight: 700;
-}
-.ui-celda-estado {
-  font-size: 12px;
-  font-weight: 600;
-}
-.ui-celda-placa {
+.ui-mapa-calle text {
+  fill: var(--map-label);
   font-size: 10px;
-  font-weight: 500;
-}
-.ui-mapa-pasaje {
-  fill: var(--surface-raised);
-}
-.ui-mapa-puerta {
-  color: var(--accent);
-}
-.ui-mapa-entrada {
-  font-size: 15px;
   font-weight: 600;
-  fill: var(--ink);
-}
-.ui-mapa-nota {
-  font-size: 12px;
-  fill: var(--ink-muted);
-}
-.ui-puesto rect {
-  fill: var(--surface);
-  stroke: var(--hairline);
-  stroke-dasharray: 4 3;
-}
-.ui-puesto text {
   text-anchor: middle;
-  font-size: 11px;
+}
+.ui-mapa-borde {
+  fill: var(--map-lot);
+  stroke: var(--map-line-strong);
+  stroke-width: 1.5;
+}
+.ui-mapa-pasillo {
+  fill: var(--map-ground);
+}
+.ui-mapa-zona {
+  fill: var(--map-label);
+  font-size: 9px;
   font-weight: 600;
-  fill: var(--ink-muted);
-}
-.ui-puesto-lleno rect {
-  fill: var(--ink);
-  stroke: var(--ink);
-  stroke-dasharray: none;
-}
-.ui-puesto-lleno text {
-  fill: var(--surface-raised);
-}
-.ui-puesto-sub {
-  font-weight: 500;
-}
-.ui-mapa-controles {
-  position: absolute;
-  top: var(--space-5);
-  right: var(--space-5);
-  display: grid;
-  background: var(--surface-raised);
-  border-radius: var(--radius-control);
-  box-shadow: var(--shadow-control);
-  overflow: hidden;
-}
-.ui-mapa-controles button {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  background: transparent;
-}
-.ui-mapa-controles button + button {
-  border-top: 1px solid var(--hairline);
-}
-.ui-mapa-controles button:disabled {
-  color: var(--ink-muted);
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.ui-mapa-leyenda {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
 }
