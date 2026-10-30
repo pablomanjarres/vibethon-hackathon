@@ -1,0 +1,97 @@
+/* Seat-map look: light lot, grey streets, green dots, black pill. */
+.mk-mapa {
+  position: absolute;
+  top: 116px;
+  left: 0;
+  width: 100%;
+  height: 360px;
+  font-family: var(--font-sans);
+}
+.mk-suelo {
+  fill: #f4f2ee;
+}
+.mk-via {
+  fill: #c9ced6;
+}
+.mk-quebrada {
+  fill: none;
+  stroke: #8fd3ee;
+  stroke-width: 3;
+}
+.mk-calle text {
+  fill: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+.mk-lote {
+  fill: #e6e3dc;
+}
+.mk-pasillo {
+  fill: #f4f2ee;
+}
+.mk-entrada rect {
+  fill: var(--ink);
+}
+.mk-entrada text {
+  fill: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+.mk-seccion rect {
+  fill: #fff;
+  stroke: #cfcac0;
+}
+.mk-seccion line {
+  stroke: #e3dfd7;
+}
+.mk-seccion-id {
+  font-size: 9px;
+  font-weight: 600;
+  fill: var(--ink-muted);
+}
+.mk-libre .mk-punto {
+  fill: #5cc04a;
+  stroke: #3a8f2c;
+}
+.mk-pocas .mk-punto {
+  fill: #e7b52f;
+  stroke: #b08414;
+}
+.mk-llena rect {
+  fill: #ebe8e2;
+}
+.mk-elegida rect {
+  fill: #f6b6b0;
+  stroke: #d64535;
+}
+.mk-elegida .mk-punto {
+  fill: #d64535;
+  stroke: #9e2b1f;
+}
+.mk-globo rect,
+.mk-globo path {
+  fill: var(--ink);
+}
+.mk-globo text {
+  fill: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+.mk-celda rect {
+  fill: var(--ink);
+}
+.mk-celda text {
+  fill: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.mk-miniatura .mk-mapa {
+  position: static;
+  width: 100%;
+  height: 100%;
+}
