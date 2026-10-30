@@ -11,6 +11,8 @@ import { Shell } from "../../ui/Shell";
 import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useComando, useEstado } from "../../ui/useTienda";
 import { DemoValets } from "./DemoValets";
+import { Equipo } from "./Equipo";
+import { Historial } from "./Historial";
 import { NotiAsignacion } from "./NotiAsignacion";
 import { celdaOcupada, etapasDe, type AccionValet } from "./pasos";
 import { Progreso } from "./Progreso";
@@ -67,6 +69,8 @@ export function PanelValet({ valetId }: { valetId: string }) {
           </Acordeon>
         </div>
       )}
+      <Historial valetId={v.id} />
+      <Equipo actual={v.id} />
       <DemoValets />
     </Shell>
   );
