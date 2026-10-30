@@ -146,3 +146,32 @@
   display: grid;
   gap: var(--space-3);
 }
+
+/* Demo shortcut: a compact list of valets, one click signs in as each. */
+.vl-demo-lista {
+  display: grid;
+  gap: var(--space-1, 4px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.vl-demo-valet {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 36px;
+  padding: var(--space-1, 4px) var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: var(--panel-inner);
+  color: var(--ink);
+  font-size: 14px;
+  text-decoration: none;
+}
+.vl-demo-valet:hover {
+  background: var(--tile);
+}
+.vl-demo-valet[aria-current="true"] {
+  border-color: currentColor;
+}

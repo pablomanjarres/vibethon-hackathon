@@ -10,6 +10,7 @@ import { PanelCabecera } from "../../ui/PanelCabecera";
 import { Shell } from "../../ui/Shell";
 import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useComando, useEstado } from "../../ui/useTienda";
+import { DemoValets } from "./DemoValets";
 import { NotiAsignacion } from "./NotiAsignacion";
 import { celdaOcupada, etapasDe, type AccionValet } from "./pasos";
 import { Progreso } from "./Progreso";
@@ -38,7 +39,7 @@ export function PanelValet({ valetId }: { valetId: string }) {
       {s ? (
         <>
           <TarjetaAsignacion servicio={s} />
-          <p className="vl-siguiente">{v.siguientePaso}</p>
+          <p className="vl-siguiente">{s.estado === "pago pendiente" ? "Apartado: esperando el pago" : v.siguientePaso}</p>
         </>
       ) : (
         <TarjetaDatos Icono={BellOff} titulo="Tu asignación">
@@ -66,6 +67,7 @@ export function PanelValet({ valetId }: { valetId: string }) {
           </Acordeon>
         </div>
       )}
+      <DemoValets />
     </Shell>
   );
 }
