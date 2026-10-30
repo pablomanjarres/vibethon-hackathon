@@ -19,7 +19,6 @@ function hastaLaOficina(): { estado: Estado; ficho: string } {
     estado,
     { tipo: "confirmarFicho", placa: "CXM540", ficho },
     { tipo: "asignarCelda", entrada: "regional" },
-    { tipo: "confirmarIngreso", entrada: "regional", placa: "CXM540" },
     { tipo: "estacionar", placa: "CXM540" },
   );
   expect(valet(estado, "RG-V1")?.estado).toBe("en servicio");
