@@ -1,0 +1,6 @@
+node_modules
+dist
+shots
+.env*
+.private
+references/**/*.mp4
