@@ -12,14 +12,17 @@ export function comandosDelEvento(evento: EventoSimulado): Comando[] {
 }
 
 /**
- * Moves the clock one minute at a time up to `hasta`, running each scenario event at its minute.
- * Events the rules reject (a full passage, an unknown plate) are returned with their reason.
+ * Moves the clock up to `hasta`, stopping at each scenario event's minute to run it, so the log
+ * gets one clock entry per jump instead of one per minute. Events the rules reject (a full
+ * passage, an unknown plate) are returned with their reason.
  */
 export function simularHasta(estado: Estado, escenario: Escenario, hasta: number): { estado: Estado; rechazos: string[] } {
   let actual = estado;
   const rechazos: string[] = [];
   while (actual.minuto < hasta) {
-    const paso = ejecutar(actual, { tipo: "avanzarReloj", minutos: 1 });
+    const desde = actual.minuto;
+    const proximo = Math.min(hasta, ...escenario.eventos.map((e) => e.minuto).filter((m) => m > desde));
+    const paso = ejecutar(actual, { tipo: "avanzarReloj", minutos: proximo - desde });
     if (!paso.ok) break;
     actual = paso.estado;
     for (const evento of escenario.eventos.filter((e) => e.minuto === actual.minuto)) {
