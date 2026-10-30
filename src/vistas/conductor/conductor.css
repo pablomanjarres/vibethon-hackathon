@@ -1,23 +1,77 @@
-/* Driver panel: plate picker, wait figure and the follow-up buttons inside sections. */
-.cd-espera {
-  margin: 0;
-  font-size: 40px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.03em;
+/* Driver panel: check-in, the current step's status and its single action. */
+.cd-estado {
+  display: grid;
+  gap: var(--space-2);
 }
-.cd-espera span {
-  font-size: 18px;
-  font-weight: 500;
+.cd-titulo-paso {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.cd-detalle-paso {
+  margin: 0;
+  font-size: 14px;
   color: var(--ink-muted);
 }
 .cd-mensaje {
   margin: 0;
   font-weight: 500;
 }
-.cd-botones {
+.cd-aviso {
+  margin: 0;
+}
+.cd-acciones {
   display: grid;
   gap: var(--space-2);
+  justify-items: center;
+}
+.cd-acciones > * {
+  width: 100%;
+}
+.cd-instruccion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-height);
+  margin: 0;
+  padding: 0 var(--space-4);
+  border: 2px dashed var(--ink-muted);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+.cd-enlace {
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.cd-enlace:focus-visible {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
+}
+.cd-codigo-linea {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+.cd-codigo-linea strong {
+  color: var(--ink);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+}
+.cd-detalles {
+  display: grid;
+  gap: var(--space-3);
 }
 .cd-registro {
   display: grid;
@@ -72,11 +126,4 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-3);
-}
-.cd-codigo-acceso {
-  margin: 0;
-  font-size: 40px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1;
 }
