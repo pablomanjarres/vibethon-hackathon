@@ -41,25 +41,6 @@
   font-size: 12px;
   color: var(--ink-muted);
 }
-.mk-leyenda li {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.mk-muestra {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-.mk-muestra.mk-libre {
-  background: #5cc04a;
-}
-.mk-muestra.mk-pocas {
-  background: #e7b52f;
-}
-.mk-muestra.mk-llena {
-  background: #cfcac0;
-}
 .mk-oferta {
   display: flex;
   gap: var(--space-3);
@@ -68,6 +49,7 @@
   display: grid;
   gap: 2px;
   align-content: start;
+  justify-items: start;
 }
 .mk-miniatura {
   width: 84px;
@@ -89,15 +71,6 @@
   font-size: 12px;
   color: var(--ink-muted);
 }
-.mk-alerta {
-  justify-self: start;
-  padding: 1px 6px;
-  border-radius: var(--radius-tag);
-  background: var(--peligro-soft);
-  color: var(--peligro);
-  font-size: 11px;
-  font-weight: 600;
-}
 .mk-datos {
   list-style: none;
   margin: 0;
@@ -110,14 +83,4 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-}
-.mk-boton {
-  display: grid;
-  place-items: center;
-  height: 38px;
-  border-radius: var(--radius-pill);
-  background: var(--libre-soft);
-  color: var(--libre);
-  font-weight: 600;
-  font-size: 13px;
 }

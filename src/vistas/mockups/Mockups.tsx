@@ -1,5 +1,7 @@
 import { useEffect } from "react";
-import { Car, Clock, KeyRound } from "lucide-react";
+import { Car, CircleAlert, CircleCheck, Clock, Clock3, KeyRound, Minus } from "lucide-react";
+import { Pastilla, type Insignia } from "../../ui/Pastilla";
+import { ESTADO_CELDA } from "../../ui/estados";
 import { CELDA_ELEGIDA, TARIFA, ZONAS, ZONA_ELEGIDA, peso } from "./datos";
 import { MapaCampus } from "./MapaCampus";
 import { Hoja, Telefono } from "./Telefono";
@@ -43,7 +45,7 @@ export default function Mockups() {
                 <strong className="mk-precio">
                   {peso(TARIFA.minuto)} <span>por minuto</span>
                 </strong>
-                <span className="mk-alerta">Alta demanda</span>
+                <Pastilla texto="Alta demanda" Icono={CircleAlert} tono="peligro" />
                 <span className="mk-sub">
                   {zona.libres} de {zona.total} celdas libres
                 </span>
@@ -66,7 +68,7 @@ export default function Mockups() {
                 <KeyRound size={16} aria-hidden="true" /> Valet incluido · {peso(TARIFA.valet)}
               </li>
             </ul>
-            <span className="mk-boton">Reservada</span>
+            <Pastilla {...ESTADO_CELDA.reservada} grande />
           </Hoja>
         </Telefono>
       </div>
@@ -74,18 +76,18 @@ export default function Mockups() {
   );
 }
 
+const LEYENDA: Insignia[] = [
+  { texto: "Varias libres", Icono: CircleCheck, tono: "libre" },
+  { texto: "Pocas", Icono: Clock3, tono: "reservada" },
+  { texto: "Llena", Icono: Minus, tono: "ocupada" },
+];
+
 function Leyenda() {
-  const items = [
-    ["libre", "Varias libres"],
-    ["pocas", "Pocas"],
-    ["llena", "Llena"],
-  ];
   return (
     <ul className="mk-leyenda">
-      {items.map(([tono, texto]) => (
-        <li key={tono}>
-          <span className={`mk-muestra mk-${tono}`} aria-hidden="true" />
-          {texto}
+      {LEYENDA.map((item) => (
+        <li key={item.texto}>
+          <Pastilla {...item} />
         </li>
       ))}
     </ul>
