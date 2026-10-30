@@ -20,12 +20,17 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 56px;
+    flex-wrap: wrap;
+    gap: 32px 48px;
     padding: 24px;
   }
+  /* Beside the phone when it fits, below it when the window is narrow. */
   .tl-presentador {
     align-content: start;
-    width: min(360px, 100%);
+    flex: 1 1 300px;
+    min-width: 0;
+    max-width: 380px;
+    padding: 0;
     max-height: 90dvh;
     overflow-y: auto;
   }
