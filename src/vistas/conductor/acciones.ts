@@ -1,4 +1,4 @@
-import { Banknote, CarFront, CircleAlert, KeyRound, LogOut, MapPin, ParkingSquare, type LucideIcon } from "lucide-react";
+import { Banknote, CircleAlert, KeyRound, LogOut, MapPin, ParkingSquare, Ticket, type LucideIcon } from "lucide-react";
 import type { Comando } from "../../parqueadero/motor";
 import type { VistaConductor } from "../../parqueadero/lecturas/conductor";
 
@@ -26,38 +26,47 @@ export function pasoActual(v: VistaConductor, elegida: string | null): PasoActua
   if (!v.encontrado) return NADA;
   const placa = v.placa;
   const pagar: Paso = { texto: "Pagar", Icono: Banknote, comando: { tipo: "pagar", placa } };
+  const s = v.servicio;
+  if (s && s.estado !== "entregado") {
+    switch (s.estado) {
+      case "pago pendiente":
+        return {
+          principal: { texto: `Pagar valet ${s.precio}`, Icono: Banknote, comando: { tipo: "pagarValet", servicio: s.id, aprobado: true } },
+          instruccion: null,
+          secundario: { texto: "Cancelar pago", Icono: CircleAlert, comando: { tipo: "pagarValet", servicio: s.id, aprobado: false } },
+        };
+      case "pagado":
+        return { ...NADA, instruccion: `${s.valet} va hacia tu carro en el pasaje` };
+      case "ficho emitido":
+        return { ...NADA, principal: { texto: `Confirmar ficho ${s.ficho}`, Icono: Ticket, comando: { tipo: "confirmarFicho", placa, ficho: s.ficho } } };
+      case "llaves en oficina":
+        return { ...NADA, instruccion: `Reclama tus llaves en la oficina con el ficho ${s.ficho}` };
+      default:
+        return { ...NADA, instruccion: "Ve a clase: el valet se encarga de tu carro" };
+    }
+  }
   switch (v.estado) {
     case "en fila":
     case "en espera": {
       const celda = v.puedeReservar ? (elegida && v.celdasLibres.includes(elegida) ? elegida : v.celdasLibres[0]) : null;
+      const valet = v.oferta?.disponibles[0];
+      const contratar: Paso | null = v.puedePedirValet && valet
+        ? { texto: `Contratar valet (${v.oferta?.precio} ${v.oferta?.moneda})`, Icono: KeyRound, comando: { tipo: "contratarValet", placa, valet } }
+        : null;
+      const salir: Paso | null = v.puedeSalirSinParquear ? { texto: "Salir sin parquear", Icono: LogOut, comando: { tipo: "salirSinParquear", placa } } : null;
       return {
         principal: celda ? { texto: `Reservar celda ${celda}`, Icono: MapPin, comando: { tipo: "reservarCelda", placa, celda } } : null,
         instruccion: null,
-        secundario: v.puedeSalirSinParquear ? { texto: "Salir sin parquear", Icono: LogOut, comando: { tipo: "salirSinParquear", placa } } : null,
+        secundario: contratar ?? salir,
       };
     }
     case "con celda": {
-      if (v.ficho)
-        return v.llave === "conductor"
-          ? { ...NADA, principal: { texto: "Ya entregué las llaves", Icono: KeyRound, comando: { tipo: "entregarLlaves", placa } } }
-          : NADA;
       const ocupada: Paso = { texto: "Mi celda está ocupada", Icono: CircleAlert, comando: { tipo: "reportarCeldaOcupada", placa } };
-      if (!v.confirmado) {
-        const valet: Paso = { texto: "Reservar valet", Icono: KeyRound, comando: { tipo: "pedirValet", placa } };
-        return { principal: null, instruccion: "Muestra tu placa en la portería", secundario: v.puedePedirValet ? valet : ocupada };
-      }
+      if (!v.confirmado) return { principal: null, instruccion: "Muestra tu placa en la portería", secundario: ocupada };
       return { principal: { texto: "Ya estacioné", Icono: ParkingSquare, comando: { tipo: "estacionar", placa } }, instruccion: null, secundario: ocupada };
     }
     case "estacionado":
-      if (v.ficho)
-        return {
-          principal: { texto: "Pedir mi carro", Icono: CarFront, comando: { tipo: "pedirDevolucion", ficho: v.ficho } },
-          instruccion: null,
-          secundario: v.pagado ? null : pagar,
-        };
       return { ...NADA, principal: v.pagado ? { texto: "Salir", Icono: LogOut, comando: { tipo: "salir", placa } } : pagar };
-    case "en devolución":
-      return v.pagado ? NADA : { ...NADA, principal: pagar };
     default:
       return NADA;
   }

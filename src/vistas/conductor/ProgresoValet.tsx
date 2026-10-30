@@ -1,15 +1,19 @@
 import type { EstadoServicio } from "../../parqueadero/tipos";
 import "./pasos.css";
 
-const PASOS = ["Llaves entregadas", "Estacionado", "Pedido", "Entregado"] as const;
+const PASOS = ["Ficho confirmado", "Estacionado", "Llaves en oficina", "Llaves entregadas"] as const;
 
-/** How far each service state has gone along the four steps; -1 before the keys are handed over. */
+/** How far each service state has gone along the four steps; -1 before the ficho is confirmed. */
 const AVANCE: Record<EstadoServicio, number> = {
-  solicitado: -1,
+  "pago pendiente": -1,
+  pagado: -1,
+  "ficho emitido": -1,
   "en curso": 0,
   estacionado: 1,
-  devolución: 2,
+  "llaves en oficina": 2,
   entregado: 3,
+  rechazado: -1,
+  vencido: -1,
 };
 
 /** One status line and four dots, from keys handed over to car returned. */
