@@ -57,8 +57,8 @@ const PASOS: Paso[] = [
   { quien: "Conductor", vista: "conductor", params: conductor, texto: () => "Llaves de vuelta. Fin del recorrido.", hecho: (e) => llego(e, "entregado") },
 ];
 
-/** The driver's screen: the desktop page, or the phone when the walkthrough started there (?cel). */
-const pantalla = (paso: Paso, cel: boolean) => (cel && paso.vista === "conductor" ? "telefono" : paso.vista);
+/** The driver's and valet's screens: the desktop pages, or the phone when the walkthrough started there (?cel). */
+const pantalla = (paso: Paso, cel: boolean) => (cel && (paso.vista === "conductor" || paso.vista === "valet") ? "telefono" : paso.vista);
 const marca = (cel: boolean): Record<string, string> => (cel ? { cel: "1" } : {});
 
 /** The car the full-lot option shows: last in Regional, so it has the longest wait. */
@@ -146,12 +146,14 @@ export function Recorrido() {
   const destino = ir(n);
   // When the next step happens on another screen, go there on its own, a moment after the action.
   useEffect(() => {
-    if (!activo || pantalla(PASOS[n - 1], cel) === path) return;
+    // Already on the step's screen as the step's person (the phone hosts both driver and valet).
+    const aqui = pantalla(PASOS[n - 1], cel) === path && Object.entries(PASOS[n - 1].params(estado)).every(([k, v]) => !v || params.get(k) === v);
+    if (!activo || aqui) return;
     const t = window.setTimeout(() => {
       window.location.hash = destino.replace(/^#/, "");
     }, 700);
     return () => window.clearTimeout(t);
-  }, [activo, n, path, destino, cel]);
+  }, [activo, n, path, destino, cel, estado, params]);
   if (lleno) return <BarraLoteLleno estado={estado} cel={cel} />;
   if (!activo) return null;
   const paso = PASOS[n - 1];

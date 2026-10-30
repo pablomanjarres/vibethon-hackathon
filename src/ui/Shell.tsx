@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { Building2, Car, House, KeyRound, ShieldCheck, type LucideIcon } from "lucide-react";
-import { href } from "../shared/route";
+import { href, useRoute } from "../shared/route";
 import { MapaLote } from "./MapaLote";
 import { AccesoRapido } from "./AccesoRapido";
 import { Recorrido } from "./Recorrido";
@@ -39,6 +39,8 @@ interface Props {
 /** Map-first frame shared by every page: the lot behind, the floating panel, the view stack. */
 export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, privado = false, children }: Props) {
   const estado = useEstado();
+  // Shown inside the phone frame (?embebido): the screen only, no view stack or presenter bar.
+  const embebido = useRoute().params.has("embebido");
   const nombre = VISTAS.find((item) => item.id === vista)?.nombre;
   useEffect(() => {
     document.title = nombre ? `${nombre} · Parqueadero EAFIT` : "Parqueadero EAFIT";
@@ -61,6 +63,7 @@ export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, privado
       <main className="ui-panel">
         <div className="ui-panel-contenido">{children}</div>
       </main>
+      {!embebido && (
       <nav className="ui-pila" aria-label="Vistas">
         <ul>
           {PILA.map(({ id, nombre: etiqueta, Icono }) => (
@@ -77,7 +80,8 @@ export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, privado
         <AccesoRapido vista={vista} />
         <Reloj />
       </nav>
-      <Recorrido />
+      )}
+      {!embebido && <Recorrido />}
     </div>
   );
 }

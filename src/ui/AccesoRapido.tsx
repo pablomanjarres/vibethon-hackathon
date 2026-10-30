@@ -100,7 +100,7 @@ function filasDe(vista: VistaId, estado: Estado, ruta: string): { titulo: string
       filas: estado.valets
         .filter((v) => v.entrada === e.id)
         .filter((v, _, todos) => v.estado !== "disponible" || v === todos.find((x) => x.estado === "disponible"))
-        .map((v) => ({ clave: v.id, titulo: v.id, dato: v.codigo, nota: v.estado, ir: href("valet", { valet: v.id, codigo: v.codigo, demo: "1" }) })),
+        .map((v) => ({ clave: v.id, titulo: v.id, dato: v.codigo, nota: v.estado, ir: href(ruta === "telefono" ? "telefono" : "valet", { valet: v.id, codigo: v.codigo, demo: "1" }) })),
     }))];
   }
   if (vista === "porteria") {
@@ -187,12 +187,12 @@ export function AccesoRapido({ vista }: { vista?: VistaId }) {
   );
 }
 
-/** The quick-action groups of a view; `ruta` is the screen the sign-in links open (the phone opens its own). */
-export function ListaAccesos({ vista, ruta = vista, onIr }: { vista: VistaId; ruta?: string; onIr?: () => void }) {
+/** The quick-action groups of a view (`comunes`: with the walkthrough group); `ruta` is the screen the sign-in links open (the phone opens its own). */
+export function ListaAccesos({ vista, ruta = vista, comunes = true, onIr }: { vista: VistaId; ruta?: string; comunes?: boolean; onIr?: () => void }) {
   const estado = useEstado();
   const { aviso, enviar } = useComando();
   const grupos = [
-    { titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "empieza desde la semilla: conductor → valet → portería → oficina", ir: inicioRecorrido(estado, ruta === "telefono"), antes: () => tienda.reiniciar() }, { clave: "lleno", titulo: "Lote lleno y tiempo estimado", nota: "llena el lote, salen 3 carros y abre a SVK088 con su espera", comandos: [], luego: () => escenarioLoteLleno(ruta === "telefono") }] },
+    ...(comunes ? [{ titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "empieza desde la semilla: conductor → valet → portería → oficina", ir: inicioRecorrido(estado, ruta === "telefono"), antes: () => tienda.reiniciar() }, { clave: "lleno", titulo: "Lote lleno y tiempo estimado", nota: "llena el lote, salen 3 carros y abre a SVK088 con su espera", comandos: [], luego: () => escenarioLoteLleno(ruta === "telefono") }] }] : []),
     ...filasDe(vista, estado, ruta),
   ];
   const fila = (f: Fila): ReactNode => {

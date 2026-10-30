@@ -143,3 +143,13 @@ a.tl-flotante {
   color: var(--peligro);
   font-weight: 500;
 }
+
+/* The valet's own app, at phone width, under the status bar. */
+.tl-marco {
+  position: absolute;
+  inset: 54px 0 0;
+  width: 100%;
+  height: calc(100% - 54px);
+  border: 0;
+  background: var(--canvas);
+}
