@@ -26,7 +26,7 @@ npm run foto    # foto inicial del escenario: lote, pasajes, turnos y valets
 
 ## Limitaciones
 
-- Todo es simulado: cámaras, registro de placas, llegadas, salidas y pagos. No hay base de datos, nube ni despliegue; el estado vive en memoria y vuelve a la semilla al recargar.
+- Todo es simulado: cámaras, registro de placas, llegadas, salidas y pagos. No hay base de datos, nube ni despliegue; el estado se guarda solo en este navegador (localStorage): recargar lo conserva y "Reiniciar" en Oficina vuelve a la semilla.
 - Las 12 celdas son un ejemplo, no la capacidad real. Los minutos entre liberaciones y las tarifas son supuestos del escenario.
 - El estado se comparte entre las vistas de una misma pestaña del navegador, no entre dispositivos.
 - No hay pruebas automáticas.
