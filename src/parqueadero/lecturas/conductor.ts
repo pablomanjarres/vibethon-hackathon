@@ -29,6 +29,9 @@ function mensaje(carro: Carro, servicio: Servicio | null, espera: Espera | null)
   if (servicio?.estado === "estacionado") return `Tu carro está en la celda ${carro.celda}. Pide la devolución con el ficho ${servicio.ficho}.`;
   if (servicio?.estado === "devolución") return "Un valet está trayendo tu carro.";
   switch (carro.estado) {
+    case "en espera":
+      if (!espera) return "Quedaste en la fila de espera. Entras al pasaje apenas haya cupo.";
+      return `Quedaste en la fila de espera. Hay ${carros(espera.carrosAdelante)} antes que tú. Espera estimada: ${espera.minutos} min. Entras al pasaje apenas haya cupo.`;
     case "en fila":
       if (!espera || espera.minutos === 0) return "Hay una celda libre para ti. Espera la señal de la portería.";
       return `Hay ${carros(espera.carrosAdelante)} antes que tú. Espera estimada: ${espera.minutos} min.`;
@@ -66,7 +69,7 @@ export function vistaConductor(estado: Estado, placaEscrita: string): VistaCondu
     };
   }
   const servicio = carro.servicio ? estado.servicios[carro.servicio] : null;
-  const espera = carro.estado === "en fila" ? estimarEspera(estado, placa) : null;
+  const espera = carro.estado === "en fila" || carro.estado === "en espera" ? estimarEspera(estado, placa) : null;
   const celdasLibres = estado.celdas.filter((c) => c.estado === "libre").map((c) => c.id);
   return {
     placa,

@@ -56,6 +56,23 @@ ok  reservarCelda CXM540: CXM540 reservó la celda A04.
 ok  estacionar CXM540: CXM540 se estacionó en A04.
 ```
 
+### Corrección 4: el conductor no podía registrar su placa para guardar su puesto
+
+| Paso | Contenido |
+|---|---|
+| Fallo observado | En la vista del conductor no había forma confiable de registrar la placa propia: con los dos pasajes llenos, como en la semilla, el registro se rechazaba con "El pasaje de Las Vegas está lleno (4 de 4). El carro espera afuera." y el carro no quedaba en ninguna fila |
+| Causa | El registro solo existía para la cámara de la portería y trataba el pasaje lleno como un error, no como una espera |
+| Prompt corregido | "In the conductor stage, there is no reliable way to register your own plate to save your spot in the parking lot also is not pretty clear doing that either, get that done fast" (prompt 25) |
+| Comprobación | `registrarLlegada` ya no rechaza por pasaje lleno: el carro queda en la fila de espera y entra al pasaje en orden cuando sale un carro. Ejecución contra el motor: |
+
+```text
+ok  MAT471 quedó registrado en la fila de espera de Las Vegas (puesto 1); entra al pasaje apenas haya cupo.
+    en espera | Quedaste en la fila de espera. Hay 10 carros antes que tú. Espera estimada: 30 min. Entras al pasaje apenas haya cupo.
+NO  La placa MAT471 ya está en el parqueadero.
+ok  FRS112 (Las Vegas) va a la celda A01.
+    LV fila: HUO845,KPA391,ZTE627,MAT471 | MAT471: en fila
+```
+
 ## 4. Cómo sabemos que cumple
 
 | Requisito o ítem | Cómo se comprobó | Resultado |
@@ -65,5 +82,5 @@ ok  estacionar CXM540: CXM540 se estacionó en A04.
 | Ninguna celda dos veces | Ejecución contra el motor | Segunda asignación rechazada mientras no haya celdas libres |
 | Valet y clase | Ejecución contra el motor | "SVK088 quedó con RG-V1. Guarda el ficho F-001 y ve a clase."; el carro conserva su turno |
 | Salida con pago | Ejecución contra el motor | "Falta el pago de HKM214." antes de pagar |
-| Eventos del escenario | `simularHasta(10)` | "Minuto 4: El pasaje de Las Vegas está lleno (4 de 4). El carro espera afuera." |
+| Eventos del escenario | `simularHasta(30)` | "MAT471 quedó registrado en la fila de espera de Las Vegas (puesto 1); entra al pasaje apenas haya cupo." |
 | Tipos y build | `npm run check`, `npm run build` | Pasan |
