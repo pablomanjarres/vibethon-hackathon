@@ -141,3 +141,10 @@
 .app-message {
   padding: var(--space-6);
 }
+
+/* The gate works with lists and details: a wider panel, and the map moves right to make room. */
+@media (min-width: 900px) {
+  .ui-app[data-vista="porteria"] {
+    --panel-width: min(520px, 42vw);
+  }
+}

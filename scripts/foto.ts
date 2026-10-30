@@ -25,4 +25,6 @@ for (const entrada of estado.entradas) {
 }
 console.log("\nCódigos de acceso de los carros en los pasajes (solo para la demo):");
 for (const entrada of estado.entradas) console.log("  " + entrada.fila.map((p) => `${p} ${estado.carros[p].codigo}`).join(", "));
+console.log("\nCódigos de los valets (solo para la demo):");
+for (const entrada of estado.entradas) console.log("  " + estado.valets.filter((v) => v.entrada === entrada.id).map((v) => `${v.id} ${v.codigo}`).join(", "));
 console.log(`\nPagos: ${oficina.pagos.cantidad}. Fichos activos: ${oficina.fichosActivos.length}. Eventos simulados: ${ESCENARIO_INICIAL.eventos.length}.`);

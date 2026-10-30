@@ -10,7 +10,9 @@
     "check": "tsc --noEmit",
     "shot": "node scripts/shot.mjs",
     "sweep": "node scripts/sweep.mjs",
-    "foto": "node scripts/foto.ts"
+    "foto": "node scripts/foto.ts",
+    "test": "vitest run",
+    "estados": "node scripts/estados.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
@@ -25,6 +27,7 @@
     "@vitejs/plugin-react": "6.1.2",
     "playwright-core": "1.64.1",
     "typescript": "7.0.2",
-    "vite": "8.3.3"
+    "vite": "8.3.3",
+    "vitest": "5.0.5"
   }
 }

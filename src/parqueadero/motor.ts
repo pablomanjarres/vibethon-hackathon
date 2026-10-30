@@ -1,4 +1,13 @@
-import { asignarCelda, estacionar, registrarLlegada, reservarCelda } from "./comandos/filas.ts";
+import {
+  asignarCelda,
+  confirmarIngreso,
+  dejarSalir,
+  estacionar,
+  registrarLlegada,
+  reportarCeldaOcupada,
+  reservarCelda,
+  salirSinParquear,
+} from "./comandos/filas.ts";
 import { avanzarReloj, pagar, salir } from "./comandos/salida.ts";
 import { entregarCarro, entregarLlaves, pedirDevolucion, pedirValet, recogerCarro } from "./comandos/valet.ts";
 import { Rechazo } from "./transiciones.ts";
@@ -9,6 +18,10 @@ export type Comando =
   | { tipo: "registrarLlegada"; placa: string; entrada: string }
   | { tipo: "asignarCelda"; entrada: string }
   | { tipo: "reservarCelda"; placa: string; celda: string }
+  | { tipo: "confirmarIngreso"; entrada: string; placa: string }
+  | { tipo: "salirSinParquear"; placa: string }
+  | { tipo: "dejarSalir"; entrada: string }
+  | { tipo: "reportarCeldaOcupada"; placa: string }
   | { tipo: "estacionar"; placa: string }
   | { tipo: "pedirValet"; placa: string }
   | { tipo: "entregarLlaves"; placa: string }
@@ -31,6 +44,14 @@ function aplicar(estado: Estado, comando: Comando): string {
       return asignarCelda(estado, comando.entrada);
     case "reservarCelda":
       return reservarCelda(estado, comando.placa, comando.celda);
+    case "confirmarIngreso":
+      return confirmarIngreso(estado, comando.entrada, comando.placa);
+    case "salirSinParquear":
+      return salirSinParquear(estado, comando.placa);
+    case "dejarSalir":
+      return dejarSalir(estado, comando.entrada);
+    case "reportarCeldaOcupada":
+      return reportarCeldaOcupada(estado, comando.placa);
     case "estacionar":
       return estacionar(estado, comando.placa);
     case "pedirValet":

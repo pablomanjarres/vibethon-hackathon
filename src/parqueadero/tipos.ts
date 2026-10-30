@@ -50,6 +50,12 @@ export interface Carro {
   estacionadoEn: number | null;
   /** Minute the car left the lot (older saved states have none). */
   salioEn?: number | null;
+  /** The driver said they will not park: the car keeps its place and leaves at the gate. */
+  sinParquear?: boolean;
+  /** The gate checked plate and reservation; only then may the car park. */
+  confirmado?: boolean;
+  /** A notice for the driver, such as a reassigned cell. */
+  aviso?: string | null;
   llave: UbicacionLlave;
   pagado: boolean;
 }
@@ -66,6 +72,8 @@ export interface Celda {
 
 export interface Valet {
   id: string;
+  /** Private sign-in code for this valet's phone. */
+  codigo: string;
   entrada: string;
   estado: EstadoValet;
   servicio: string | null;
@@ -109,5 +117,8 @@ export interface Estado {
   servicios: Record<string, Servicio>;
   pagos: Pago[];
   bitacora: Evento[];
+  /** Minutes when a cell was freed, and when one was handed out: the wait estimate is built on them. */
+  liberaciones?: number[];
+  asignaciones?: number[];
   consecutivos: { servicio: number; pago: number; codigo: number };
 }

@@ -43,7 +43,7 @@ export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, privado
   }, [nombre]);
   const mapa = estado.mapas[0];
   return (
-    <div className="ui-app">
+    <div className="ui-app" data-vista={vista}>
       <div className="ui-capa-mapa">
         {mapa && (
           <MapaLote
