@@ -52,8 +52,9 @@
 .tl-volver {
   display: inline-grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: var(--control-height);
+  height: var(--control-height);
+  flex: none;
   border-radius: var(--radius-pill);
   color: var(--ink);
 }
