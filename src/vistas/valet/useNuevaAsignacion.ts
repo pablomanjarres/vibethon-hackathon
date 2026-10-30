@@ -5,7 +5,7 @@ import type { Servicio } from "./pasos";
 /** One line with everything the valet needs: plate, cell, ficho, entrance and when it arrived. */
 export function detalleAsignacion(s: Servicio): string {
   const lugar = s.celda ? `celda ${s.celda}` : "celda por asignar";
-  const carro = s.estado === "devolución" ? `devolver ${s.placa} desde la ${lugar}` : `${s.placa} → ${lugar}`;
+  const carro = s.estado === "llaves en oficina" ? `devolver ${s.placa} desde la ${lugar}` : `${s.placa} → ${lugar}`;
   return `${carro}, ficho ${s.ficho}, ${s.entrada}, ${s.asignado}`;
 }
 

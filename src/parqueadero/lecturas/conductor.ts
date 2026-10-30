@@ -16,7 +16,12 @@ export interface VistaConductor {
   ficho: string | null;
   valet: string | null;
   llave: UbicacionLlave | null;
+  /** Inside the passage with no active service: may hire a valet of their own entrance. */
   puedePedirValet: boolean;
+  /** Valet offer for this driver: free valets of their entrance, price, and whether the wait makes it worth it. */
+  oferta: { disponibles: string[]; precio: number; moneda: string; sugerido: boolean } | null;
+  /** The active valet service, if any. */
+  servicio: { id: string; ficho: string; estado: string; valet: string | null; precio: number } | null;
   /** True when this car is next in the fairness order and a cell is free: it may pick one on the map. */
   puedeReservar: boolean;
   /** The driver may still say they leave without parking. */
@@ -43,10 +48,12 @@ export function textoEspera(espera: Espera | null): string {
 }
 
 function mensaje(carro: Carro, servicio: Servicio | null, espera: Espera | null): string {
-  if (servicio?.estado === "solicitado") return `Un valet va hacia tu carro. Tu ficho es ${servicio.ficho}.`;
-  if (servicio?.estado === "en curso") return `Tu carro quedó con el valet. Ve a clase y guarda el ficho ${servicio.ficho}.`;
-  if (servicio?.estado === "estacionado") return `Tu carro está en la celda ${carro.celda}. Pide la devolución con el ficho ${servicio.ficho}.`;
-  if (servicio?.estado === "devolución") return "Un valet está trayendo tu carro.";
+  if (servicio?.estado === "pago pendiente") return `Valet ${servicio.valet} apartado. Confirma el pago de ${servicio.precio}.`;
+  if (servicio?.estado === "pagado") return `Pago aprobado. ${servicio.valet} va hacia tu carro en el pasaje.`;
+  if (servicio?.estado === "ficho emitido") return `Confirma tu ficho ${servicio.ficho} antes de irte.`;
+  if (servicio?.estado === "en curso") return `Tu carro quedó con ${servicio.valet} y conserva su puesto. Ve a clase con el ficho ${servicio.ficho}.`;
+  if (servicio?.estado === "estacionado") return `Tu carro está en la celda ${carro.celda}. El valet lleva las llaves a la oficina.`;
+  if (servicio?.estado === "llaves en oficina") return `Tus llaves están en la oficina. Muestra el ficho ${servicio.ficho} para reclamarlas.`;
   switch (carro.estado) {
     case "en espera":
       return `Quedaste en la fila de espera, afuera del pasaje. ${textoEspera(espera)} Entras al pasaje apenas haya cupo.`;
@@ -85,6 +92,8 @@ export function vistaConductor(estado: Estado, placaEscrita: string, codigo?: st
       valet: null,
       llave: null,
       puedePedirValet: false,
+      oferta: null,
+      servicio: null,
       puedeReservar: false,
       puedeSalirSinParquear: false,
       sinParquear: false,
@@ -96,6 +105,8 @@ export function vistaConductor(estado: Estado, placaEscrita: string, codigo?: st
     };
   }
   const servicio = carro.servicio ? estado.servicios[carro.servicio] : null;
+  const activo = Boolean(servicio && !["rechazado", "vencido"].includes(servicio.estado));
+  const puedeContratar = carro.estado === "en fila" && !activo && estado.valets.some((v) => v.entrada === carro.entrada && v.estado === "disponible");
   const espera = carro.estado === "en fila" || carro.estado === "en espera" ? estimarEspera(estado, placa) : null;
   const celdasLibres = estado.celdas.filter((c) => c.estado === "libre").map((c) => c.id);
   return {
@@ -103,13 +114,23 @@ export function vistaConductor(estado: Estado, placaEscrita: string, codigo?: st
     encontrado: true,
     entrada: carro.entrada ? nombreEntrada(estado, carro.entrada) : null,
     estado: carro.estado,
-    mensaje: mensaje(carro, servicio, espera),
+    mensaje: mensaje(carro, activo ? servicio : null, espera),
     espera,
     celda: carro.celda,
     ficho: servicio?.ficho ?? null,
     valet: servicio?.valet ?? null,
     llave: carro.llave,
-    puedePedirValet: carro.estado === "con celda" && !servicio && estado.valets.some((v) => v.estado === "disponible"),
+    puedePedirValet: puedeContratar,
+    oferta: puedeContratar
+      ? {
+          disponibles: estado.valets.filter((v) => v.entrada === carro.entrada && v.estado === "disponible").map((v) => v.id),
+          precio: estado.reglas.tarifaValet,
+          moneda: estado.reglas.moneda,
+          // Suggested when the estimate is over 15 minutes; hiring is allowed below that too.
+          sugerido: Boolean(espera?.rango && espera.rango.max > 15),
+        }
+      : null,
+    servicio: servicio && activo ? { id: servicio.id, ficho: servicio.ficho, estado: servicio.estado, valet: servicio.valet, precio: servicio.precio ?? 0 } : null,
     puedeReservar: carro.estado === "en fila" && celdasLibres.length > 0 && ordenDeAtencion(estado)[0] === placa,
     puedeSalirSinParquear: (carro.estado === "en fila" || carro.estado === "en espera") && !carro.sinParquear && !servicio,
     sinParquear: Boolean(carro.sinParquear),

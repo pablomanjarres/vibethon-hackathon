@@ -6,7 +6,7 @@ import type { Servicio } from "./pasos";
 /** The valet's job at a glance: the cell biggest, then the plate, then ficho and entrance. */
 export function TarjetaAsignacion({ servicio: s }: { servicio: Servicio }) {
   return (
-    <TarjetaDatos Icono={Ticket} titulo={s.estado === "devolución" ? "Devuelve este carro" : "Tu asignación"} contador={{ valor: s.asignado, etiqueta: "Llegó" }}>
+    <TarjetaDatos Icono={Ticket} titulo={s.estado === "llaves en oficina" ? "Devuelve este carro" : "Tu asignación"} contador={{ valor: s.asignado, etiqueta: "Llegó" }}>
       <div className="vl-asignacion">
         <p className="vl-celda">
           <span className="vl-rotulo">Celda</span>
