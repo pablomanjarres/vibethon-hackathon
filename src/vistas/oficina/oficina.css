@@ -1,40 +1,4 @@
-/* Office panel: entrance tiles, cells by state, the minute field and the log. */
-.of-tiles {
-  display: grid;
-  gap: var(--space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.of-tile {
-  background: var(--panel-inner);
-  border-radius: var(--radius-card);
-  padding: var(--space-3);
-  display: grid;
-  gap: var(--space-3);
-}
-.of-tile h3 {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-}
-.of-medidor {
-  height: 8px;
-  border-radius: var(--radius-pill);
-  background: var(--tile);
-  overflow: hidden;
-}
-.of-medidor > span {
-  display: block;
-  height: 100%;
-  background: var(--libre);
-}
-.of-medidor-lleno > span {
-  background: var(--peligro);
-}
+/* Office panel: valet pills, the searchable car list, the opened detail, the log and the simulation field. */
 .of-pastillas {
   display: flex;
   flex-wrap: wrap;
@@ -43,36 +7,58 @@
   padding: 0;
   list-style: none;
 }
-.of-grupo {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-2);
+.of-detalle {
+  scroll-margin: var(--space-4);
 }
-.of-celdas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.of-sub {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.of-carros {
+  display: grid;
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.of-celda {
-  min-width: 44px;
-  min-height: 40px;
-  padding: 0 var(--space-2);
+.of-carro {
+  width: 100%;
+  min-height: 44px;
+  display: grid;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--hairline);
   border-radius: var(--radius-control);
-  background: var(--tile);
+  background: var(--panel-inner);
   color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.of-carro:hover {
+  background: var(--tile);
+}
+.of-carro[aria-pressed="true"] {
+  border-color: var(--surface-light);
+  background: var(--tile);
+}
+.of-carro-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.of-carro-fila strong {
+  font-size: 15px;
   font-weight: 600;
 }
-.of-celda:hover {
-  background: var(--tile-hover);
+.of-carro-linea {
+  font-size: 13px;
+  color: var(--ink-muted);
 }
-.of-celda[aria-pressed="true"] {
-  background: var(--surface-light);
-  border-color: var(--surface-light);
-  color: var(--ink-inverse);
+.of-carro-linea:empty {
+  display: none;
 }
 .of-hasta {
   grid-template-columns: 1fr 96px;
@@ -92,4 +78,8 @@
 }
 .of-bitacora li {
   justify-content: flex-start;
+}
+.of-cifras .ui-cifra-valor {
+  font-size: 22px;
+  white-space: nowrap;
 }
