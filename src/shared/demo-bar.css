@@ -1,0 +1,116 @@
+/* Presenter chrome: neutral, small, never mistaken for product UI. */
+.demo-bar {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 1000;
+  font: 13px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #1c1d1f;
+}
+.demo-bar-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #c9cbcf;
+  border-radius: 999px;
+  background: #ffffffee;
+  box-shadow: 0 6px 20px #0000001f;
+  backdrop-filter: blur(6px);
+}
+.demo-bar-dot {
+  display: none;
+}
+/* Small screens: a round icon button, so the control covers as little of the product as possible. */
+@media (max-width: 760px) {
+  .demo-bar {
+    right: 10px;
+    bottom: 10px;
+  }
+  .demo-bar-toggle {
+    position: relative;
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+  }
+  .demo-bar-label {
+    display: none;
+  }
+  .demo-bar-dot {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d9480f;
+  }
+}
+.demo-bar-panel {
+  width: min(300px, calc(100vw - 28px));
+  padding: 12px;
+  border: 1px solid #c9cbcf;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 12px 34px #00000029;
+}
+.demo-bar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.demo-bar-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+.demo-bar-list {
+  display: grid;
+  gap: 4px;
+}
+.demo-bar-list button {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 6px;
+  align-items: start;
+  min-height: 44px;
+  padding: 7px 8px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  text-align: left;
+}
+.demo-bar-list button[aria-pressed="true"] {
+  border-color: #1c1d1f;
+  background: #f1f2f4;
+}
+.demo-bar-list small {
+  display: block;
+  color: #5d6066;
+}
+.demo-bar-code {
+  font-variant-numeric: tabular-nums;
+  color: #5d6066;
+}
+.demo-bar-home {
+  display: flex;
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 0 8px;
+  border-top: 1px solid #e3e4e7;
+  text-decoration: none;
+}
