@@ -8,8 +8,19 @@ import { href } from "../shared/route";
 import type { VistaId } from "./Shell";
 import { useComando, useEstado } from "./useTienda";
 import { tienda } from "../parqueadero/tienda";
+import { ESCENARIO_INICIAL } from "../parqueadero/escenarios/index.ts";
 import { escenarioLoteLleno, inicioRecorrido } from "./Recorrido";
 import "./acceso.css";
+
+/** What "start over" brings back, read from the scenario file so it never drifts from it. */
+const SEMILLA = (() => {
+  const esc = ESCENARIO_INICIAL;
+  const celdas = esc.mapas.flatMap((m) => m.celdas);
+  const libres = celdas.filter((c) => c.estado === "libre").map((c) => c.id);
+  const filas = esc.entradas.map((e) => `${e.fila.length} en ${e.nombre}`).join(" y ");
+  const valets = esc.entradas.reduce((n, e) => n + e.valets, 0);
+  return `reloj ${esc.inicio}, ${filas}, libre ${libres.join(", ") || "ninguna"}, ${valets} valets disponibles; en todas las pestañas`;
+})();
 
 const ORDEN: EstadoCarro[] = ["en espera", "en fila", "con celda", "estacionado", "en devolución"];
 
@@ -20,7 +31,7 @@ interface Fila {
   nota: string;
   /** A link that opens a screen already signed in, or a command sent right here. */
   ir?: string;
-  /** Runs before following the link, e.g. resetting the lot for the walkthrough. */
+  /** Runs before following the link or sending the commands, e.g. resetting the lot. */
   antes?: () => void;
   /** After the commands succeed, go here (read from the updated state). */
   luego?: (estado: Estado) => string;
@@ -192,6 +203,18 @@ export function ListaAccesos({ vista, ruta = vista, comunes = true, onIr }: { vi
   const estado = useEstado();
   const { aviso, enviar } = useComando();
   const grupos = [
+    {
+      titulo: "Empezar de cero",
+      filas: [
+        {
+          clave: "semilla",
+          titulo: "Volver al estado fijo de prueba",
+          nota: SEMILLA,
+          antes: () => tienda.reiniciar(),
+          comandos: [],
+        },
+      ],
+    },
     ...(comunes ? [{ titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "empieza desde la semilla: conductor → valet → portería → oficina", ir: inicioRecorrido(estado, ruta === "telefono"), antes: () => tienda.reiniciar() }, { clave: "lleno", titulo: "Lote lleno y tiempo estimado", nota: "llena el lote, salen 3 carros y abre a SVK088 con su espera", comandos: [], luego: () => escenarioLoteLleno(ruta === "telefono") }] }] : []),
     ...filasDe(vista, estado, ruta),
   ];
@@ -217,10 +240,11 @@ export function ListaAccesos({ vista, ruta = vista, comunes = true, onIr }: { vi
       <button
         type="button"
         onClick={() => {
-          if (f.comandos?.every((c) => enviar(c)) && f.luego) {
-            window.location.hash = f.luego(tienda.leer()).replace(/^#/, "");
-            onIr?.();
-          }
+          f.antes?.();
+          if (!(f.comandos ?? []).every((c) => enviar(c))) return;
+          if (f.luego) window.location.hash = f.luego(tienda.leer()).replace(/^#/, "");
+          // Close after a jump, or after a plain reset; command rows stay open to send the next one.
+          if (f.luego || !f.comandos?.length) onIr?.();
         }}
       >
         {contenido}
