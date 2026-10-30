@@ -53,8 +53,9 @@
   }
 }
 .vl-asignacion {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   align-items: end;
   gap: var(--space-5);
 }
@@ -80,7 +81,12 @@
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: 0.04em;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+}
+/* Waiting for a cell is a sentence, not a cell code: smaller so the plate keeps its line. */
+.vl-celda.vl-sin-celda strong {
+  font-size: 28px;
+  line-height: 1.1;
 }
 .vl-siguiente {
   margin: 0;

@@ -13,7 +13,7 @@ export function TarjetaAsignacion({ servicio: s }: { servicio: Servicio }) {
   return (
     <TarjetaDatos Icono={Ticket} titulo={s.estado === "llaves en oficina" ? "Devuelve este carro" : "Tu asignación"} contador={{ valor: s.asignado, etiqueta: "Llegó" }}>
       <div className="vl-asignacion">
-        <p className="vl-celda">
+        <p className={sinCelda ? "vl-celda vl-sin-celda" : "vl-celda"}>
           <span className="vl-rotulo">Celda</span>
           <strong className="num">{s.celda ?? (sinCelda ? "Esperando celda" : "—")}</strong>
         </p>
