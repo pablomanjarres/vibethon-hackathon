@@ -24,8 +24,8 @@ import { useNuevaAsignacion } from "./useNuevaAsignacion";
 /** Next-step wording for the steps where the valet checks the driver's ficho. */
 const SIGUIENTE: Partial<Record<string, (s: Servicio) => string>> = {
   "pago pendiente": () => "Apartado: esperando el pago",
-  pagado: (s) => `Ve al pasaje de ${s.entrada}, pide el ficho al conductor de ${s.placa} y confírmalo para recibir las llaves.`,
-  "ficho emitido": (s) => `Pide el ficho al conductor de ${s.placa} y confírmalo para recibir las llaves.`,
+  pagado: (s) => `Ve al pasaje de ${s.entrada}, revisa que el ficho del conductor de ${s.placa} sea el mismo y confírmalo.`,
+  "ficho emitido": (s) => `Revisa que el ficho del conductor de ${s.placa} sea el mismo y confírmalo.`,
 };
 
 /** One valet's phone: only their assignment, its cell on the map, and the one next step. */
