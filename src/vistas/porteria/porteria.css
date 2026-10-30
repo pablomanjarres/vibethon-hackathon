@@ -1,0 +1,35 @@
+.pt-rejilla {
+  grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+}
+@media (max-width: 900px) {
+  .pt-rejilla {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.pt-turno {
+  margin: 0;
+  font-weight: 500;
+}
+.pt-fila > li {
+  justify-content: flex-start;
+}
+.pt-pos {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--surface-raised);
+  font-weight: 600;
+  font-size: 14px;
+}
+.pt-placa {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+}
+.pt-libres {
+  font-size: 14px;
+}
