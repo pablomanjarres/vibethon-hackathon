@@ -10,15 +10,15 @@ Frase: **mapa sereno, una acción por pantalla, estado siempre escrito.**
 
 | Fuente | Qué se toma | Dónde |
 |---|---|---|
-| Chargetrip (principal) | El aspecto: fondo crema, superficies claras, tinta casi negra, serif en títulos, botón de tinta, tarjetas de 16 px, panel flotante sobre el mapa | `references/refero/chargetrip/`, tokens en `src/ui/tokens.css` |
-| Chargetrip GO y SeatGeek | Ejemplos de distribución de app: lista a la izquierda, mapa del lote a la derecha; en teléfono, una columna | `references/refero/chargetrip/`, `references/refero/inspiration/office.jpg` |
+| Chargetrip GO, pantalla de estación (principal) | El aspecto y la distribución: mapa oscuro a pantalla completa, panel flotante a la izquierda (cabecera con icono y X, tres acciones, chips, tarjeta interna con contador verde, secciones plegables), botones redondos arriba a la derecha y zoom abajo | `references/refero/chargetrip/stations-panel.jpg`, tokens en `src/ui/tokens.css` |
+| Mapa tipo silletería (maquetas) | El dibujo del lote: calles con nombre, contorno redondeado, pasillo central, un puesto por celda agrupado por zona, globo sobre el puesto elegido | `src/vistas/mockups/`, `src/ui/MapaLote.tsx` |
 | Luma | Flujos de portería: lista de invitados con búsqueda y una pestaña por entrada, aviso de registro, hoja de "no encontrado" con "Intentar de nuevo" | `references/refero/inspiration/README.md`, `staff.jpg` |
 | Referencias de conductor | Espera como pronóstico, mapa de celdas, estado del valet por pasos, ficho como tiquete | `references/refero/inspiration/README.md`, `driver.jpg` |
 | Estado de pedido (Instagram) | Pantalla del valet: pasos hechos con su hora y el siguiente como único botón | `staff.jpg` |
 
 ## 3. Tokens
 
-Todos viven en `src/ui/tokens.css` y ninguna vista define colores propios: `--canvas`, `--surface`, `--ink`, `--accent`, los tonos de estado (`--libre`, `--reservada`, `--ocupada`, `--peligro`) con su versión suave, radios (`--radius-control` 8 px, `--radius-card` 16 px, `--radius-pill`), sombras, espaciado de 4 a 28 px y `--control-height` de 44 px.
+Todos viven en `src/ui/tokens.css` y ninguna vista define colores propios: mapa (`--map-ground`, `--map-lot`, `--map-line`, `--map-label`), panel (`--panel`, `--panel-inner`, `--tile`, `--ink`, `--ink-muted`, `--surface-light` para la acción principal), los tonos de estado (`--libre`, `--reservada`, `--ocupada`, `--peligro`) con su versión suave, radios (`--radius-control` 8 px, `--radius-card` 12 px, `--radius-panel` 16 px, `--radius-pill`), espaciado de 4 a 28 px y `--control-height` de 44 px.
 
 ## 4. Qué no se copia
 
@@ -26,4 +26,4 @@ Ni el logo, ni el nombre, ni los textos, ni las imágenes o ilustraciones de Cha
 
 ## 5. Mapa
 
-Solo el lote de EAFIT, dibujado desde los datos del escenario (`src/ui/MapaLote.tsx`). Sin mapa de calles, sin teselas, sin red.
+Solo el lote de EAFIT y sus cuatro calles, dibujado desde el estado (`src/ui/MapaLote.tsx`, `src/ui/distribuirLote.ts`): las celdas, sus zonas y posiciones, las entradas y sus filas salen de `src/parqueadero`. Sin teselas ni red. El mapa llena la ventana detrás del panel y se ajusta al espacio libre; el zoom solo agranda el lote dentro de su marco.
