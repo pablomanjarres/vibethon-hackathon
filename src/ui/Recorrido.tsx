@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, CheckCircle2, Circle, RotateCcw, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Circle, RotateCcw, Timer, X } from "lucide-react";
 import { useEffect } from "react";
 import { tienda } from "../parqueadero/tienda";
 import type { Estado, EstadoServicio } from "../parqueadero/tipos";
@@ -56,6 +56,26 @@ const PASOS: Paso[] = [
   { quien: "Conductor", vista: "conductor", params: conductor, texto: () => "Llaves de vuelta. Fin del recorrido.", hecho: (e) => llego(e, "entregado") },
 ];
 
+/** The car the full-lot option shows: last in Regional, so it has the longest wait. */
+const PLACA_ESPERA = "SVK088";
+
+/**
+ * Full-lot option: from the seed, the last free cell is handed out and three parked cars leave at
+ * different minutes (each freed cell goes to the next car), so the lot ends full and the wait
+ * estimate has real data. Returns the driver screen of a car at the back of the line.
+ */
+export function escenarioLoteLleno(): string {
+  tienda.reiniciar();
+  tienda.ejecutar({ tipo: "avanzarReloj", minutos: 1 });
+  for (const [minutos, placa] of [[3, "HKM214"], [4, "JRT508"], [2, "DWN161"]] as const) {
+    tienda.ejecutar({ tipo: "avanzarReloj", minutos });
+    tienda.ejecutar({ tipo: "pagar", placa });
+    tienda.ejecutar({ tipo: "salir", placa });
+  }
+  const estado = tienda.leer();
+  return href("conductor", { placa: PLACA_ESPERA, codigo: estado.carros[PLACA_ESPERA]?.codigo ?? "", demo: "1" });
+}
+
 /** Link that starts the walkthrough at its first step. */
 export function inicioRecorrido(estado: Estado): string {
   return href(PASOS[0].vista, { ...PASOS[0].params(estado), recorrido: "1" });
@@ -106,6 +126,9 @@ export function Recorrido() {
             Siguiente: {PASOS[n].quien} <ArrowRight size={16} aria-hidden="true" />
           </a>
         ) : null}
+        <button type="button" className="ui-recorrido-lleno" onClick={() => (window.location.hash = escenarioLoteLleno().replace(/^#/, ""))}>
+          <Timer size={16} aria-hidden="true" /> Lote lleno y espera
+        </button>
         <a href={inicioRecorrido(estado)} onClick={() => tienda.reiniciar()} aria-label="Empezar el recorrido de nuevo">
           <RotateCcw size={16} aria-hidden="true" /> De nuevo
         </a>
