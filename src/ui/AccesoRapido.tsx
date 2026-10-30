@@ -192,7 +192,7 @@ export function ListaAccesos({ vista, ruta = vista, onIr }: { vista: VistaId; ru
   const estado = useEstado();
   const { aviso, enviar } = useComando();
   const grupos = [
-    { titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "empieza desde la semilla: conductor → valet → portería → oficina", ir: inicioRecorrido(estado), antes: () => tienda.reiniciar() }, { clave: "lleno", titulo: "Lote lleno y tiempo estimado", nota: "llena el lote, salen 3 carros y abre a SVK088 con su espera", comandos: [], luego: () => escenarioLoteLleno() }] },
+    { titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "empieza desde la semilla: conductor → valet → portería → oficina", ir: inicioRecorrido(estado, ruta === "telefono"), antes: () => tienda.reiniciar() }, { clave: "lleno", titulo: "Lote lleno y tiempo estimado", nota: "llena el lote, salen 3 carros y abre a SVK088 con su espera", comandos: [], luego: () => escenarioLoteLleno(ruta === "telefono") }] },
     ...filasDe(vista, estado, ruta),
   ];
   const fila = (f: Fila): ReactNode => {
