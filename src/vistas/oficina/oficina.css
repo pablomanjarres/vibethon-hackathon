@@ -1,0 +1,140 @@
+.of-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.of-pila {
+  display: grid;
+  gap: var(--space-4);
+}
+.of-rejilla {
+  grid-template-columns: minmax(320px, 440px) minmax(0, 1fr);
+}
+@media (max-width: 900px) {
+  .of-rejilla {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.of-mapa {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* Live tiles per entrance */
+.of-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.of-tile {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-panel);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+}
+.of-tile h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.of-medidor {
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--tile);
+  overflow: hidden;
+}
+.of-medidor > span {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+}
+.of-medidor-lleno > span {
+  background: var(--peligro);
+}
+.of-pastillas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Cells by state */
+.of-grupo {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+}
+.of-grupo + .of-grupo {
+  margin-top: var(--space-3);
+}
+.of-celdas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.of-celda {
+  min-width: 52px;
+  min-height: 40px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.of-celda:hover {
+  background: var(--tile-hover);
+}
+.of-celda[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface-raised);
+}
+
+/* Simulation controls */
+.of-sim {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+.of-sim .ui-campo input {
+  width: 120px;
+}
+.of-rechazos {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: grid;
+  gap: var(--space-1);
+  font-size: 14px;
+}
+.of-bitacora time {
+  flex: none;
+  font-weight: 600;
+}
+.of-bitacora li {
+  justify-content: flex-start;
+}
+
+:where(.of-celda, .of-tile a):focus-visible {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
+}
