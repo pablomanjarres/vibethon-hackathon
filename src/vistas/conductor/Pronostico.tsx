@@ -1,7 +1,5 @@
-import { Timer } from "lucide-react";
 import type { Espera } from "../../parqueadero/espera";
-import { carros, hora } from "../../parqueadero/lecturas/formato";
-import { Tarjeta } from "../../ui/Tarjeta";
+import { hora } from "../../parqueadero/lecturas/formato";
 import "./pasos.css";
 
 interface Props {
@@ -12,7 +10,7 @@ interface Props {
   llegoEn: number;
 }
 
-/** The wait as a forecast: minutes, cars ahead and the steps from registration to the cell. */
+/** The wait as a forecast: the steps from registration to the cell, with their times. */
 export function Pronostico({ espera, entrada, inicio, minuto, llegoEn }: Props) {
   const turno = hora(inicio, minuto + espera.minutos);
   const pasos = [
@@ -22,25 +20,14 @@ export function Pronostico({ espera, entrada, inicio, minuto, llegoEn }: Props) 
     { texto: "Celda", detalle: "Justo después de la portería", hecho: false },
   ];
   return (
-    <Tarjeta titulo="Tu espera" Icono={Timer}>
-      <div className="cd-pronostico">
-        <p className="cd-pronostico-min num">
-          {espera.minutos}
-          <span> min</span>
-        </p>
-        <p className="ui-texto-suave">
-          {espera.carrosAdelante === 0 ? "Eres el siguiente en la fila." : `${carros(espera.carrosAdelante)} antes que tú, contando ambas entradas.`}
-        </p>
-      </div>
-      <ol className="cd-linea">
-        {pasos.map((paso) => (
-          <li key={paso.texto} className={paso.hecho ? "cd-hecho" : undefined}>
-            <span className="cd-punto" aria-hidden="true" />
-            <span className="cd-linea-texto">{paso.texto}</span>
-            <span className="cd-linea-detalle num">{paso.detalle}</span>
-          </li>
-        ))}
-      </ol>
-    </Tarjeta>
+    <ol className="cd-linea">
+      {pasos.map((paso) => (
+        <li key={paso.texto} className={paso.hecho ? "cd-hecho" : undefined}>
+          <span className="cd-punto" aria-hidden="true" />
+          <span className="cd-linea-texto">{paso.texto}</span>
+          <span className="cd-linea-detalle num">{paso.detalle}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
