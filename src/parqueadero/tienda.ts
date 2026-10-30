@@ -77,6 +77,10 @@ export function crearTienda(escenario: Escenario = ESCENARIO_INICIAL): Tienda {
     guardar(clave, estado);
     avisar();
   };
+  escucharOtrasPestanas(clave, escenario, (siguiente) => {
+    estado = siguiente;
+    avisar();
+  });
   return {
     leer: () => estado,
     ejecutar(comando) {
@@ -101,6 +105,21 @@ export function crearTienda(escenario: Escenario = ESCENARIO_INICIAL): Tienda {
       return rechazos;
     },
   };
+}
+
+/**
+ * Another tab of this browser saved or cleared the state: take it as ours. A removed key (or a
+ * cleared storage) means a reset to the seed; a broken or foreign value is ignored.
+ */
+function escucharOtrasPestanas(clave: string, escenario: Escenario, aplicar: (estado: Estado) => void): void {
+  if (typeof window === "undefined") return;
+  window.addEventListener("storage", (evento) => {
+    if (evento.key !== null && evento.key !== clave) return;
+    if (evento.storageArea !== almacen()) return;
+    if (evento.key === null || evento.newValue === null) return aplicar(estadoInicial(escenario));
+    const guardado = cargar(clave, escenario);
+    if (guardado) aplicar(guardado);
+  });
 }
 
 /** The one store all four views share, so the driver, gate, valet and office screens never disagree. */

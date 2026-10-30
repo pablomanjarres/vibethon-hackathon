@@ -24,11 +24,11 @@ Si la pestaña ya se usó, empezar en `#/oficina` y pulsar **Reiniciar**.
 | 0:45 | Pulsar **Ya entregué las llaves** | Aviso "SVK088 quedó con RG-V1. Guarda el ficho F-001 y ve a clase." y el progreso del valet | "Entrega las llaves y camina a clase. El carro conserva su turno en la fila." |
 | 0:55 | Abrir `#/porteria?entrada=regional` | Pasaje 5/6, "Turno de Las Vegas: su primer carro llegó antes.", SVK088 marcado "Con valet"; el botón **Asignar celda** está desactivado | "La portería ve el mismo estado: CXM540 ya salió del pasaje y ahora el turno es de Las Vegas." |
 | 1:00 | Pestaña **Las Vegas** (`#/porteria?entrada=las-vegas`) | "Es tu turno, pero no hay celdas libres." | "Es su turno, pero no hay celda, así que nadie asigna nada." |
-| 1:05 | Abrir `#/oficina`, dejar 30 en "Simular eventos hasta el minuto" y pulsar **Simular** | "Simulado hasta el minuto 30. 1 evento rechazado." y la lista: "Minuto 4: El pasaje de Las Vegas está lleno (4 de 4). El carro espera afuera."; se liberan A01, A05 y B03 | "Estos son los eventos del escenario. Cuando un carro llega a un pasaje lleno, el sistema lo rechaza con su motivo y no cambia nada." |
+| 1:05 | Abrir `#/oficina`, dejar 30 en "Simular eventos hasta el minuto" y pulsar **Simular** | Ningún evento rechazado; en la bitácora: "MAT471 quedó registrado en la fila de espera de Las Vegas (puesto 1); entra al pasaje apenas haya cupo."; se liberan A01, A05 y B03 | "Estos son los eventos del escenario. Si un carro llega con el pasaje lleno no se pierde: queda en la fila de espera, en orden, y entra solo cuando hay cupo." |
 | 1:20 | Pulsar **Reiniciar** | "Simulación reiniciada al minuto 0." y el lote vuelve a la semilla | "Y en cualquier momento volvemos al punto de partida." |
 | 1:30 | Fin | | "Eso es lo que funciona hoy. Todo es simulado y local." |
 
-Nota: partiendo de la semilla sin el recorrido anterior, **Simular** hasta el minuto 30 da dos rechazos: también "Minuto 7: El pasaje de Regional está lleno (6 de 6). El carro espera afuera."
+Nota: partiendo de la semilla sin el recorrido anterior, OLP350 también queda en la fila de espera de Regional (puesto 1) en el minuto 7.
 
 ## 2. Preguntas de los jurados
 
@@ -39,7 +39,7 @@ Decidimos que un solo módulo (`src/parqueadero/`) haga todo cambio de estado y 
 Para el estudiante que llega en carro a hora pico: SVK088 vio su espera de 27 min y pudo irse a clase con el ficho F-001. Cada pantalla dice el siguiente paso en una frase; la prueba con personas fuera del equipo todavía no está hecha y lo decimos así.
 
 **Johnatan García (JOGA): ¿Qué puede salir mal, cómo lo probaron y qué hace el sistema cuando ocurre?**
-Que alguien se salte la fila, que una celda se entregue dos veces o que entre un carro a un pasaje lleno. Lo vieron: HUO845 no puede reservar y la app dice cuántos carros tiene antes; la portería sin celdas libres no puede asignar; el evento del minuto 4 se rechazó con "El pasaje de Las Vegas está lleno (4 de 4)". Un comando rechazado deja el estado igual y explica el motivo.
+Que alguien se salte la fila, que una celda se entregue dos veces o que entre un carro a un pasaje lleno. Lo vieron: HUO845 no puede reservar y la app dice cuántos carros tiene antes; la portería sin celdas libres no puede asignar; el carro que llegó en el minuto 4 con el pasaje lleno quedó en la fila de espera, en orden, sin saltarse a nadie. Un comando rechazado deja el estado igual y explica el motivo.
 
 ## 3. Versión de 7 minutos (final)
 

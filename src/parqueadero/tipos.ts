@@ -5,7 +5,7 @@
 
 export type EstadoCelda = "libre" | "reservada" | "ocupada";
 export type EstadoValet = "disponible" | "reservado" | "en servicio";
-export type EstadoCarro = "en fila" | "con celda" | "estacionado" | "en devolución" | "retirado";
+export type EstadoCarro = "en espera" | "en fila" | "con celda" | "estacionado" | "en devolución" | "retirado";
 export type EstadoServicio = "solicitado" | "en curso" | "estacionado" | "devolución" | "entregado";
 export type UbicacionLlave = "conductor" | "valet" | "tablero";
 
@@ -32,6 +32,8 @@ export interface Entrada {
   capacidadPasaje: number;
   /** Plates in the passage, first one is at the gate. */
   fila: string[];
+  /** Plates registered while the passage was full; each enters the passage, in order, when a car leaves it. */
+  espera?: string[];
   celdasAsignadas: number;
 }
 

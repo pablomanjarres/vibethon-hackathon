@@ -55,7 +55,7 @@
 |---|---|---|---|
 | Johany Carreño | Cómo piensa el equipo | ¿Qué decisiones tomó el equipo y cómo comprobaron que la solución cumple el reto? | Regla de equidad en `equidad.ts`, tabla de requisitos, `npm run foto` |
 | David Pulgarín | Por qué una persona lo usaría | ¿Para quién diseñaron esto y qué evidencia tienen de que se entiende? | Vista del conductor con su espera; prueba con personas |
-| Johnatan García (JOGA) | Por qué confiar en el resultado | ¿Qué puede salir mal, cómo lo probaron y qué hace el sistema cuando ocurre? | Rechazos con motivo: pasaje lleno, celda ya entregada, turno de la otra entrada, salida sin pago |
+| Johnatan García (JOGA) | Por qué confiar en el resultado | ¿Qué puede salir mal, cómo lo probaron y qué hace el sistema cuando ocurre? | Fila de espera cuando el pasaje está lleno; rechazos con motivo: celda ya entregada, turno de la otra entrada, salida sin pago |
 
 ## Requisitos (del enunciado, tal como se escribió)
 

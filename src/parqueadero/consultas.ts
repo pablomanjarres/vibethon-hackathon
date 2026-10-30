@@ -11,6 +11,11 @@ export function nombreEntrada(estado: Estado, id: string | null): string {
   return estado.entradas.find((e) => e.id === id)?.nombre ?? "el lote";
 }
 
+/** Cars registered outside a full passage (older saved states have no list yet). */
+export function esperaDe(entrada: Entrada): string[] {
+  return entrada.espera ?? [];
+}
+
 export function entradaPorId(estado: Estado, id: string): Entrada {
   const entrada = estado.entradas.find((e) => e.id === id);
   exigir(entrada, `No existe la entrada ${id}.`);

@@ -140,7 +140,7 @@ export function estadoInicial(esc: Escenario): Estado {
   );
   const entradas: Entrada[] = esc.entradas.map((e) => {
     for (const c of e.fila) carros[c.placa] = carroNuevo(c.placa, { entrada: e.id, llegoEn: c.llegoEn });
-    return { id: e.id, codigo: e.codigo, nombre: e.nombre, capacidadPasaje: e.capacidadPasaje, fila: e.fila.map((c) => c.placa), celdasAsignadas: 0 };
+    return { id: e.id, codigo: e.codigo, nombre: e.nombre, capacidadPasaje: e.capacidadPasaje, fila: e.fila.map((c) => c.placa), espera: [], celdasAsignadas: 0 };
   });
   const valets: Valet[] = esc.entradas.flatMap((e) =>
     Array.from({ length: e.valets }, (_, i): Valet => ({ id: `${e.codigo}-V${i + 1}`, entrada: e.id, estado: "disponible", servicio: null })),

@@ -1,23 +1,23 @@
-import { carroPorPlaca, celdaDe, entradaPorId, normalizarPlaca, servicioDe, valetPorId } from "../consultas.ts";
+import { carroPorPlaca, celdaDe, entradaPorId, esperaDe, normalizarPlaca, servicioDe, valetPorId } from "../consultas.ts";
 import { ordenDeAtencion, siguienteEntrada } from "../equidad.ts";
 import { cambiarCelda, cambiarValet, exigir } from "../transiciones.ts";
 import type { Carro, Celda, Entrada, Estado } from "../tipos.ts";
 
-/** Plate registration: the camera at the start of a passage records a car joining the line. */
+/**
+ * Plate registration (the camera, or the driver from the app): the car joins the passage, or the
+ * waiting line outside it when the passage is full. It is never turned away for lack of room.
+ */
 export function registrarLlegada(estado: Estado, placaLeida: string, entradaId: string): string {
   const placa = normalizarPlaca(placaLeida);
   exigir(/^[A-Z0-9]{5,7}$/.test(placa), `La placa "${placaLeida}" no es válida.`);
   const entrada = entradaPorId(estado, entradaId);
   const previo = estado.carros[placa];
   exigir(!previo || previo.estado === "retirado", `La placa ${placa} ya está en el parqueadero.`);
-  exigir(
-    entrada.fila.length < entrada.capacidadPasaje,
-    `El pasaje de ${entrada.nombre} está lleno (${entrada.fila.length} de ${entrada.capacidadPasaje}). El carro espera afuera.`,
-  );
+  const lleno = entrada.fila.length >= entrada.capacidadPasaje;
   estado.carros[placa] = {
     placa,
     entrada: entrada.id,
-    estado: "en fila",
+    estado: lleno ? "en espera" : "en fila",
     llegoEn: estado.minuto,
     celda: null,
     servicio: null,
@@ -25,6 +25,10 @@ export function registrarLlegada(estado: Estado, placaLeida: string, entradaId: 
     llave: "conductor",
     pagado: false,
   };
+  if (lleno) {
+    entrada.espera = [...esperaDe(entrada), placa];
+    return `${placa} quedó registrado en la fila de espera de ${entrada.nombre} (puesto ${entrada.espera.length}); entra al pasaje apenas haya cupo.`;
+  }
   entrada.fila.push(placa);
   return `${placa} entró al pasaje de ${entrada.nombre} (${entrada.fila.length} de ${entrada.capacidadPasaje}).`;
 }
@@ -37,6 +41,12 @@ function darCelda(estado: Estado, entrada: Entrada, celda: Celda): Carro {
   carro.estado = "con celda";
   carro.celda = celda.id;
   entrada.celdasAsignadas += 1;
+  const [siguiente, ...resto] = esperaDe(entrada);
+  if (siguiente) {
+    entrada.espera = resto;
+    entrada.fila.push(siguiente);
+    estado.carros[siguiente].estado = "en fila";
+  }
   return carro;
 }
 

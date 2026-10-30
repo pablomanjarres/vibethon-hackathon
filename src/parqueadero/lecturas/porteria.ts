@@ -1,3 +1,4 @@
+import { esperaDe } from "../consultas.ts";
 import { siguienteEntrada } from "../equidad.ts";
 import { estimarEspera } from "../espera.ts";
 import type { Estado } from "../tipos.ts";
@@ -14,6 +15,8 @@ export interface VistaPorteria {
   entrada: string;
   nombre: string;
   pasaje: { ocupados: number; capacidad: number };
+  /** Cars registered while the passage was full, waiting outside in order. */
+  enEspera: string[];
   fila: CarroEnPasaje[];
   esMiTurno: boolean;
   /** Why this gate may or may not hand out the next cell. */
@@ -39,6 +42,7 @@ export function vistaPorteria(estado: Estado, entradaId: string): VistaPorteria 
     entrada: entrada.id,
     nombre: entrada.nombre,
     pasaje: { ocupados: entrada.fila.length, capacidad: entrada.capacidadPasaje },
+    enEspera: esperaDe(entrada),
     fila: entrada.fila.map((placa) => ({
       placa,
       llego: hora(estado.inicio, estado.carros[placa].llegoEn),
