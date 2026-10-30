@@ -1,36 +1,48 @@
-/* The one set of design tokens, taken from the Chargetrip reference (references/refero/chargetrip). */
+/* The one set of design tokens, taken from the Chargetrip GO station screen (references/refero/chargetrip). */
 :root {
-  --canvas: #efece6;
-  --surface: #fbfaf6;
-  --surface-raised: #ffffff;
-  --tile: #e8e5de;
-  --tile-hover: #dedad1;
-  --ink: #1d1c1a;
-  --ink-hover: #3a3936;
-  --ink-muted: #5c5954;
-  --hairline: #e3dfd7;
-  --accent: #c2410c;
-  --accent-dot: #f2541b;
+  color-scheme: dark;
 
-  /* Status tones: always paired with a text label and an icon. */
-  --libre: #146c42;
-  --libre-soft: #dcefe4;
-  --reservada: #9a5b00;
-  --reservada-soft: #fbecd2;
-  --ocupada: #4b4a47;
-  --ocupada-soft: #e4e1da;
-  --peligro: #b42318;
-  --peligro-soft: #fde4e1;
+  /* Map */
+  --map-ground: #3b3937;
+  --map-lot: #43413e;
+  --map-line: #6b6864;
+  --map-line-strong: #8d8984;
+  --map-label: #d9d5cf;
 
-  --font-serif: "Newsreader", Georgia, serif;
+  /* Floating panel */
+  --panel: #232120;
+  --panel-inner: #1a1918;
+  --tile: #353331;
+  --tile-hover: #423f3c;
+  --hairline: #3a3836;
+  --ink: #f4f2ee;
+  --ink-muted: #b5b0a9;
+  --ink-inverse: #1c1b1a;
+  --surface-light: #f4f2ee;
+  --surface-light-hover: #ffffff;
+
+  /* Status tones: always paired with a text label and an icon. Text tones pass 4.5:1 on --panel. */
+  --libre: #4cc38a;
+  --libre-pin: #2f9e6a;
+  --libre-soft: #183a2a;
+  --reservada: #f0b44c;
+  --reservada-pin: #d48a12;
+  --reservada-soft: #3e2f14;
+  --ocupada: #c4c0ba;
+  --ocupada-pin: #77736e;
+  --ocupada-soft: #34322f;
+  --peligro: #ff8a7a;
+  --peligro-soft: #46211c;
+
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
 
   --radius-control: 8px;
-  --radius-card: 16px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
   --radius-pill: 999px;
   --radius-tag: 6px;
-  --shadow-panel: 0 4px 24px rgb(0 0 0 / 0.12);
-  --shadow-control: 0 1px 2px rgb(0 0 0 / 0.08);
+  --shadow-panel: 0 8px 32px rgb(0 0 0 / 0.45);
+  --shadow-control: 0 2px 8px rgb(0 0 0 / 0.4);
 
   --space-1: 4px;
   --space-2: 8px;
@@ -39,12 +51,14 @@
   --space-5: 20px;
   --space-6: 28px;
   --control-height: 44px;
+  --panel-gap: 10px;
+  --panel-width: 380px;
 
-  --focus-color: #1d4ed8;
+  --focus-color: #8ab4ff;
 }
 
 body {
-  background: var(--canvas);
+  background: var(--map-ground);
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: 15px;
