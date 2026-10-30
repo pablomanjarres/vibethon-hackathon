@@ -7,6 +7,7 @@ import type { Estado, EstadoCarro } from "../parqueadero/tipos";
 import { href } from "../shared/route";
 import type { VistaId } from "./Shell";
 import { useComando, useEstado } from "./useTienda";
+import { inicioRecorrido } from "./Recorrido";
 import "./acceso.css";
 
 const ORDEN: EstadoCarro[] = ["en espera", "en fila", "con celda", "estacionado", "en devolución"];
@@ -107,7 +108,10 @@ export function AccesoRapido({ vista }: { vista?: VistaId }) {
     return () => window.removeEventListener("keydown", cerrar);
   }, [abierto]);
   if (!vista) return null;
-  const grupos = filasDe(vista, estado);
+  const grupos = [
+    { titulo: "Recorrido guiado", filas: [{ clave: "recorrido", titulo: "Seguir un carro de la fila a las llaves", nota: "conductor → valet → portería → oficina", ir: inicioRecorrido(estado) }] },
+    ...filasDe(vista, estado),
+  ];
   const fila = (f: Fila): ReactNode => {
     const contenido = (
       <>
