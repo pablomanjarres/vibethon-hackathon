@@ -3,7 +3,8 @@ import type { VistaOficina } from "../../parqueadero/lecturas/oficina";
 import type { Celda } from "../../parqueadero/tipos";
 import { ESTADO_CELDA } from "../../ui/estados";
 import { Pastilla } from "../../ui/Pastilla";
-import { Datos, Tarjeta, Vacio } from "../../ui/Tarjeta";
+import { Datos } from "../../ui/Datos";
+import { TarjetaDatos } from "../../ui/TarjetaDatos";
 
 interface Props {
   celda: Celda | null;
@@ -12,12 +13,7 @@ interface Props {
 
 /** The selected cell: its state, its plate and the valet service attached to that plate. */
 export function DetalleCelda({ celda, fichos }: Props) {
-  if (!celda)
-    return (
-      <Tarjeta titulo="Celda" Icono={MapPin}>
-        <Vacio>Elige una celda en el mapa o en la lista.</Vacio>
-      </Tarjeta>
-    );
+  if (!celda) return <p className="ui-texto-suave">Toca un pin del mapa o una celda de la lista para ver su detalle.</p>;
   const servicio = celda.placa ? fichos.find((f) => f.placa === celda.placa) : undefined;
   const detalle = {
     libre: "Lista para el siguiente carro en la fila.",
@@ -25,7 +21,8 @@ export function DetalleCelda({ celda, fichos }: Props) {
     ocupada: "Hay un carro estacionado.",
   }[celda.estado];
   return (
-    <Tarjeta titulo={`Celda ${celda.id}`} Icono={MapPin} extra={<Pastilla {...ESTADO_CELDA[celda.estado]} />}>
+    <TarjetaDatos Icono={MapPin} titulo={`Celda ${celda.id}`}>
+      <Pastilla {...ESTADO_CELDA[celda.estado]} />
       <p className="ui-texto-suave">{detalle}</p>
       <Datos
         filas={[
@@ -35,6 +32,6 @@ export function DetalleCelda({ celda, fichos }: Props) {
           { etiqueta: "Valet", valor: servicio?.valet ?? "Sin valet" },
         ]}
       />
-    </Tarjeta>
+    </TarjetaDatos>
   );
 }
