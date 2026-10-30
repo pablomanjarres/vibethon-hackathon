@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { hora } from "../../parqueadero/lecturas/formato";
-import { setParams, useRoute } from "../../shared/route";
+import { href, setParams, useRoute } from "../../shared/route";
 import { useEstado } from "../../ui/useTienda";
 import { Dispositivo } from "./Dispositivo";
 import { Ingreso } from "./Ingreso";
@@ -22,6 +22,7 @@ export default function Telefono() {
   const estado = useEstado();
   const { params } = useRoute();
   const placa = params.get("placa")?.toUpperCase() ?? "";
+  const valet = params.get("valet");
   const codigo = params.get("codigo") ?? "";
   // The code and confirmation shown right after check-in survive the switch to the driver's screen.
   const [nuevo, setNuevo] = useState<{ placa: string; codigo: string; texto: string } | null>(null);
@@ -37,7 +38,13 @@ export default function Telefono() {
   return (
     <div className="tl-escena">
       <Dispositivo hora={hora(estado.inicio, estado.minuto)}>
-        {placa ? (
+        {valet ? (
+          <iframe
+            className="tl-marco"
+            title={`App del valet ${valet}`}
+            src={href("valet", { valet, codigo: params.get("codigo") ?? undefined, embebido: "1" })}
+          />
+        ) : placa ? (
           <PantallaConductor
             key={`${placa}:${codigo}`}
             estado={estado}
@@ -55,6 +62,7 @@ export default function Telefono() {
         <Recorrido />
         <section className="ui-acceso tl-accesos">
           <ListaAccesos vista="conductor" ruta="telefono" />
+          <ListaAccesos vista="valet" ruta="telefono" comunes={false} />
         </section>
       </aside>
     </div>
