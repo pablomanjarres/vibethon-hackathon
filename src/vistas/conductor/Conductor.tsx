@@ -20,6 +20,7 @@ export default function Conductor() {
       codigo={codigo}
       registro={nuevo && nuevo.placa === placa ? nuevo : null}
       onRegistrada={registrada}
+      demo={params.has("demo")}
     />
   );
 }

@@ -127,3 +127,60 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-3);
 }
+
+/* Valet offer and service steps */
+.cd-oferta {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--panel-inner);
+}
+.cd-oferta-sugerida {
+  box-shadow: inset 0 0 0 2px var(--surface-light);
+}
+.cd-oferta-titulo,
+.cd-oferta-sugerencia,
+.cd-valet-titulo,
+.cd-valet-nota {
+  margin: 0;
+}
+.cd-oferta-titulo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+}
+.cd-oferta-sugerencia {
+  font-weight: 600;
+  font-size: 14px;
+}
+.cd-oferta .ui-chips button {
+  font: inherit;
+  font-size: 13px;
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  cursor: pointer;
+}
+.cd-valet-titulo {
+  font-size: 22px;
+  font-weight: 600;
+}
+.cd-valet-ficho {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--panel-inner);
+}
+.cd-valet-ficho strong {
+  font-size: 44px;
+  line-height: 1;
+}
+.cd-demo {
+  display: grid;
+  gap: var(--space-3);
+  max-height: 260px;
+  overflow-y: auto;
+}
