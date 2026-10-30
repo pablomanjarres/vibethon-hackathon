@@ -22,13 +22,22 @@ function avanzar(placa: string): Aviso | null {
   return { ok: true, texto: `${paso.quien} (+${paso.minutos} min): ${ultimo}` };
 }
 
+interface Props {
+  estado: Estado;
+  placa: string;
+  onResultado: (aviso: Aviso) => void;
+  /** Rewrites what is shown, e.g. to hide other drivers' plates on the phone. */
+  ocultar?: (texto: string) => string;
+}
+
 /**
  * Demo only (?demo): what the gate, a valet, the office or another driver does next for this car,
  * one press at a time, with the simulated clock moving so the wait estimate fills in.
  */
-export function SiguientePasoDemo({ estado, placa, onResultado }: { estado: Estado; placa: string; onResultado: (aviso: Aviso) => void }) {
+export function SiguientePasoDemo({ estado, placa, onResultado: informar, ocultar = (t) => t }: Props) {
   const paso = pasoSimulado(estado, placa);
   if (!paso) return null;
+  const onResultado = (aviso: Aviso) => informar({ ...aviso, texto: ocultar(aviso.texto) });
   const esperando = ["en fila", "en espera"].includes(estado.carros[placa]?.estado ?? "");
   const hastaCelda = () => {
     let ultimo: Aviso | null = null;
@@ -44,7 +53,7 @@ export function SiguientePasoDemo({ estado, placa, onResultado }: { estado: Esta
   return (
     <div className="cd-demo-paso">
       <Boton variante="secundario" Icono={StepForward} ancho onClick={() => onResultado(avanzar(placa) ?? { ok: true, texto: "Nada más que simular." })}>
-        Siguiente paso: {paso.quien} (+{paso.minutos} min)
+        Siguiente paso: {ocultar(paso.quien)} (+{paso.minutos} min)
       </Boton>
       {esperando && (
         <Boton variante="contorno" Icono={FastForward} ancho onClick={hastaCelda}>

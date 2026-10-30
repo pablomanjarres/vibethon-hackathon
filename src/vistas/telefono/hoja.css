@@ -118,3 +118,7 @@
   font-size: 12px;
   color: var(--ink-muted);
 }
+/* Valet chips are tapped with a thumb here. */
+.tl-detalles .ui-chip {
+  min-height: 40px;
+}

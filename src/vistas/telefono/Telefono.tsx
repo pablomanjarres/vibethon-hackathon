@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { hora } from "../../parqueadero/lecturas/formato";
-import { useRoute } from "../../shared/route";
+import { setParams, useRoute } from "../../shared/route";
 import { useEstado } from "../../ui/useTienda";
 import { Dispositivo } from "./Dispositivo";
 import { Ingreso } from "./Ingreso";
@@ -22,6 +22,12 @@ export default function Telefono() {
   const placa = params.get("placa")?.toUpperCase() ?? "";
   const codigo = params.get("codigo") ?? "";
   const demo = params.has("demo");
+  // The code and confirmation shown right after check-in survive the switch to the driver's screen.
+  const [nuevo, setNuevo] = useState<{ placa: string; codigo: string; texto: string } | null>(null);
+  const registrada = (placa: string, codigo: string, texto: string) => {
+    setNuevo({ placa, codigo, texto });
+    setParams({ placa, codigo }, { push: true });
+  };
 
   useEffect(() => {
     document.title = "Teléfono del conductor · Parqueadero EAFIT";
@@ -30,7 +36,18 @@ export default function Telefono() {
   return (
     <div className="tl-escena">
       <Dispositivo hora={hora(estado.inicio, estado.minuto)}>
-        {placa ? <PantallaConductor estado={estado} placa={placa} codigo={codigo} /> : <Ingreso />}
+        {placa ? (
+          <PantallaConductor
+            key={`${placa}:${codigo}`}
+            estado={estado}
+            placa={placa}
+            codigo={codigo}
+            registro={nuevo?.placa === placa ? nuevo : null}
+            onRegistrada={registrada}
+          />
+        ) : (
+          <Ingreso estado={estado} onRegistrada={registrada} />
+        )}
       </Dispositivo>
       {demo && (
       <aside className="tl-presentador" aria-label="Entrar como otro conductor">

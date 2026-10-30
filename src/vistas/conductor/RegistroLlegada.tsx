@@ -27,7 +27,7 @@ export function RegistroLlegada({ estado, onRegistrada }: Props) {
     const normalizada = normalizarPlaca(placa);
     if (enviar({ tipo: "registrarLlegada", placa: normalizada, entrada })) {
       const despues = tienda.leer();
-      onRegistrada(normalizada, codigoDeRegistro(despues, normalizada) ?? "", despues.bitacora.at(-1)?.detalle ?? `${normalizada} quedó registrada.`);
+      onRegistrada(normalizada, codigoDeRegistro(despues, normalizada) ?? "", [...despues.bitacora].reverse().find((e) => e.detalle.includes(normalizada))?.detalle ?? `${normalizada} quedó registrada.`);
     } else setRechazo(true);
   };
   const reintentar = () => {
