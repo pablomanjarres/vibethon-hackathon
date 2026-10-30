@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Car, CircleAlert, CircleCheck, Clock, Clock3, KeyRound, Minus } from "lucide-react";
 import { Pastilla, type Insignia } from "../../ui/Pastilla";
 import { ESTADO_CELDA } from "../../ui/estados";
+import { MARCA, tituloPagina } from "../../ui/identidad";
 import { CELDA_ELEGIDA, TARIFA, ZONAS, ZONA_ELEGIDA, peso } from "./datos";
 import { MapaCampus } from "./MapaCampus";
 import { Hoja, Telefono } from "./Telefono";
@@ -14,12 +15,12 @@ const celdaId = `${zona.id}-${String(CELDA_ELEGIDA).padStart(2, "0")}`;
 /** Read-only phone mockups: the lot as a seat map, a chosen zone, and the reserved cell. */
 export default function Mockups() {
   useEffect(() => {
-    document.title = "Mockups · Parqueadero EAFIT";
+    document.title = tituloPagina("Mockups");
   }, []);
   return (
     <main className="mk-pagina">
       <header className="mk-intro">
-        <p>Parqueadero EAFIT · solo lectura</p>
+        <p>{MARCA} · solo lectura</p>
         <h1>Elige tu zona como eliges tu silla</h1>
       </header>
       <div className="mk-fila">
