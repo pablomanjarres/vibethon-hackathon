@@ -1,4 +1,4 @@
-import { CarFront, KeyRound, OctagonAlert, ParkingSquare, Undo2, type LucideIcon } from "lucide-react";
+import { CarFront, KeyRound, OctagonAlert, ParkingSquare, type LucideIcon } from "lucide-react";
 import type { Comando } from "../../parqueadero/motor";
 import { hora } from "../../parqueadero/lecturas/formato";
 import type { VistaValet } from "../../parqueadero/lecturas/valet";
@@ -21,14 +21,15 @@ interface Etapa {
   accion?: (s: Servicio, estado: Estado) => AccionValet | null;
 }
 
-/** Taking a car in: the valet gets the keys, then parks it in the reserved cell. */
-const ENTRADA: Etapa[] = [
-  { tipo: "pedirValet", texto: "Asignación recibida" },
+/** One service: paid, the valet takes the car in the passage, parks it, and leaves the keys at the office. */
+const ETAPAS: Etapa[] = [
+  { tipo: "pagarValet", texto: "Pago aprobado" },
   {
     tipo: "entregarLlaves",
-    texto: "Llaves recibidas",
-    accion: (s) => ({ texto: "Recibí las llaves", Icono: KeyRound, comando: { tipo: "entregarLlaves", placa: s.placa } }),
+    texto: "Carro recibido y ficho entregado",
+    accion: (s) => ({ texto: "Recibí el carro", Icono: KeyRound, comando: { tipo: "entregarLlaves", placa: s.placa } }),
   },
+  { tipo: "confirmarFicho", texto: "Ficho confirmado por el conductor" },
   {
     tipo: "estacionar",
     texto: "Carro estacionado",
@@ -42,30 +43,18 @@ const ENTRADA: Etapa[] = [
           }
         : null,
   },
-];
-
-/** Giving a car back: the valet takes it out of the cell, then hands it over against the ficho. */
-const DEVOLUCION: Etapa[] = [
-  { tipo: "pedirDevolucion", texto: "Devolución pedida" },
   {
-    tipo: "recogerCarro",
-    texto: "Carro sacado de la celda",
-    accion: (s) => ({ texto: s.celda ? `Saqué el carro de ${s.celda}` : "Saqué el carro", Icono: CarFront, comando: { tipo: "recogerCarro", ficho: s.ficho } }),
-  },
-  {
-    tipo: "entregarCarro",
-    texto: "Carro entregado",
-    accion: (s) => ({ texto: "Entregué el carro", Icono: Undo2, comando: { tipo: "entregarCarro", ficho: s.ficho } }),
+    tipo: "dejarLlaves",
+    texto: "Llaves en la oficina",
+    accion: (s) => ({ texto: "Dejé las llaves en la oficina", Icono: CarFront, comando: { tipo: "dejarLlaves", ficho: s.ficho } }),
   },
 ];
 
-/** How many steps of this assignment are done, read from the service and the car. */
-function hechos(estado: Estado, s: Servicio): number {
-  if (s.estado === "devolución") return estado.carros[s.placa]?.estado === "estacionado" ? 1 : 2;
-  if (s.estado === "entregado") return DEVOLUCION.length;
-  if (s.estado === "solicitado") return 1;
-  if (s.estado === "en curso") return 2;
-  return ENTRADA.length;
+const HECHOS: Record<string, number> = { "pago pendiente": 0, pagado: 1, "ficho emitido": 2, "en curso": 3, estacionado: 4 };
+
+/** How many steps of this service are done. */
+function hechos(_estado: Estado, s: Servicio): number {
+  return HECHOS[s.estado] ?? ETAPAS.length;
 }
 
 /** Time of the latest log entry for this step that names the plate or the ficho. */
@@ -76,7 +65,7 @@ function horaDe(estado: Estado, tipo: string, s: Servicio): string | null {
 
 /** The steps of the current assignment, how many are done, and the one action the valet takes next. */
 export function etapasDe(estado: Estado, s: Servicio): { pasos: Paso[]; hechos: number; accion: AccionValet | null } {
-  const lista = s.estado === "devolución" || s.estado === "entregado" ? DEVOLUCION : ENTRADA;
+  const lista = ETAPAS;
   const listos = hechos(estado, s);
   const pasos = lista.map((etapa, i) => ({
     texto: etapa.texto,
@@ -89,6 +78,6 @@ export function etapasDe(estado: Estado, s: Servicio): { pasos: Paso[]; hechos: 
 /** While the car is headed to a reserved cell, the valet can report that cell taken and get another. */
 export function celdaOcupada(estado: Estado, s: Servicio): AccionValet | null {
   const carro = estado.carros[s.placa];
-  if (s.estado === "devolución" || s.estado === "entregado" || !s.celda || carro?.estado !== "con celda") return null;
+  if (!s.celda || carro?.estado !== "con celda") return null;
   return { texto: "La celda está ocupada", Icono: OctagonAlert, comando: { tipo: "reportarCeldaOcupada", placa: s.placa } };
 }

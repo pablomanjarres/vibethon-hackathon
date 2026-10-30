@@ -33,15 +33,16 @@ export function vistaValet(estado: Estado, valetId: string): VistaValet {
   if (!valet) throw new Error(`No existe el valet ${valetId}.`);
   const servicio = valet.servicio ? estado.servicios[valet.servicio] : null;
   const carro = servicio ? estado.carros[servicio.placa] : null;
-  let siguientePaso = "Disponible. Espera una solicitud.";
-  if (servicio && carro) {
-    if (servicio.estado === "solicitado")
-      siguientePaso = `Recibe las llaves de ${carro.placa} en la portería de ${nombreEntrada(estado, carro.entrada)} y llévalo a la celda ${carro.celda}.`;
-    else if (servicio.estado === "en curso")
-      siguientePaso = carro.celda ? `Lleva ${carro.placa} a la celda ${carro.celda}.` : `Sigue en la fila con ${carro.placa}; la portería asigna la celda.`;
-    else if (servicio.estado === "devolución")
-      siguientePaso = carro.estado === "estacionado" ? `Saca ${carro.placa} de la celda ${carro.celda}.` : `Entrega ${carro.placa} contra el ficho ${servicio.ficho}.`;
-  }
+  const pasos: Partial<Record<string, string>> = carro && servicio
+    ? {
+        "pago pendiente": `Apartado para ${carro.placa}: esperando el pago.`,
+        pagado: `Ve al pasaje de ${nombreEntrada(estado, carro.entrada)}, recibe ${carro.placa} y entrega el ficho ${servicio.ficho}.`,
+        "ficho emitido": `Espera a que el conductor confirme el ficho ${servicio.ficho}.`,
+        "en curso": carro.celda ? `Lleva ${carro.placa} a la celda ${carro.celda} (confirma en la portería).` : `Sigue en la fila con ${carro.placa}; la portería asigna la celda.`,
+        estacionado: `Deja las llaves de ${carro.placa} en la oficina con el ficho ${servicio.ficho}.`,
+      }
+    : {};
+  const siguientePaso = (servicio && pasos[servicio.estado]) || "Disponible. Espera una asignación.";
   return {
     id: valet.id,
     entrada: nombreEntrada(estado, valet.entrada),
@@ -49,7 +50,7 @@ export function vistaValet(estado: Estado, valetId: string): VistaValet {
     servicio:
       servicio && carro
         ? {
-            id: `${servicio.id}:${servicio.estado === "devolución" ? "devolucion" : "entrada"}`,
+            id: servicio.id,
             ficho: servicio.ficho,
             placa: carro.placa,
             estado: servicio.estado,

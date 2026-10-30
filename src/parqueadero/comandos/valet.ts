@@ -1,98 +1,144 @@
-import { carroPorPlaca, celdaDe, nombreEntrada, servicioDe, servicioPorFicho, valetPorId } from "../consultas.ts";
-import { liberarCelda } from "../asignador.ts";
+import { carroPorPlaca, celdaDe, codigoAcceso, nombreEntrada, servicioDe, servicioPorFicho, valetPorId } from "../consultas.ts";
 import { cambiarValet, exigir } from "../transiciones.ts";
 import type { Estado, Servicio } from "../tipos.ts";
 
 /**
- * A driver whose cell is already reserved asks for a valet, so the valet always knows where to park.
- * A valet of the car's entrance takes it (any free valet if none there); the service gets its ficho.
+ * The valet service, one state per step:
+ * pago pendiente → pagado → ficho emitido → en curso → estacionado → llaves en oficina → entregado
+ * (or rechazado / vencido when the simulated payment fails or times out). Skipping or repeating a
+ * step is rejected with the step the service is in.
  */
-export function pedirValet(estado: Estado, placa: string): string {
+
+/** Minutes the chosen valet is held while the simulated payment runs. */
+export function minutosDePago(estado: Estado): number {
+  return estado.reglas.minutosPago ?? 2;
+}
+
+function exigirPaso(servicio: Servicio, esperado: Servicio["estado"], accion: string): void {
+  exigir(servicio.estado === esperado, `No se puede ${accion}: el servicio ${servicio.ficho} está en "${servicio.estado}".`);
+}
+
+function valetDe(estado: Estado, servicio: Servicio) {
+  return valetPorId(estado, servicio.valet);
+}
+
+/**
+ * Hiring holds the chosen valet and creates the service in one command, so two drivers can never
+ * get the same valet. Only a car already inside its passage, only a valet of its own entrance. It
+ * gives no priority and frees no space: the car keeps its exact place in line.
+ */
+export function contratarValet(estado: Estado, placa: string, valetId: string): string {
   const carro = carroPorPlaca(estado, placa);
-  exigir(carro.estado === "con celda", "Primero reserva tu celda: el valet necesita saber dónde estacionar.");
-  exigir(!carro.servicio, `${carro.placa} ya tiene un valet asignado.`);
-  const valet =
-    estado.valets.find((v) => v.entrada === carro.entrada && v.estado === "disponible") ??
-    estado.valets.find((v) => v.estado === "disponible");
-  exigir(valet, `No hay valets disponibles en ${nombreEntrada(estado, carro.entrada)}. Puedes estacionar tú mismo en la celda ${carro.celda}.`);
+  exigir(carro.estado === "en fila", "Solo puedes contratar un valet cuando ya estás dentro del pasaje.");
+  const activo = carro.servicio ? estado.servicios[carro.servicio] : null;
+  exigir(!activo || activo.estado === "rechazado" || activo.estado === "vencido", `${carro.placa} ya tiene un servicio de valet.`);
+  const valet = estado.valets.find((v) => v.id === valetId);
+  exigir(valet, `No existe el valet ${valetId}.`);
+  exigir(valet.entrada === carro.entrada, `${valet.id} trabaja en ${nombreEntrada(estado, valet.entrada)}; elige un valet de tu entrada.`);
+  exigir(valet.estado === "disponible", `${valet.id} ya no está disponible. Elige otro.`);
   estado.consecutivos.servicio += 1;
-  const numero = estado.consecutivos.servicio;
+  const n = estado.consecutivos.servicio;
   const servicio: Servicio = {
-    id: `S-${numero}`,
+    id: `S-${n}`,
     placa: carro.placa,
-    ficho: `F-${String(numero).padStart(3, "0")}`,
+    ficho: `F-${String(n).padStart(3, "0")}-${codigoAcceso(7000 + n)}`,
     valet: valet.id,
-    estado: "solicitado",
+    estado: "pago pendiente",
     asignadoEn: estado.minuto,
+    precio: estado.reglas.tarifaValet,
+    pagoVence: estado.minuto + minutosDePago(estado),
   };
   estado.servicios[servicio.id] = servicio;
   cambiarValet(valet, "reservado");
   valet.servicio = servicio.id;
   carro.servicio = servicio.id;
-  return `${valet.id} va hacia ${carro.placa} para llevarlo a la celda ${carro.celda}. Ficho ${servicio.ficho}.`;
+  return `${valet.id} quedó apartado para ${carro.placa} mientras se paga ${servicio.precio} ${estado.reglas.moneda} (servicio ${servicio.id}).`;
 }
 
-/** The driver hands over the keys and walks to class; the car keeps its place in the line. */
+/** Releases the held valet when the payment does not go through; the driver keeps their turn. */
+function soltarValet(estado: Estado, servicio: Servicio, fin: "rechazado" | "vencido"): void {
+  const valet = valetDe(estado, servicio);
+  cambiarValet(valet, "disponible");
+  valet.servicio = null;
+  servicio.estado = fin;
+  servicio.valet = null;
+}
+
+/** Simulated payment: approved confirms the service and credits the income to that valet; rejected frees the valet. */
+export function pagarValet(estado: Estado, servicioId: string, aprobado: boolean): string {
+  const servicio = estado.servicios[servicioId];
+  exigir(servicio, `No existe el servicio ${servicioId}.`);
+  exigirPaso(servicio, "pago pendiente", "pagar");
+  if (!aprobado) {
+    const valet = servicio.valet;
+    soltarValet(estado, servicio, "rechazado");
+    return `Pago rechazado para ${servicio.id}: ${valet} vuelve a estar disponible y ${servicio.placa} conserva su turno.`;
+  }
+  servicio.estado = "pagado";
+  estado.consecutivos.ingreso = (estado.consecutivos.ingreso ?? 0) + 1;
+  estado.ingresos = [
+    ...(estado.ingresos ?? []),
+    { id: `I-${estado.consecutivos.ingreso}`, servicio: servicio.id, valet: servicio.valet as string, monto: servicio.precio ?? 0, enMinuto: estado.minuto },
+  ];
+  return `Pago aprobado: ${servicio.precio} ${estado.reglas.moneda} para ${servicio.valet} (servicio ${servicio.id}).`;
+}
+
+/** Payments still pending when their time runs out free the valet. Called when the clock moves. */
+export function vencerPagos(estado: Estado): string[] {
+  return Object.values(estado.servicios)
+    .filter((s) => s.estado === "pago pendiente" && estado.minuto >= (s.pagoVence ?? Infinity))
+    .map((s) => {
+      const valet = s.valet;
+      soltarValet(estado, s, "vencido");
+      return `El pago de ${s.id} venció: ${valet} vuelve a estar disponible y ${s.placa} conserva su turno.`;
+    });
+}
+
+/** In the passage the valet takes the car and hands the driver the ficho. */
 export function entregarLlaves(estado: Estado, placa: string): string {
   const carro = carroPorPlaca(estado, placa);
   const servicio = servicioDe(estado, carro);
-  exigir(servicio.estado === "solicitado", `Las llaves de ${carro.placa} ya se entregaron.`);
-  const valet = valetPorId(estado, servicio.valet);
-  cambiarValet(valet, "en servicio");
+  exigirPaso(servicio, "pagado", "entregar las llaves");
+  exigir(carro.estado === "en fila", `${carro.placa} ya salió del pasaje.`);
+  cambiarValet(valetDe(estado, servicio), "en servicio");
+  servicio.estado = "ficho emitido";
+  carro.llave = "valet";
+  return `${servicio.valet} recibió el carro ${carro.placa} y entregó el ficho ${servicio.ficho}.`;
+}
+
+/** The driver confirms the ficho code before leaving; then they can walk to class. */
+export function confirmarFicho(estado: Estado, placa: string, ficho: string): string {
+  const carro = carroPorPlaca(estado, placa);
+  const servicio = servicioDe(estado, carro);
+  exigirPaso(servicio, "ficho emitido", "confirmar el ficho");
+  exigir(servicio.ficho === ficho.trim().toUpperCase(), "El ficho no coincide con este servicio.");
   servicio.estado = "en curso";
-  carro.llave = "valet";
-  return `${carro.placa} quedó con ${valet.id}. Guarda el ficho ${servicio.ficho} y ve a clase.`;
+  return `${carro.placa} confirmó el ficho ${servicio.ficho}. Puede ir a clase; el carro conserva su puesto con ${servicio.valet}.`;
 }
 
-/** With the ficho, the driver asks for the car back; a free valet takes the job. */
-export function pedirDevolucion(estado: Estado, ficho: string): string {
+/** Back at the office the valet leaves the keys; only now is the valet free again. */
+export function dejarLlaves(estado: Estado, ficho: string): string {
   const servicio = servicioPorFicho(estado, ficho);
-  exigir(
-    servicio.estado === "estacionado",
-    servicio.estado === "devolución" ? "Ya hay un valet trayendo el carro." : "El carro todavía no está estacionado.",
-  );
-  const carro = estado.carros[servicio.placa];
-  const valet =
-    estado.valets.find((v) => v.entrada === carro.entrada && v.estado === "disponible") ??
-    estado.valets.find((v) => v.estado === "disponible");
-  exigir(valet, "No hay valets disponibles. Intenta en unos minutos.");
-  cambiarValet(valet, "reservado");
-  valet.servicio = servicio.id;
-  servicio.valet = valet.id;
-  servicio.estado = "devolución";
-  servicio.asignadoEn = estado.minuto;
-  return `${valet.id} va por ${carro.placa} (ficho ${servicio.ficho}).`;
-}
-
-/** The valet takes the car out of its cell, which becomes free for the next car in line. */
-export function recogerCarro(estado: Estado, ficho: string): string {
-  const servicio = servicioPorFicho(estado, ficho);
-  exigir(servicio.estado === "devolución", "Primero hay que pedir la devolución con el ficho.");
-  const carro = estado.carros[servicio.placa];
-  exigir(carro.estado === "estacionado", `${carro.placa} ya salió de su celda.`);
-  const valet = valetPorId(estado, servicio.valet);
-  cambiarValet(valet, "en servicio");
-  const celda = celdaDe(estado, carro);
-  liberarCelda(estado, celda);
-  carro.celda = null;
-  carro.estado = "en devolución";
-  carro.llave = "valet";
-  return `${valet.id} sacó ${carro.placa} de ${celda.id}; la celda quedó libre.`;
-}
-
-/** The valet hands the car and keys back against the ficho, once it is paid. */
-export function entregarCarro(estado: Estado, ficho: string): string {
-  const servicio = servicioPorFicho(estado, ficho);
-  const carro = estado.carros[servicio.placa];
-  exigir(carro.estado === "en devolución", "El valet todavía no ha sacado el carro.");
-  exigir(carro.pagado, `Falta el pago de ${carro.placa}.`);
-  const valet = valetPorId(estado, servicio.valet);
+  exigirPaso(servicio, "estacionado", "dejar las llaves en la oficina");
+  const valet = valetDe(estado, servicio);
   cambiarValet(valet, "disponible");
   valet.servicio = null;
-  servicio.valet = null;
+  servicio.estado = "llaves en oficina";
+  estado.carros[servicio.placa].llave = "tablero";
+  return `${valet.id} dejó las llaves de ${servicio.placa} en la oficina (ficho ${servicio.ficho}) y queda disponible.`;
+}
+
+/** The driver shows the ficho; the office validates it and records the delivery. */
+export function reclamarLlaves(estado: Estado, ficho: string): string {
+  const buscado = ficho.trim().toUpperCase();
+  const servicio = Object.values(estado.servicios).find((s) => s.ficho === buscado);
+  exigir(servicio, "Ese ficho no existe. Revisa el código.");
+  exigir(servicio.estado !== "entregado", `Las llaves del ficho ${servicio.ficho} ya se entregaron.`);
+  exigirPaso(servicio, "llaves en oficina", "entregar las llaves");
+  const carro = estado.carros[servicio.placa];
   servicio.estado = "entregado";
+  servicio.entregadoEn = estado.minuto;
   carro.llave = "conductor";
-  carro.estado = "retirado";
-  carro.salioEn = estado.minuto;
-  return `${carro.placa} fue entregado con el ficho ${servicio.ficho}.`;
+  const celda = carro.celda ? celdaDe(estado, carro).id : "su celda";
+  return `Oficina: llaves de ${carro.placa} entregadas con el ficho ${servicio.ficho}. El carro está en ${celda}.`;
 }

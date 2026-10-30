@@ -5,7 +5,8 @@
   "reglas": {
     "minutosPorLiberacion": 3,
     "tarifaPorMinuto": 60,
-    "tarifaValet": 3000,
+    "tarifaValet": 8000,
+    "minutosPago": 2,
     "moneda": "COP"
   },
   "mapas": [

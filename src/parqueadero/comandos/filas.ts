@@ -1,6 +1,6 @@
 import { darCelda, ordenDeAtencion, reasignar, salirPorLaPorteria, siguienteEntrada } from "../asignador.ts";
-import { carroPorPlaca, celdaDe, codigoAcceso, entradaPorId, esperaDe, normalizarPlaca, servicioDe, valetPorId } from "../consultas.ts";
-import { cambiarCelda, cambiarValet, exigir } from "../transiciones.ts";
+import { carroPorPlaca, celdaDe, codigoAcceso, entradaPorId, esperaDe, normalizarPlaca, servicioDe } from "../consultas.ts";
+import { cambiarCelda, exigir } from "../transiciones.ts";
 import type { Entrada, Estado } from "../tipos.ts";
 
 /**
@@ -109,24 +109,20 @@ export function reportarCeldaOcupada(estado: Estado, placa: string): string {
   return reasignar(estado, carro);
 }
 
-/** The car reaches its reserved cell. A valet who drove it goes back to available and the keys go to the board. */
+/** The car reaches its reserved cell after the gate confirmed it. A valet reports zone and cell and still holds the keys. */
 export function estacionar(estado: Estado, placa: string): string {
   const carro = carroPorPlaca(estado, placa);
   exigir(carro.estado === "con celda", `${carro.placa} no tiene una celda reservada.`);
   exigir(carro.confirmado, `La portería todavía no confirmó la placa y la reserva de ${carro.placa}.`);
   const servicio = carro.servicio ? servicioDe(estado, carro) : null;
-  exigir(!servicio || servicio.estado === "en curso", `El valet todavía no recibió las llaves de ${carro.placa}.`);
+  const conValet = servicio && !["rechazado", "vencido"].includes(servicio.estado) ? servicio : null;
+  exigir(!conValet || conValet.estado === "en curso", `El servicio ${conValet?.ficho} aún no está en curso: primero el valet recibe el carro y el conductor confirma el ficho.`);
   const celda = celdaDe(estado, carro);
   cambiarCelda(celda, "ocupada");
   carro.estado = "estacionado";
   carro.estacionadoEn = estado.minuto;
   carro.aviso = null;
-  if (!servicio) return `${carro.placa} se estacionó en ${celda.id}.`;
-  const valet = valetPorId(estado, servicio.valet);
-  cambiarValet(valet, "disponible");
-  valet.servicio = null;
-  servicio.valet = null;
-  servicio.estado = "estacionado";
-  carro.llave = "tablero";
-  return `${valet.id} estacionó ${carro.placa} en ${celda.id}; las llaves quedaron en el tablero con el ficho ${servicio.ficho}.`;
+  if (!conValet) return `${carro.placa} se estacionó en ${celda.id}.`;
+  conValet.estado = "estacionado";
+  return `${conValet.valet} estacionó ${carro.placa} en la zona ${celda.zona}, celda ${celda.id}; ahora lleva las llaves a la oficina (ficho ${conValet.ficho}).`;
 }

@@ -9,7 +9,7 @@ import {
   salirSinParquear,
 } from "./comandos/filas.ts";
 import { avanzarReloj, pagar, salir } from "./comandos/salida.ts";
-import { entregarCarro, entregarLlaves, pedirDevolucion, pedirValet, recogerCarro } from "./comandos/valet.ts";
+import { confirmarFicho, contratarValet, dejarLlaves, entregarLlaves, pagarValet, reclamarLlaves } from "./comandos/valet.ts";
 import { Rechazo } from "./transiciones.ts";
 import type { Estado, Evento } from "./tipos.ts";
 
@@ -23,11 +23,12 @@ export type Comando =
   | { tipo: "dejarSalir"; entrada: string }
   | { tipo: "reportarCeldaOcupada"; placa: string }
   | { tipo: "estacionar"; placa: string }
-  | { tipo: "pedirValet"; placa: string }
+  | { tipo: "contratarValet"; placa: string; valet: string }
+  | { tipo: "pagarValet"; servicio: string; aprobado: boolean }
   | { tipo: "entregarLlaves"; placa: string }
-  | { tipo: "pedirDevolucion"; ficho: string }
-  | { tipo: "recogerCarro"; ficho: string }
-  | { tipo: "entregarCarro"; ficho: string }
+  | { tipo: "confirmarFicho"; placa: string; ficho: string }
+  | { tipo: "dejarLlaves"; ficho: string }
+  | { tipo: "reclamarLlaves"; ficho: string }
   | { tipo: "pagar"; placa: string }
   | { tipo: "salir"; placa: string }
   | { tipo: "avanzarReloj"; minutos: number };
@@ -54,16 +55,18 @@ function aplicar(estado: Estado, comando: Comando): string {
       return reportarCeldaOcupada(estado, comando.placa);
     case "estacionar":
       return estacionar(estado, comando.placa);
-    case "pedirValet":
-      return pedirValet(estado, comando.placa);
+    case "contratarValet":
+      return contratarValet(estado, comando.placa, comando.valet);
+    case "pagarValet":
+      return pagarValet(estado, comando.servicio, comando.aprobado);
     case "entregarLlaves":
       return entregarLlaves(estado, comando.placa);
-    case "pedirDevolucion":
-      return pedirDevolucion(estado, comando.ficho);
-    case "recogerCarro":
-      return recogerCarro(estado, comando.ficho);
-    case "entregarCarro":
-      return entregarCarro(estado, comando.ficho);
+    case "confirmarFicho":
+      return confirmarFicho(estado, comando.placa, comando.ficho);
+    case "dejarLlaves":
+      return dejarLlaves(estado, comando.ficho);
+    case "reclamarLlaves":
+      return reclamarLlaves(estado, comando.ficho);
     case "pagar":
       return pagar(estado, comando.placa);
     case "salir":
