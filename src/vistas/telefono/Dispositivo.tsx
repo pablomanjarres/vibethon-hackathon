@@ -9,7 +9,7 @@ import "./dispositivo.css";
 export function Dispositivo({ hora, children }: { hora: string; children: ReactNode }) {
   return (
     <div className="tl-dispositivo">
-      <div className="tl-pantalla">
+      <main className="tl-pantalla">
         <div className="tl-barra-estado" aria-hidden="true">
           <span className="num">{hora}</span>
           <span className="tl-isla" />
@@ -21,7 +21,7 @@ export function Dispositivo({ hora, children }: { hora: string; children: ReactN
         </div>
         {children}
         <span className="tl-inicio" aria-hidden="true" />
-      </div>
+      </main>
     </div>
   );
 }
