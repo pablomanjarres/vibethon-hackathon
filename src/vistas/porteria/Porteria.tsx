@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CircleArrowRight, Clock3, DoorOpen, Hourglass, ListOrdered, ParkingSquare, ShieldCheck, UsersRound } from "lucide-react";
 import { vistaPorteria } from "../../parqueadero/lecturas/porteria";
+import { registroCarros } from "../../parqueadero/lecturas/registro";
 import { href, useRoute } from "../../shared/route";
 import { Acordeon } from "../../ui/Acordeon";
 import { AvisoResultado } from "../../ui/AvisoResultado";
@@ -13,27 +14,42 @@ import { Pastilla } from "../../ui/Pastilla";
 import { Shell } from "../../ui/Shell";
 import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useComando, useEstado } from "../../ui/useTienda";
+import { BuscarPlaca } from "./BuscarPlaca";
+import { DetallePorteria, type SeleccionPorteria } from "./DetallePorteria";
 import { FilaPasaje } from "./FilaPasaje";
 import "./porteria.css";
 
-/** One gate: whose turn it is and why, its passage, the waiting line outside and its valets, over the lot. Drivers register themselves. */
+/**
+ * One gate: whose turn it is and why, its passage and the line outside, then a plate search over this
+ * entrance's cars with one detail open at a time. Drivers register themselves.
+ */
 export default function Porteria() {
   const estado = useEstado();
   const { params } = useRoute();
   const { aviso, enviar } = useComando();
-  const [elegida, setElegida] = useState<string | null>(null);
+  const [seleccion, setSeleccion] = useState<SeleccionPorteria | null>(null);
   const [esperaAbierta, setEsperaAbierta] = useState(false);
+  const detalle = useRef<HTMLDivElement>(null);
   const entradaId = estado.entradas.some((e) => e.id === params.get("entrada")) ? params.get("entrada")! : estado.entradas[0].id;
   const v = vistaPorteria(estado, entradaId);
-  const indice = estado.entradas.findIndex((e) => e.id === entradaId);
-  const otra = estado.entradas.length > 1 ? estado.entradas[(indice + 1) % estado.entradas.length] : null;
+  const carros = registroCarros(estado, entradaId);
   const valets = estado.valets.filter((x) => x.entrada === entradaId);
   const turno = v.esMiTurno
     ? { texto: "Tu turno", Icono: CircleArrowRight, tono: "libre" as const }
     : { texto: "En espera", Icono: Hourglass, tono: "reservada" as const };
+  const elegirPlaca = (placa: string) => setSeleccion({ tipo: "carro", placa });
+  const celdaElegida =
+    seleccion?.tipo === "celda" ? seleccion.id : seleccion?.tipo === "carro" ? (estado.carros[seleccion.placa]?.celda ?? null) : null;
+  const claveSeleccion = seleccion ? `${seleccion.tipo}:${seleccion.tipo === "carro" ? seleccion.placa : seleccion.id}` : null;
+
+  // Switching gates closes the open detail: it may belong to the other entrance.
+  useEffect(() => setSeleccion(null), [entradaId]);
+  useEffect(() => {
+    if (claveSeleccion) detalle.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }, [claveSeleccion]);
 
   return (
-    <Shell vista="porteria" seleccion={elegida ?? v.celdasLibres[0] ?? null} onSeleccionar={setElegida}>
+    <Shell vista="porteria" seleccion={seleccion ? celdaElegida : (v.celdasLibres[0] ?? null)} onSeleccionar={(id) => setSeleccion({ tipo: "celda", id })}>
       <PanelCabecera
         Icono={ShieldCheck}
         titulo={`Portería ${v.nombre}`}
@@ -54,24 +70,12 @@ export default function Porteria() {
             activa: esperaAbierta,
             onClick: () => setEsperaAbierta(!esperaAbierta),
           },
-          otra
-            ? { texto: otra.nombre, Icono: DoorOpen, href: href("porteria", { entrada: otra.id }) }
-            : { texto: "Otra entrada", Icono: DoorOpen, motivo: "el lote tiene una sola entrada." },
         ]}
       />
       <AvisoResultado aviso={aviso} />
       <Chips
         etiqueta="Entradas"
-        chips={estado.entradas.map((e) => ({
-          id: e.id,
-          texto: (
-            <>
-              {e.nombre} <span className="num pt-cuenta">{e.fila.length}</span>
-            </>
-          ),
-          href: href("porteria", { entrada: e.id }),
-          actual: e.id === entradaId,
-        }))}
+        chips={estado.entradas.map((e) => ({ id: e.id, texto: e.nombre, href: href("porteria", { entrada: e.id }), actual: e.id === entradaId }))}
       />
       <TarjetaDatos Icono={DoorOpen} titulo={`Pasaje ${v.nombre}`} contador={{ valor: v.celdasLibres.length, etiqueta: "Celdas libres" }}>
         <div className="ui-cifras">
@@ -82,9 +86,15 @@ export default function Porteria() {
         <Pastilla {...turno} />
         <p className="pt-turno">{v.turno}</p>
       </TarjetaDatos>
+      {seleccion && (
+        <div ref={detalle} className="pt-ancla">
+          <DetallePorteria estado={estado} v={v} seleccion={seleccion} onCerrar={() => setSeleccion(null)} />
+        </div>
+      )}
+      <BuscarPlaca carros={carros} elegida={seleccion?.tipo === "carro" ? seleccion.placa : null} onElegir={elegirPlaca} />
       <div>
-        <Acordeon Icono={ListOrdered} titulo="Fila del pasaje" extra={`${v.fila.length} de ${v.pasaje.capacidad}`} inicial>
-          <FilaPasaje fila={v.fila} />
+        <Acordeon Icono={ListOrdered} titulo="Fila del pasaje" extra={`${v.fila.length} de ${v.pasaje.capacidad}`}>
+          <FilaPasaje fila={v.fila} onElegir={elegirPlaca} />
         </Acordeon>
         <Acordeon Icono={Clock3} titulo="Fila de espera afuera" extra={v.enEspera.length} abierto={esperaAbierta} onCambiar={setEsperaAbierta}>
           {v.enEspera.length === 0 ? (
@@ -93,8 +103,10 @@ export default function Porteria() {
             <ol className="ui-lista pt-fila">
               {v.enEspera.map((placa, i) => (
                 <li key={placa}>
-                  <span className="pt-pos num">{i + 1}</span>
-                  <strong className="pt-placa num">{placa}</strong>
+                  <button type="button" className="pt-placa-fila" onClick={() => elegirPlaca(placa)}>
+                    <span className="pt-pos num">{i + 1}</span>
+                    <strong className="pt-placa num">{placa}</strong>
+                  </button>
                 </li>
               ))}
             </ol>
