@@ -67,7 +67,24 @@ function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[
     }))];
   }
   if (vista === "porteria") {
-    return estado.entradas.map((e) => {
+    // Free a cell on demand: a parked car with no valet service in progress pays and leaves.
+    const activos = ["pago pendiente", "pagado", "ficho emitido", "en curso", "estacionado", "llaves en oficina"];
+    const saliente = Object.values(estado.carros).find(
+      (c) => c.estado === "estacionado" && (!c.servicio || !activos.includes(estado.servicios[c.servicio]?.estado)),
+    );
+    const libres = estado.celdas.filter((c) => c.estado === "libre").length;
+    const lote: Fila[] = saliente
+      ? [
+          {
+            clave: "liberar",
+            titulo: `Liberar ${saliente.celda}`,
+            dato: saliente.placa,
+            nota: `${saliente.placa} paga y sale · libres ahora: ${libres}`,
+            comandos: [...(saliente.pagado ? [] : [{ tipo: "pagar", placa: saliente.placa } as Comando]), { tipo: "salir", placa: saliente.placa }],
+          },
+        ]
+      : [];
+    return [{ titulo: "Lote", filas: lote }, ...estado.entradas.map((e) => {
       const p = vistaPorteria(estado, e.id);
       const filas: Fila[] = p.porConfirmar.map((c) => ({
         clave: `c-${c.placa}`,
@@ -79,7 +96,7 @@ function filasDe(vista: VistaId, estado: Estado): { titulo: string; filas: Fila[
       if (p.puedeAsignar) filas.unshift({ clave: `a-${e.id}`, titulo: "Asignar celda", dato: p.celdasLibres[0], nota: p.turno, comandos: [{ tipo: "asignarCelda", entrada: e.id }] });
       if (p.puedeDejarSalir) filas.unshift({ clave: `s-${e.id}`, titulo: "Dejar salir", dato: p.fila[0]?.placa, nota: "sale sin parquear", comandos: [{ tipo: "dejarSalir", entrada: e.id }] });
       return { titulo: `Portería ${e.nombre}`, filas };
-    });
+    })];
   }
   if (vista === "oficina") {
     const servicios = Object.values(estado.servicios);
