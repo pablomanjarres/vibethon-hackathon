@@ -128,3 +128,57 @@ make sure some agents run in smaller models of opus like opus 5.5 mid or high in
 ```text
 remeber no running review rounds, or code reviews
 ```
+
+## 18 · 30/10/2026, 2:09 p. m.
+
+```text
+The UI doesnt seem to follow the following UI https://refero.design/pages/2c20bab9-b7de-4e52-8b72-061a090f6706
+```
+
+## 19 · 30/10/2026, 2:15 p. m.
+
+```text
+also hand me the link to see the UI in the laptop in real time
+```
+
+## 20 · 30/10/2026, 2:16 p. m.
+
+```text
+Yes, sync laptop
+```
+
+## 21 · 30/10/2026, 2:21 p. m.
+
+```text
+the mockups that are in the project rn, look good, I need them in the actual parking spots that appear in the current UI
+```
+
+## 22 · 30/10/2026, 2:22 p. m.
+
+```text
+current status of the Ui agent>?
+```
+
+## 23 · 30/10/2026, 2:23 p. m.
+
+```text
+create another session working in creating a version of the current UI but that displays it in a phone, it doenst needs to be connected directly sending orders to the other UIs, it works in response of what they did
+```
+
+## 24 · 30/10/2026, 2:25 p. m.
+
+```text
+it's like a phone view in the app , to see how it looks for users
+```
+
+## 25 · 30/10/2026, 2:27 p. m.
+
+```text
+In the conductor stage, there is no reliable way to register your own plate to save your spot in the parking lot
+```
+
+## 26 · 30/10/2026, 2:27 p. m.
+
+```text
+also is not pretty clear doing that either, get that done fast
+```
