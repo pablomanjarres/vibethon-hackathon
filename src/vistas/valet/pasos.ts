@@ -1,4 +1,4 @@
-import { CarFront, KeyRound, ParkingSquare, Undo2, type LucideIcon } from "lucide-react";
+import { CarFront, KeyRound, OctagonAlert, ParkingSquare, Undo2, type LucideIcon } from "lucide-react";
 import type { Comando } from "../../parqueadero/motor";
 import { hora } from "../../parqueadero/lecturas/formato";
 import type { VistaValet } from "../../parqueadero/lecturas/valet";
@@ -11,12 +11,14 @@ export interface AccionValet {
   texto: string;
   Icono: LucideIcon;
   comando: Comando;
+  /** When set, the action is not possible yet and this says why. */
+  motivo?: string | null;
 }
 
 interface Etapa {
   tipo: Comando["tipo"];
   texto: string;
-  accion?: (s: Servicio) => AccionValet | null;
+  accion?: (s: Servicio, estado: Estado) => AccionValet | null;
 }
 
 /** Taking a car in: the valet gets the keys, then parks it in the reserved cell. */
@@ -30,7 +32,15 @@ const ENTRADA: Etapa[] = [
   {
     tipo: "estacionar",
     texto: "Carro estacionado",
-    accion: (s) => (s.celda ? { texto: `Ya lo estacioné en ${s.celda}`, Icono: ParkingSquare, comando: { tipo: "estacionar", placa: s.placa } } : null),
+    accion: (s, estado) =>
+      s.celda
+        ? {
+            texto: `Ya lo estacioné en ${s.celda}`,
+            Icono: ParkingSquare,
+            comando: { tipo: "estacionar", placa: s.placa },
+            motivo: estado.carros[s.placa]?.confirmado ? null : "Espera la confirmación de la portería",
+          }
+        : null,
   },
 ];
 
@@ -73,5 +83,12 @@ export function etapasDe(estado: Estado, s: Servicio): { pasos: Paso[]; hechos: 
     hecho: i < listos,
     hora: i < listos ? (horaDe(estado, etapa.tipo, s) ?? (i === 0 ? s.asignado : null)) : null,
   }));
-  return { pasos, hechos: listos, accion: lista[listos]?.accion?.(s) ?? null };
+  return { pasos, hechos: listos, accion: lista[listos]?.accion?.(s, estado) ?? null };
+}
+
+/** While the car is headed to a reserved cell, the valet can report that cell taken and get another. */
+export function celdaOcupada(estado: Estado, s: Servicio): AccionValet | null {
+  const carro = estado.carros[s.placa];
+  if (s.estado === "devolución" || s.estado === "entregado" || !s.celda || carro?.estado !== "con celda") return null;
+  return { texto: "La celda está ocupada", Icono: OctagonAlert, comando: { tipo: "reportarCeldaOcupada", placa: s.placa } };
 }
