@@ -83,3 +83,38 @@
     top: 64px;
   }
 }
+.ui-acceso li > button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--tile, rgb(255 255 255 / 0.06));
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ui-acceso li > button small {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  opacity: 0.75;
+}
+.ui-acceso-ok,
+.ui-acceso-error,
+.ui-acceso-vacio {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+.ui-acceso-ok {
+  color: var(--libre, #5bd08d);
+}
+.ui-acceso-error {
+  color: var(--peligro, #ff8a80);
+}
+.ui-acceso-vacio {
+  opacity: 0.75;
+}
