@@ -1,21 +1,22 @@
 import { useId, useState, type FormEvent } from "react";
-import { FastForward, Play, RotateCcw, SlidersHorizontal } from "lucide-react";
+import { FastForward, Play, RotateCcw } from "lucide-react";
 import { tienda } from "../../parqueadero/tienda";
 import { AvisoResultado } from "../../ui/AvisoResultado";
-import { Boton } from "../../ui/Boton";
-import { Tarjeta } from "../../ui/Tarjeta";
+import { FilaAcciones } from "../../ui/FilaAcciones";
 import { useComando } from "../../ui/useTienda";
 
-/** Presenter controls: move the clock, play the scenario's events up to a minute, or start over. */
+/** Presenter controls as the panel's action tiles: move the clock, play the scenario up to a minute, or start over. */
 export function ControlesSimulacion({ minuto }: { minuto: number }) {
   const id = useId();
   const { aviso, enviar, informar } = useComando();
   const [hasta, setHasta] = useState(String(minuto + 30));
   const [rechazos, setRechazos] = useState<string[]>([]);
+  const objetivo = Number(hasta);
+  const valido = Number.isInteger(objetivo) && objetivo > minuto;
 
-  const simular = (event: FormEvent) => {
-    event.preventDefault();
-    const objetivo = Number(hasta);
+  const simular = (event?: FormEvent) => {
+    event?.preventDefault();
+    if (!valido) return;
     const motivos = tienda.simularHasta(objetivo);
     setRechazos(motivos);
     informar({
@@ -33,40 +34,25 @@ export function ControlesSimulacion({ minuto }: { minuto: number }) {
   };
 
   return (
-    <Tarjeta titulo="Simulación" Icono={SlidersHorizontal} extra={<span className="ui-texto-suave num">Minuto {minuto}</span>}>
-      <div className="of-sim">
-        <Boton
-          variante="secundario"
-          Icono={Play}
-          onClick={() => {
-            setRechazos([]);
-            enviar({ tipo: "avanzarReloj", minutos: 1 });
-          }}
-        >
-          Avanzar 1 min
-        </Boton>
-        <form className="ui-campo" onSubmit={simular}>
-          <label htmlFor={id}>Simular eventos hasta el minuto</label>
-          <div className="ui-campo-fila">
-            <input
-              id={id}
-              type="number"
-              inputMode="numeric"
-              min={minuto + 1}
-              step={1}
-              value={hasta}
-              onChange={(event) => setHasta(event.target.value)}
-              required
-            />
-            <Boton type="submit" Icono={FastForward}>
-              Simular
-            </Boton>
-          </div>
-        </form>
-        <Boton variante="contorno" Icono={RotateCcw} onClick={reiniciar}>
-          Reiniciar
-        </Boton>
-      </div>
+    <>
+      <FilaAcciones
+        acciones={[
+          {
+            texto: "Avanzar 1 min",
+            Icono: Play,
+            onClick: () => {
+              setRechazos([]);
+              enviar({ tipo: "avanzarReloj", minutos: 1 });
+            },
+          },
+          { texto: "Simular", Icono: FastForward, onClick: () => simular(), motivo: valido ? null : `elige un minuto mayor que ${minuto}.` },
+          { texto: "Reiniciar", Icono: RotateCcw, onClick: reiniciar },
+        ]}
+      />
+      <form className="ui-campo of-hasta" onSubmit={simular}>
+        <label htmlFor={id}>Simular eventos hasta el minuto</label>
+        <input id={id} type="number" inputMode="numeric" min={minuto + 1} step={1} value={hasta} onChange={(event) => setHasta(event.target.value)} required />
+      </form>
       <AvisoResultado aviso={aviso} />
       {rechazos.length > 0 && (
         <ul className="of-rechazos" aria-label="Eventos rechazados">
@@ -75,6 +61,6 @@ export function ControlesSimulacion({ minuto }: { minuto: number }) {
           ))}
         </ul>
       )}
-    </Tarjeta>
+    </>
   );
 }

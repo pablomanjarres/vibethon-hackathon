@@ -1,10 +1,10 @@
-import { ArrowLeftRight, CarFront, Hand, KeyRound, ScrollText, Ticket } from "lucide-react";
+import { ArrowLeftRight, CarFront, Hand } from "lucide-react";
 import { hora } from "../../parqueadero/lecturas/formato";
 import type { VistaOficina } from "../../parqueadero/lecturas/oficina";
 import type { EstadoServicio, Evento } from "../../parqueadero/tipos";
 import type { Insignia } from "../../ui/Pastilla";
 import { Pastilla } from "../../ui/Pastilla";
-import { Cifra, Tarjeta, Vacio } from "../../ui/Tarjeta";
+import { Cifra, Vacio } from "../../ui/Datos";
 
 /** Text, icon and tone for each valet service state shown at the desk. */
 const ESTADO_SERVICIO: Record<EstadoServicio, Insignia> = {
@@ -17,7 +17,7 @@ const ESTADO_SERVICIO: Record<EstadoServicio, Insignia> = {
 
 export function FichosActivos({ fichos }: { fichos: VistaOficina["fichosActivos"] }) {
   return (
-    <Tarjeta titulo="Fichos activos" Icono={Ticket} extra={<span className="ui-texto-suave num">{fichos.length}</span>}>
+    <>
       {fichos.length === 0 ? (
         <Vacio>No hay servicios de valet abiertos.</Vacio>
       ) : (
@@ -34,13 +34,13 @@ export function FichosActivos({ fichos }: { fichos: VistaOficina["fichosActivos"
           ))}
         </ul>
       )}
-    </Tarjeta>
+    </>
   );
 }
 
 export function LlavesYPagos({ llaves, pagos }: { llaves: string[]; pagos: VistaOficina["pagos"] }) {
   return (
-    <Tarjeta titulo="Llaves y pagos" Icono={KeyRound}>
+    <>
       <div className="ui-cifras">
         <Cifra valor={llaves.length} etiqueta="Llaves en el tablero" />
         <Cifra valor={pagos.cantidad} etiqueta="Pagos" />
@@ -51,13 +51,14 @@ export function LlavesYPagos({ llaves, pagos }: { llaves: string[]; pagos: Vista
       ) : (
         <Vacio>No hay llaves en el tablero.</Vacio>
       )}
-    </Tarjeta>
+    </>
   );
 }
 
 export function Bitacora({ eventos, inicio }: { eventos: Evento[]; inicio: string }) {
   return (
-    <Tarjeta titulo="Bitácora" Icono={ScrollText} extra={<span className="ui-texto-suave">Lo más reciente arriba</span>}>
+    <>
+      <p className="ui-texto-suave">Lo más reciente arriba.</p>
       {eventos.length === 0 ? (
         <Vacio>Todavía no hay eventos.</Vacio>
       ) : (
@@ -70,7 +71,7 @@ export function Bitacora({ eventos, inicio }: { eventos: Evento[]; inicio: strin
           ))}
         </ol>
       )}
-    </Tarjeta>
+    </>
   );
 }
 

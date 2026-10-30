@@ -2,7 +2,7 @@ import { LayoutGrid } from "lucide-react";
 import type { Celda } from "../../parqueadero/tipos";
 import { ESTADO_CELDA, type EstadoCeldaUi } from "../../ui/estados";
 import { Pastilla } from "../../ui/Pastilla";
-import { Tarjeta } from "../../ui/Tarjeta";
+import { TarjetaDatos } from "../../ui/TarjetaDatos";
 
 interface Props {
   celdas: Celda[];
@@ -10,10 +10,11 @@ interface Props {
   onSeleccionar: (id: string) => void;
 }
 
-/** Every cell grouped by state, as a guest list; picking one selects it on the map. */
+/** Every cell grouped by state with its count; picking one selects its pin on the map. */
 export function CeldasPorEstado({ celdas, seleccion, onSeleccionar }: Props) {
+  const libres = celdas.filter((c) => c.estado === "libre").length;
   return (
-    <Tarjeta titulo="Celdas por estado" Icono={LayoutGrid} extra={<span className="ui-texto-suave num">{celdas.length} en total</span>}>
+    <TarjetaDatos Icono={LayoutGrid} titulo="Celdas por estado" contador={{ valor: `${libres}/${celdas.length}`, etiqueta: "Libres" }}>
       {(Object.keys(ESTADO_CELDA) as EstadoCeldaUi[]).map((estado) => {
         const grupo = celdas.filter((c) => c.estado === estado);
         const meta = ESTADO_CELDA[estado];
@@ -40,6 +41,6 @@ export function CeldasPorEstado({ celdas, seleccion, onSeleccionar }: Props) {
           </div>
         );
       })}
-    </Tarjeta>
+    </TarjetaDatos>
   );
 }

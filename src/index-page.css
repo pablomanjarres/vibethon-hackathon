@@ -1,75 +1,37 @@
-/* Entry page and app messages, on the app's tokens. */
-.index-page,
-.app-message {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 56px 20px;
-  font: 16px/1.5 var(--font-sans);
-  color: var(--ink);
-}
-.index-ceja {
-  margin: 0 0 var(--space-2);
-  color: var(--accent);
-  font-weight: 500;
-}
-.index-page h1 {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: clamp(32px, 5vw, 46px);
-  line-height: 1.1;
-}
-.index-intro {
-  margin: var(--space-3) 0 var(--space-6);
-  color: var(--ink-muted);
-}
-.index-page ul {
-  display: grid;
-  gap: var(--space-3);
-  margin: 0;
-  padding: 0;
+/* Entry page rows: one per view, separated by thin dividers like the panel sections. */
+.index-lista {
   list-style: none;
+  margin: 0 calc(-1 * var(--space-4));
+  padding: 0;
 }
-.index-page a {
+.index-lista li {
+  border-top: 1px solid var(--hairline);
+}
+.index-lista a {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 64px;
-  padding: var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--surface);
-  box-shadow: var(--shadow-control);
+  min-height: 56px;
+  padding: var(--space-3) var(--space-4);
   color: var(--ink);
   text-decoration: none;
 }
-.index-page a:hover {
-  background: var(--surface-raised);
-  box-shadow: var(--shadow-panel);
-}
-.index-page a:focus-visible,
-.app-message a:focus-visible {
-  outline: 3px solid var(--focus-color);
-  outline-offset: 2px;
-}
-.index-icono {
-  flex: none;
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-control);
+.index-lista a:hover {
   background: var(--tile);
 }
+.index-lista a:focus-visible {
+  outline-offset: -3px;
+}
 .index-texto {
-  display: grid;
   flex: 1;
+  display: grid;
+  gap: 2px;
   min-width: 0;
+}
+.index-texto strong {
+  font-weight: 600;
 }
 .index-texto span {
   color: var(--ink-muted);
-  font-size: 15px;
-}
-.app-message a {
-  color: var(--ink);
-  font-weight: 600;
+  font-size: 13px;
 }

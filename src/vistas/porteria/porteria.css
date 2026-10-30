@@ -1,11 +1,4 @@
-.ui-mapa-panel.pt-rejilla {
-  grid-template-columns: minmax(340px, 520px) minmax(0, 1fr);
-}
-@media (max-width: 900px) {
-  .ui-mapa-panel.pt-rejilla {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
+/* Gate panel: turn line, passage search and rows, check-in banner. */
 .pt-turno {
   margin: 0;
   font-weight: 500;
@@ -27,9 +20,9 @@
   gap: var(--space-2);
   min-height: var(--control-height);
   padding: 0 var(--space-3);
-  border: 1px solid var(--hairline);
+  border: 1px solid var(--ink-muted);
   border-radius: var(--radius-control);
-  background: var(--surface-raised);
+  background: var(--panel);
   color: var(--ink-muted);
 }
 .pt-buscar:focus-within {
@@ -56,9 +49,9 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: var(--ink);
-  color: var(--surface-raised);
-  font-weight: 600;
+  background: #fff;
+  color: #111;
+  font-weight: 700;
   font-size: 14px;
 }
 .pt-placa {
@@ -89,4 +82,16 @@
 .pt-checkin-detalle {
   font-size: 14px;
   color: var(--ink);
+}
+.pt-registro,
+.pt-filapasaje {
+  display: grid;
+  gap: var(--space-3);
+}
+.pt-valet {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  color: var(--ink);
+  font-weight: 600;
 }

@@ -14,11 +14,11 @@
   text-align: center;
 }
 .ui-boton-primario {
-  background: var(--ink);
-  color: var(--surface-raised);
+  background: var(--surface-light);
+  color: var(--ink-inverse);
 }
 .ui-boton-primario:hover:not(:disabled) {
-  background: var(--ink-hover);
+  background: var(--surface-light-hover);
 }
 .ui-boton-secundario {
   background: var(--tile);
@@ -30,7 +30,7 @@
 .ui-boton-contorno {
   background: transparent;
   color: var(--ink);
-  border-color: var(--ink);
+  border-color: var(--ink-muted);
   border-radius: var(--radius-pill);
 }
 .ui-boton-contorno:hover:not(:disabled) {
@@ -38,7 +38,8 @@
 }
 .ui-boton:disabled {
   cursor: not-allowed;
-  opacity: 0.55;
+  background: var(--panel-inner);
+  color: var(--ink-muted);
 }
 .ui-boton-ancho {
   width: 100%;
@@ -90,6 +91,7 @@
 }
 .ui-campo label {
   font-weight: 500;
+  font-size: 14px;
 }
 .ui-campo-fila {
   display: flex;
@@ -102,36 +104,8 @@
   padding: 0 var(--space-3);
   border: 1px solid var(--ink-muted);
   border-radius: var(--radius-control);
-  background: var(--surface-raised);
+  background: var(--panel-inner);
+  color: var(--ink);
   font-weight: 600;
   letter-spacing: 0.06em;
-}
-
-/* Segmented choice between entrances or valets: outline pills, the active one filled. */
-.ui-opciones {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.ui-opciones a {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 40px;
-  padding: 0 var(--space-4);
-  border: 1px solid var(--ink);
-  border-radius: var(--radius-pill);
-  color: var(--ink);
-  text-decoration: none;
-  font-weight: 500;
-}
-.ui-opciones a:hover {
-  background: var(--tile);
-}
-.ui-opciones a[aria-current="true"] {
-  background: var(--ink);
-  color: var(--surface-raised);
 }

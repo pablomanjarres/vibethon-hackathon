@@ -1,44 +1,18 @@
-/* Cards */
-.ui-tarjeta {
-  background: var(--surface);
-  border-radius: var(--radius-card);
-  padding: var(--space-5);
-  display: grid;
-  gap: var(--space-4);
-  align-content: start;
-  min-width: 0;
-}
-.ui-tarjeta-cabeza {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-.ui-tarjeta-cabeza h2 {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-}
+/* Figures, label/value rows, empty states and plain lists inside the panel. */
 .ui-cifra {
   display: grid;
   gap: 2px;
-  background: var(--surface-raised);
-  border-radius: 12px;
-  padding: var(--space-3) var(--space-4);
   min-width: 0;
 }
 .ui-cifra-valor {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
 .ui-cifra-etiqueta {
-  font-weight: 500;
+  font-size: 13px;
+  color: var(--ink-muted);
 }
 .ui-cifra-detalle {
   font-size: 13px;
@@ -46,8 +20,8 @@
 }
 .ui-cifras {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: var(--space-2);
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: var(--space-3);
 }
 .ui-datos {
   margin: 0;
@@ -57,7 +31,7 @@
   display: flex;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-3) 0;
+  padding: var(--space-2) 0;
   border-top: 1px solid var(--hairline);
 }
 .ui-datos > div:first-child {
@@ -75,9 +49,7 @@
 .ui-vacio {
   color: var(--ink-muted);
   margin: 0;
-  padding: var(--space-3);
-  border: 1px dashed var(--hairline);
-  border-radius: 12px;
+  font-size: 14px;
 }
 .ui-lista {
   list-style: none;
@@ -90,7 +62,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-3) 0;
+  padding: var(--space-2) 0;
   border-top: 1px solid var(--hairline);
   min-width: 0;
 }

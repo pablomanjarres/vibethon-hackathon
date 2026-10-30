@@ -2,7 +2,7 @@ import { DoorOpen } from "lucide-react";
 import type { VistaOficina } from "../../parqueadero/lecturas/oficina";
 import { ESTADO_VALET, type EstadoValetUi } from "../../ui/estados";
 import { Pastilla } from "../../ui/Pastilla";
-import { Cifra } from "../../ui/Tarjeta";
+import { Cifra } from "../../ui/Datos";
 
 type Entrada = VistaOficina["entradas"][number];
 
@@ -24,9 +24,9 @@ function TileEntrada({ entrada, totalAsignadas }: { entrada: Entrada; totalAsign
   const parte = totalAsignadas ? Math.round((entrada.celdasAsignadas / totalAsignadas) * 100) : 0;
   return (
     <li className="of-tile">
-      <h2>
+      <h3>
         <DoorOpen size={18} strokeWidth={2} aria-hidden="true" /> Entrada {entrada.nombre}
-      </h2>
+      </h3>
       <div className="ui-cifras">
         <Cifra valor={`${entrada.enPasaje}/${entrada.capacidad}`} etiqueta="En el pasaje" detalle={lleno ? "Pasaje lleno" : undefined} />
         <Cifra valor={entrada.celdasAsignadas} etiqueta="Celdas entregadas" detalle={`${parte} % del total`} />

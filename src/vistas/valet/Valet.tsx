@@ -1,23 +1,27 @@
-import { CarFront, KeyRound, ParkingSquare, Ticket, Undo2, type LucideIcon } from "lucide-react";
+import { useState } from "react";
+import { Car, CarFront, KeyRound, ListChecks, ParkingSquare, ShieldCheck, Ticket, Undo2, type LucideIcon } from "lucide-react";
 import type { Comando } from "../../parqueadero/motor";
 import { hora } from "../../parqueadero/lecturas/formato";
-import { listaValets, vistaValet } from "../../parqueadero/lecturas/valet";
+import { vistaValet } from "../../parqueadero/lecturas/valet";
 import type { Estado } from "../../parqueadero/tipos";
-import { useRoute } from "../../shared/route";
+import { href, useRoute } from "../../shared/route";
+import { Acordeon } from "../../ui/Acordeon";
 import { AvisoResultado } from "../../ui/AvisoResultado";
-import { Boton } from "../../ui/Boton";
+import { Chips } from "../../ui/Chips";
+import { Datos, Vacio } from "../../ui/Datos";
 import { ESTADO_VALET } from "../../ui/estados";
+import { FilaAcciones, type AccionPanel } from "../../ui/FilaAcciones";
+import { PanelCabecera } from "../../ui/PanelCabecera";
 import { Pastilla } from "../../ui/Pastilla";
 import { Shell } from "../../ui/Shell";
-import { Tarjeta, Vacio } from "../../ui/Tarjeta";
+import { TarjetaDatos } from "../../ui/TarjetaDatos";
 import { useComando, useEstado } from "../../ui/useTienda";
-import { ElegirValet } from "./ElegirValet";
 import { Progreso, type Paso } from "./Progreso";
 import "./valet.css";
 
 type Servicio = { ficho: string; placa: string; celda: string | null };
 
-/** The service steps in order; the ones a valet does carry their button. */
+/** The service steps in order; the ones a valet does carry their action. */
 const PASOS: { tipo: Comando["tipo"]; texto: string; boton?: { texto: (s: Servicio) => string; Icono: LucideIcon; comando: (s: Servicio) => Comando } }[] = [
   { tipo: "pedirValet", texto: "Servicio pedido" },
   { tipo: "entregarLlaves", texto: "Llaves recibidas", boton: { texto: () => "Recibí las llaves", Icono: KeyRound, comando: (s) => ({ tipo: "entregarLlaves", placa: s.placa }) } },
@@ -48,9 +52,10 @@ export default function Valet() {
   const estado = useEstado();
   const { params } = useRoute();
   const { aviso, enviar } = useComando();
-  const valets = listaValets(estado);
+  const [elegida, setElegida] = useState<string | null>(null);
   const pedido = params.get("valet");
-  const valetId = valets.some((x) => x.id === pedido) ? pedido! : (estado.valets.find((x) => x.servicio)?.id ?? valets[0].id);
+  const valetId = estado.valets.some((x) => x.id === pedido) ? pedido! : (estado.valets.find((x) => x.servicio)?.id ?? estado.valets[0].id);
+  const valet = estado.valets.find((x) => x.id === valetId)!;
   const v = vistaValet(estado, valetId);
   const s = v.servicio;
   const listos = s ? hechos(estado, s) : 0;
@@ -58,35 +63,49 @@ export default function Valet() {
   const siguiente = s ? PASOS[listos] : undefined;
   const boton = s && siguiente?.boton && (siguiente.tipo !== "estacionar" || s.celda) ? siguiente.boton : null;
 
+  const acciones: AccionPanel[] = [
+    boton && s
+      ? { texto: boton.texto(s), Icono: boton.Icono, onClick: () => enviar(boton.comando(s)) }
+      : { texto: "Siguiente paso", Icono: ListChecks, motivo: v.siguientePaso },
+    { texto: "Mi portería", Icono: ShieldCheck, href: href("porteria", { entrada: valet.entrada }) },
+    s
+      ? { texto: "Ver conductor", Icono: Car, href: href("conductor", { placa: s.placa }) }
+      : { texto: "Ver conductor", Icono: Car, motivo: "no hay un servicio en curso." },
+  ];
+
   return (
-    <Shell vista="valet">
-      <div className="vl-columna">
-        <ElegirValet valets={valets} actual={valetId} />
-        <div className="vl-cabeza">
-          <div>
-            <p className="ui-ceja">
-              Valet {v.id} · {v.entrada}
-            </p>
-            <h1 className="ui-titulo">{v.siguientePaso}</h1>
-          </div>
-          <Pastilla {...ESTADO_VALET[v.estado]} grande />
-        </div>
+    <Shell vista="valet" seleccion={elegida ?? s?.celda ?? null} onSeleccionar={setElegida}>
+      <PanelCabecera
+        Icono={KeyRound}
+        titulo={`Valet ${v.id}`}
+        subtitulo={`Entrada ${v.entrada} · ${ESTADO_VALET[v.estado].texto}`}
+        cerrar={{ href: href(""), etiqueta: "Volver al inicio" }}
+      />
+      <FilaAcciones acciones={acciones} />
+      <AvisoResultado aviso={aviso} />
+      <Chips
+        etiqueta="Valets"
+        chips={estado.valets.map((x) => ({ id: x.id, texto: <span className="num">{x.id}</span>, href: href("valet", { valet: x.id }), actual: x.id === valetId }))}
+      />
+      <TarjetaDatos Icono={Ticket} titulo="Servicio actual" contador={s ? { valor: s.ficho, etiqueta: "Ficho" } : undefined}>
+        <Pastilla {...ESTADO_VALET[v.estado]} />
+        <p className="vl-siguiente">{v.siguientePaso}</p>
         {s ? (
-          <Tarjeta titulo={`Placa ${s.placa}`} Icono={Ticket} extra={<span className="vl-ficho num" aria-label={`Ficho ${s.ficho}`}>{s.ficho}</span>}>
-            <p className="ui-texto-suave num vl-celda">Celda {s.celda ?? "por asignar en la portería"}</p>
-            <Progreso pasos={pasos} />
-            {boton ? (
-              <Boton Icono={boton.Icono} ancho onClick={() => enviar(boton.comando(s))}>
-                {boton.texto(s)}
-              </Boton>
-            ) : (
-              <p className="vl-espera">{v.siguientePaso}</p>
-            )}
-          </Tarjeta>
+          <Datos
+            filas={[
+              { etiqueta: "Placa", valor: s.placa },
+              { etiqueta: "Celda", valor: s.celda ?? "Por asignar en la portería" },
+              { etiqueta: "Ficho", valor: s.ficho },
+            ]}
+          />
         ) : (
           <Vacio>Sin servicio. Cuando un conductor pida valet, aparecerá aquí.</Vacio>
         )}
-        <AvisoResultado aviso={aviso} />
+      </TarjetaDatos>
+      <div>
+        <Acordeon Icono={ListChecks} titulo="Progreso del servicio" extra={s ? `${listos} de ${PASOS.length}` : undefined} inicial>
+          {s ? <Progreso pasos={pasos} /> : <Vacio>Sin pasos todavía: no hay un servicio en curso.</Vacio>}
+        </Acordeon>
       </div>
     </Shell>
   );

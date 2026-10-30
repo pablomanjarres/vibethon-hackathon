@@ -1,40 +1,10 @@
-/* Map with a floating detail panel, the Chargetrip stations layout. */
-.ui-mapa-panel {
-  display: grid;
-  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
-  gap: var(--space-3);
-  align-items: start;
-}
-@media (max-width: 900px) {
-  .ui-mapa-panel {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-.ui-panel-lateral {
-  background: var(--surface);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-panel);
-  padding: var(--space-4);
-  display: grid;
-  gap: var(--space-4);
-  min-width: 0;
-}
-.ui-panel-cabeza {
+/* Floating panel pieces, after the GO station panel: header, action tiles, chips, inner card, sections. */
+.ui-pc {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
 }
-.ui-panel-cabeza h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-.ui-panel-cabeza p {
-  margin: 0;
-  color: var(--ink-muted);
-  font-size: 14px;
-}
-.ui-panel-icono {
+.ui-pc-icono {
   flex: none;
   width: 40px;
   height: 40px;
@@ -42,34 +12,221 @@
   display: grid;
   place-items: center;
   background: var(--tile);
+  color: var(--ink);
 }
-.ui-panel-cerrar {
-  margin-left: auto;
+.ui-pc-texto {
+  flex: 1;
+  min-width: 0;
+}
+.ui-pc-texto h1 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.ui-pc-texto p {
+  margin: 2px 0 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.ui-pc-cerrar {
   flex: none;
   width: 40px;
   height: 40px;
   display: grid;
   place-items: center;
+  border-radius: var(--radius-control);
+  background: var(--tile);
+  color: var(--ink);
+}
+.ui-pc-cerrar:hover {
+  background: var(--tile-hover);
+}
+
+/* Action tiles */
+.ui-acciones-bloque {
+  display: grid;
+  gap: var(--space-2);
+}
+.ui-acciones {
+  display: grid;
+  gap: var(--space-2);
+}
+.ui-accion {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  min-height: 56px;
+  padding: var(--space-2);
   border: 0;
   border-radius: var(--radius-control);
   background: var(--tile);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
 }
-.ui-subtarjeta {
-  background: var(--surface-raised);
-  border-radius: 12px;
-  padding: var(--space-4);
-  box-shadow: 0 0 0 6px var(--tile);
+.ui-accion:hover:not(:disabled) {
+  background: var(--tile-hover);
+}
+.ui-accion-primaria {
+  background: var(--surface-light);
+  color: var(--ink-inverse);
+}
+.ui-accion-primaria:hover:not(:disabled) {
+  background: var(--surface-light-hover);
+}
+.ui-accion:disabled {
+  cursor: not-allowed;
+  background: var(--panel-inner);
+  color: var(--ink-muted);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+.ui-accion-primaria:disabled {
+  background: #a8a39c;
+  color: var(--ink-inverse);
+  box-shadow: none;
+}
+.ui-accion[aria-expanded="true"] {
+  box-shadow: inset 0 0 0 2px var(--ink-muted);
+}
+.ui-acciones-motivos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  gap: var(--space-3);
+  gap: 2px;
+  font-size: 13px;
+  color: var(--ink-muted);
 }
 
-.ui-reloj {
+/* Chips */
+.ui-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.ui-chip {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-weight: 600;
-  padding: 0 var(--space-3);
-  min-height: var(--control-height);
-  border-radius: var(--radius-control);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--ink-muted);
+  color: var(--ink);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.ui-chip:hover {
   background: var(--tile);
+}
+.ui-chip[aria-current="true"] {
+  background: var(--surface-light);
+  border-color: var(--surface-light);
+  color: var(--ink-inverse);
+}
+
+/* Inner card */
+.ui-td {
+  background: var(--panel-inner);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.ui-td-cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.ui-td-cabeza h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.ui-contador {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  flex: none;
+}
+.ui-contador-valor {
+  min-width: 28px;
+  padding: 1px 8px;
+  border-radius: var(--radius-tag);
+  background: var(--libre);
+  color: #0f2a1d;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+.ui-contador-etiqueta {
+  font-size: 13px;
+  color: var(--libre);
+  font-weight: 500;
+}
+
+/* Sections */
+.ui-acordeon {
+  border-top: 1px solid var(--hairline);
+  margin: 0 calc(-1 * var(--space-4));
+}
+.ui-acordeon h2 {
+  margin: 0;
+  font-size: inherit;
+}
+.ui-acordeon > h2 > button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+.ui-acordeon > h2 > button:hover {
+  background: var(--tile);
+}
+.ui-acordeon > h2 > button:focus-visible {
+  outline-offset: -3px;
+}
+.ui-acordeon-titulo {
+  flex: 1;
+}
+.ui-acordeon-extra {
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+.ui-acordeon-chevron {
+  flex: none;
+  transition: transform 160ms ease;
+}
+.ui-acordeon > h2 > button[aria-expanded="true"] .ui-acordeon-chevron {
+  transform: rotate(180deg);
+}
+.ui-acordeon-cuerpo {
+  padding: 0 var(--space-4) var(--space-4);
+  display: grid;
+  gap: var(--space-3);
 }

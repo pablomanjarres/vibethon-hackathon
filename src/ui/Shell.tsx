@@ -1,15 +1,16 @@
 import { useEffect, type ReactNode } from "react";
-import { Building2, Car, KeyRound, ShieldCheck, type LucideIcon } from "lucide-react";
+import { Building2, Car, House, KeyRound, ShieldCheck, type LucideIcon } from "lucide-react";
 import { href } from "../shared/route";
+import { MapaLote } from "./MapaLote";
 import { Reloj } from "./Reloj";
+import { useEstado } from "./useTienda";
 import "./tokens.css";
 import "./shell.css";
-import "./panel.css";
 import "./texto.css";
 
 export type VistaId = "conductor" | "porteria" | "valet" | "oficina";
 
-/** The four views, one shared state. Order here is the order in the navigation. */
+/** The four views, one shared state. Order here is the order in the top-right stack. */
 export const VISTAS: { id: VistaId; nombre: string; Icono: LucideIcon }[] = [
   { id: "conductor", nombre: "Conductor", Icono: Car },
   { id: "porteria", nombre: "Portería", Icono: ShieldCheck },
@@ -17,45 +18,60 @@ export const VISTAS: { id: VistaId; nombre: string; Icono: LucideIcon }[] = [
   { id: "oficina", nombre: "Oficina", Icono: Building2 },
 ];
 
+const PILA = [{ id: "", nombre: "Inicio", Icono: House }, ...VISTAS];
+
 interface Props {
-  vista: VistaId;
-  /** Controls beside the clock on the right of the bar. */
-  extra?: ReactNode;
-  /** Full-bleed map layouts drop the content width. */
-  ancho?: boolean;
+  /** The open view; none on the entry page. */
+  vista?: VistaId;
+  /** The pin selected on the map, which drives the panel. */
+  seleccion?: string | null;
+  onSeleccionar?: (celda: string) => void;
+  /** A cell the map zooms into, such as the driver's own. */
+  enfoque?: string | null;
+  /** Panel content: header, tiles, chips, card and sections. */
   children: ReactNode;
 }
 
-export function Shell({ vista, extra, ancho, children }: Props) {
-  const actual = VISTAS.find((item) => item.id === vista)!;
+/** Map-first frame shared by every page: the lot behind, the floating panel, the view stack. */
+export function Shell({ vista, seleccion = null, onSeleccionar, enfoque, children }: Props) {
+  const estado = useEstado();
+  const nombre = VISTAS.find((item) => item.id === vista)?.nombre;
   useEffect(() => {
-    document.title = `${actual.nombre} · Parqueadero EAFIT`;
-  }, [actual.nombre]);
+    document.title = nombre ? `${nombre} · Parqueadero EAFIT` : "Parqueadero EAFIT";
+  }, [nombre]);
+  const mapa = estado.mapas[0];
   return (
     <div className="ui-app">
-      <header className="ui-barra">
-        <a className="ui-marca" href={href("")}>
-          <span className="ui-marca-punto" aria-hidden="true" />
-          Parqueadero EAFIT
-        </a>
-        <nav aria-label="Vistas">
-          <ul className="ui-nav">
-            {VISTAS.map(({ id, nombre, Icono }) => (
-              <li key={id}>
-                <a href={href(id)} aria-current={id === vista ? "page" : undefined}>
-                  <Icono size={17} strokeWidth={2} aria-hidden="true" />
-                  <span>{nombre}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="ui-barra-extra">
-          <Reloj />
-          {extra}
-        </div>
-      </header>
-      <main className={ancho ? "ui-main ui-main-ancho" : "ui-main"}>{children}</main>
+      <div className="ui-capa-mapa">
+        {mapa && (
+          <MapaLote
+            nombre={mapa.nombre}
+            celdas={estado.celdas.filter((c) => c.mapa === mapa.id)}
+            entradas={estado.entradas}
+            seleccion={seleccion}
+            onSeleccionar={onSeleccionar}
+            enfoque={enfoque}
+          />
+        )}
+      </div>
+      <main className="ui-panel">
+        <div className="ui-panel-contenido">{children}</div>
+      </main>
+      <nav className="ui-pila" aria-label="Vistas">
+        <ul>
+          {PILA.map(({ id, nombre: etiqueta, Icono }) => (
+            <li key={id}>
+              <a href={href(id)} aria-label={etiqueta} aria-current={id === (vista ?? "") ? "page" : undefined}>
+                <Icono size={19} strokeWidth={2} aria-hidden="true" />
+              </a>
+              <span className="ui-pila-etiqueta" aria-hidden="true">
+                {etiqueta}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <Reloj />
+      </nav>
     </div>
   );
 }

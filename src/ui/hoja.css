@@ -6,7 +6,7 @@
   display: grid;
   align-items: end;
   justify-items: center;
-  background: rgb(29 28 26 / 0.45);
+  background: rgb(0 0 0 / 0.55);
   padding: var(--space-4);
 }
 .ui-hoja {
@@ -16,7 +16,7 @@
   gap: var(--space-3);
   padding: var(--space-6) var(--space-5) var(--space-5);
   border-radius: var(--radius-card);
-  background: var(--surface-raised);
+  background: var(--panel);
   box-shadow: var(--shadow-panel);
   text-align: center;
 }
@@ -31,9 +31,8 @@
 }
 .ui-hoja-titulo {
   margin: 0;
-  font-family: var(--font-serif);
-  font-size: 24px;
-  font-weight: 500;
+  font-size: 20px;
+  font-weight: 600;
   line-height: 1.2;
 }
 .ui-hoja-texto {

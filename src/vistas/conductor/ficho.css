@@ -1,15 +1,13 @@
 /* Ficho ticket */
 .cd-ticket {
-  background: var(--surface-raised);
+  background: var(--panel-inner);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-panel);
   display: grid;
   overflow: hidden;
 }
 .cd-ticket-cabeza,
-.cd-ticket-pie,
-.cd-ticket-extra {
-  padding: var(--space-5);
+.cd-ticket-pie {
+  padding: var(--space-4);
   display: grid;
   gap: var(--space-3);
 }
@@ -23,7 +21,7 @@
 }
 .cd-ticket-codigo {
   margin: 0;
-  font-size: 56px;
+  font-size: 44px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -42,14 +40,13 @@
   margin: 0 var(--space-4);
 }
 .cd-ticket-pie {
-  grid-template-columns: 112px 1fr;
+  grid-template-columns: 96px 1fr;
   align-items: center;
 }
 .cd-ticket-pie p { margin: 0; }
-.cd-ticket-extra { background: var(--surface); }
 .cd-codigo {
-  width: 112px;
-  height: 112px;
-  fill: var(--ink);
+  width: 96px;
+  height: 96px;
+  fill: #111;
   border-radius: 8px;
 }

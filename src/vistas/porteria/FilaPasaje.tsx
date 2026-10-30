@@ -2,7 +2,7 @@ import { useId, useState } from "react";
 import { Hourglass, KeyRound, Search } from "lucide-react";
 import type { CarroEnPasaje } from "../../parqueadero/lecturas/porteria";
 import { Pastilla } from "../../ui/Pastilla";
-import { Tarjeta, Vacio } from "../../ui/Tarjeta";
+import { Vacio } from "../../ui/Datos";
 
 const INSIGNIA = {
   fila: { texto: "En fila", Icono: Hourglass, tono: "reservada" },
@@ -10,13 +10,13 @@ const INSIGNIA = {
 } as const;
 
 /** The passage line as a guest list: search by plate, one row per car with its arrival, wait and badge. */
-export function FilaPasaje({ fila, capacidad }: { fila: CarroEnPasaje[]; capacidad: number }) {
+export function FilaPasaje({ fila }: { fila: CarroEnPasaje[] }) {
   const id = useId();
   const [busqueda, setBusqueda] = useState("");
   const filtro = busqueda.trim().toUpperCase();
   const visibles = fila.map((carro, i) => ({ carro, puesto: i + 1 })).filter(({ carro }) => carro.placa.includes(filtro));
   return (
-    <Tarjeta titulo="Fila del pasaje" extra={<span className="ui-texto-suave num">{fila.length} de {capacidad}</span>}>
+    <div className="pt-filapasaje">
       <div className="pt-buscar">
         <label htmlFor={id} className="pt-oculto">
           Buscar placa
@@ -54,6 +54,6 @@ export function FilaPasaje({ fila, capacidad }: { fila: CarroEnPasaje[]; capacid
           ))}
         </ol>
       )}
-    </Tarjeta>
+    </div>
   );
 }
