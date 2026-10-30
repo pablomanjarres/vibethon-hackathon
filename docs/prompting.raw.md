@@ -81,7 +81,13 @@ Use chargetrip as the main source for the UI and the other 2 as good examples of
 run that in a parallel agent in charge of that task (it is important that those agents deploy their own)
 ```
 
-## 10 · 30/10/2026, 1:50 p. m.
+## 10 · 30/10/2026, 1:45 p. m.
+
+```text
+use refero skill to find inspiration pages for the vibethon-hackathon the one about parking spots
+```
+
+## 11 · 30/10/2026, 1:50 p. m.
 
 ```text
 make sure the prompts gets saved, in the repo rn
