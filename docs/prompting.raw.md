@@ -92,3 +92,9 @@ use refero skill to find inspiration pages for the vibethon-hackathon the one ab
 ```text
 make sure the prompts gets saved, in the repo rn
 ```
+
+## 12 · 30/10/2026, 1:52 p. m.
+
+```text
+check the prompts in the repo, the repo is in github therefore
+```
