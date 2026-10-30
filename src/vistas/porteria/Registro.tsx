@@ -1,16 +1,14 @@
-import { useRef, useState } from "react";
+import { useState, type RefObject } from "react";
 import { CircleCheck, ScanLine } from "lucide-react";
 import type { VistaPorteria } from "../../parqueadero/lecturas/porteria";
 import { CampoPlaca } from "../../ui/CampoPlaca";
 import { Hoja } from "../../ui/Hoja";
-import { Tarjeta } from "../../ui/Tarjeta";
 import { useComando } from "../../ui/useTienda";
 
 /** Simulated plate camera: registers an arrival at this gate, a check-in banner on success, a sheet on refusal. */
-export function Registro({ v }: { v: VistaPorteria }) {
+export function Registro({ v, campo }: { v: VistaPorteria; campo: RefObject<HTMLInputElement | null> }) {
   const { aviso, enviar } = useComando();
   const [placa, setPlaca] = useState<string | null>(null);
-  const campo = useRef<HTMLInputElement>(null);
   const registrado = aviso?.ok && placa ? v.fila.findIndex((c) => c.placa === placa) : -1;
   const carro = registrado >= 0 ? v.fila[registrado] : null;
 
@@ -20,7 +18,7 @@ export function Registro({ v }: { v: VistaPorteria }) {
   };
 
   return (
-    <Tarjeta titulo="Registrar placa" Icono={ScanLine}>
+    <div className="pt-registro">
       <CampoPlaca
         etiqueta="Placa leída por la cámara"
         accion="Registrar"
@@ -49,6 +47,6 @@ export function Registro({ v }: { v: VistaPorteria }) {
           {aviso.texto}
         </Hoja>
       )}
-    </Tarjeta>
+    </div>
   );
 }
