@@ -1,22 +1,31 @@
-/* Read-only phone: full screen on a phone, inside a phone frame on wider screens. */
-.tl-fondo {
+/* Driver phone preview: full screen on a phone; on wider screens a phone frame beside the plate picker. */
+.tl-escena {
   min-height: 100dvh;
-  background: var(--canvas);
-}
-.tl-pantalla {
   background: var(--canvas);
   color: var(--ink);
 }
-@media (min-width: 520px) {
-  .tl-fondo {
+.tl-pantalla {
+  background: var(--panel);
+}
+.tl-presentador {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4) var(--space-6);
+}
+@media (min-width: 760px) {
+  .tl-escena {
     display: grid;
-    place-items: center;
+    grid-template-columns: auto minmax(0, 340px);
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-6);
     padding: var(--space-6) var(--space-4);
   }
   .tl-marco {
     width: 414px;
     height: min(868px, calc(100dvh - 56px));
-    border: 12px solid var(--ink);
+    border: 12px solid #0d0c0c;
     border-radius: 48px;
     overflow: hidden;
     box-shadow: var(--shadow-panel);
@@ -26,47 +35,28 @@
     overflow-y: auto;
     overscroll-behavior: contain;
   }
+  .tl-presentador {
+    padding: 0;
+  }
 }
 
-.tl-cabecera {
+.tl-estado {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  background: var(--surface-raised);
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-4);
+  background: var(--panel);
   border-bottom: 1px solid var(--hairline);
 }
-.tl-cabecera > div {
-  flex: 1;
-  min-width: 0;
-}
-.tl-cabecera h1 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-.tl-volver {
-  display: inline-grid;
-  place-items: center;
-  width: var(--control-height);
-  height: var(--control-height);
-  flex: none;
-  border-radius: var(--radius-pill);
-  color: var(--ink);
-}
-.tl-volver:hover {
-  background: var(--tile);
-}
 .tl-vivo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin: 0;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--ink-muted);
 }
 .tl-punto {
@@ -87,94 +77,50 @@
   }
 }
 
-.tl-contenido {
+.tl-seccion {
   display: grid;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-3) var(--space-6);
-}
-.tl-contenido .ui-tarjeta {
   padding: var(--space-4);
-  gap: var(--space-3);
 }
-.tl-cifras {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
+.tl-mapa {
+  height: 340px;
+  border-block: 1px solid var(--hairline);
 }
-.tl-cifras .ui-cifra {
-  padding: var(--space-2) var(--space-3);
+.tl-mapa .ui-mapa {
+  height: 100%;
 }
-.tl-cifras .ui-cifra-valor {
-  font-size: 22px;
-}
-.tl-cifras .ui-cifra-etiqueta {
-  font-size: 12px;
-}
-
-.tl-turno {
-  margin: 0;
-  font-weight: 500;
-}
-.tl-pasajes {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2);
-}
-.tl-pasaje {
-  display: grid;
-  align-content: start;
-  justify-items: start;
-  gap: var(--space-2);
-  padding: var(--space-3);
-  border-radius: 12px;
-  background: var(--surface-raised);
-  min-width: 0;
-}
-.tl-pasaje > header {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-2);
-  width: 100%;
-}
-.tl-pasaje .ui-vacio {
-  width: 100%;
-  padding: var(--space-2);
-  font-size: 13px;
-}
-.tl-fila {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 6px;
-  width: 100%;
-}
-.tl-fila li {
+.tl-titulo {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 14px;
-}
-.tl-puesto {
-  flex: none;
-  display: inline-grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--tile);
-  font-size: 12px;
+  margin: var(--space-2) 0 0;
+  font-size: 16px;
   font-weight: 600;
 }
-.tl-sub {
+.tl-nota {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.tl-nota svg {
+  flex: none;
+  margin-top: 2px;
 }
 
-/* The lot map fills its parent; give it a frame in the phone column. */
-.tl-mapa {
-  position: relative;
-  aspect-ratio: 350 / 470;
+.tl-presentador-titulo {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+.tl-grupo {
+  display: grid;
+  gap: var(--space-2);
+}
+.tl-grupo h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-muted);
 }
