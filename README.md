@@ -27,7 +27,7 @@ At rush hour two EAFIT gates, Las Vegas and Regional, fill the same parking lot 
 - **A fairness rule across both gates.** `src/parqueadero/asignador.ts` gives the next free stall to the car that arrived first at either entrance. On a tie it goes to the gate that has received fewer stalls, and only the gate whose turn it is can assign.
 - **Waits from what the lot is actually doing.** `src/parqueadero/espera.ts` places each car in the combined order of both gates and turns the gaps between the last 8 stall movements into a minute range. With too little data it says so instead of inventing a number.
 - **Allowed transitions only.** `src/parqueadero/transiciones.ts` allows 4 stall moves (free, reserved, occupied) and 4 valet moves. Anything else is refused with its reason.
-- **Eight views over one store.** `src/routes.ts` lists the driver, gate, valet and office views plus a phone view, mockups, a step-by-step simulator and a four-panel flow. All of them read `src/parqueadero/tienda.ts`, so they cannot contradict each other.
+- **One store behind the views.** `src/routes.ts` lists the driver, gate, valet and office views plus a phone view, mockups, a step-by-step simulator and a four-panel flow. Every view except the static mockups reads `src/parqueadero/tienda.ts`, so they cannot contradict each other.
 - **Built and logged in one day.** 403 commits and 74 merged pull requests on October 30, 2026, 27 Vitest checks, and 26 typed prompts recorded verbatim in `docs/prompting.raw.md`.
 
 ## How it works
