@@ -1,53 +1,97 @@
-# Hedge Parking: el parqueadero de EAFIT en hora pico
+<p align="center">
+  <a href="https://pablomanjarres.com/oss/vibethon-hackathon"><img src=".github/banner.webp" alt="Hedge Parking" width="100%" /></a>
+</p>
 
-Registro de prompts: [`docs/prompting.md`](docs/prompting.md) (especificación, correcciones y comprobaciones) y [`docs/prompting.raw.md`](docs/prompting.raw.md) (cada prompt escrito, tal cual).
+<h1 align="center">Hedge Parking</h1>
 
-A hora pico los carros entran por dos porterías, Las Vegas y Regional, a un mismo lote, y nadie las coordina: las celdas se entregan dos veces o de forma injusta, la gente espera en fila sin saber cuánto y los estudiantes llegan tarde a clase. Esta app le muestra a cada conductor su espera, reparte las celdas con justicia entre las dos entradas y deja que un estudiante entregue el carro a un valet y camine a clase.
+<p align="center"><em>Two campus gates, one parking lot, and a fair turn for every car. A rush-hour parking and valet app built in one day at the EAFIT Vibethon.</em></p>
 
-## Cómo correrlo
+<p align="center">
+  <img alt="React 19" src="https://img.shields.io/badge/React_19-20232A?style=flat&logo=react&logoColor=61DAFB" />
+  <img alt="TypeScript 7" src="https://img.shields.io/badge/TypeScript_7-3178C6?style=flat&logo=typescript&logoColor=white" />
+  <img alt="Vite 8" src="https://img.shields.io/badge/Vite_8-646CFF?style=flat&logo=vite&logoColor=white" />
+  <img alt="Vitest 5" src="https://img.shields.io/badge/Vitest_5-6E9F18?style=flat&logo=vitest&logoColor=white" />
+  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-c8542a?style=flat" />
+  <img alt="status prototype" src="https://img.shields.io/badge/status-prototype-e0a642?style=flat" />
+  <a href="https://pablomanjarres.com/portfolio/projects/vibethon-hackathon"><img alt="Portfolio" src="https://img.shields.io/badge/portfolio-pablomanjarres.com-c8542a?style=flat" /></a>
+  <a href="https://pablomanjarres.com/oss/vibethon-hackathon"><img alt="Landing" src="https://img.shields.io/badge/landing-pablo--oss-c8542a?style=flat" /></a>
+</p>
+
+<p align="center"><img src="https://pablomanjarres.com/portfolio/previews/vibethon-hackathon.png" alt="Hedge Parking screenshot" width="720" /></p>
+
+At rush hour two EAFIT gates, Las Vegas and Regional, fill the same parking lot and nobody coordinates them. A stall can be promised twice, one gate can starve the other, and students wait in line without knowing how long while their first class starts. Hedge Parking gives the driver, both gates, the valets and the parking office one shared state. Drivers see their place in line and an estimated wait, reserve the free stall when it is their turn, or hand the keys to a valet for a numbered ticket and walk to class. Try it in the browser at [pablomanjarres.com/portfolio/vibethon-hackathon/demo](https://pablomanjarres.com/portfolio/vibethon-hackathon/demo). The interface is in Spanish, as the challenge required.
+
+## Highlights
+
+- **One owner for every state change.** `src/parqueadero/motor.ts` runs each of 17 command types on a copy of the state. When it refuses, it returns a reason in Spanish and the state stays as it was.
+- **A fairness rule across both gates.** `src/parqueadero/asignador.ts` gives the next free stall to the car that arrived first at either entrance. On a tie it goes to the gate that has received fewer stalls, and only the gate whose turn it is can assign.
+- **Waits from what the lot is actually doing.** `src/parqueadero/espera.ts` places each car in the combined order of both gates and turns the gaps between the last 8 stall movements into a minute range. With too little data it says so instead of inventing a number.
+- **Allowed transitions only.** `src/parqueadero/transiciones.ts` allows 4 stall moves (free, reserved, occupied) and 4 valet moves. Anything else is refused with its reason.
+- **One store behind the views.** `src/routes.ts` lists the driver, gate, valet and office views plus a phone view, mockups, a step-by-step simulator and a four-panel flow. Every view except the static mockups reads `src/parqueadero/tienda.ts`, so they cannot contradict each other.
+- **Built and logged in one day.** 403 commits and 74 merged pull requests on October 30, 2026, 27 Vitest checks, and 26 typed prompts recorded verbatim in `docs/prompting.raw.md`.
+
+## How it works
+
+```text
+src/
+  parqueadero/            # the engine: the only code that changes state
+    motor.ts              # ejecutar(estado, comando): copy, apply, or refuse with a reason
+    comandos/             # lines and stalls, valet, payment and exit
+    transiciones.ts       # allowed stall and valet moves
+    asignador.ts          # who gets the next stall, across both gates
+    espera.ts             # estimated wait per car
+    escenario.ts          # validates the scenario JSON and builds the seed
+    escenarios/demo.json  # the one seed: 12 stalls, 2 gates, 8 valets each
+    lecturas/             # what each view reads: driver, gate, valet, office
+    simulacion.ts         # scripted arrivals and departures from the scenario
+    tienda.ts             # shared store, saved to localStorage
+  vistas/                 # conductor, porteria, valet, oficina, telefono, simulador, flujo
+  ui/                     # shared components and design tokens
+scripts/                  # npm run foto, shots and an error/contrast sweep
+docs/                     # brief, direction, QA matrix, demo script, prompt log
+```
+
+Every button sends a command to `motor.ts`. The engine works on a copy, checks the transition tables and the split rule, and either returns the new state with a readable event or refuses with a reason. The views never write state themselves. They call small read functions in `lecturas/` that already include the message to show and the next step, which keeps the driver, gate, valet and office screens consistent.
+
+The scenario file is the only input. Maps, capacities, starting conditions and events come from JSON, so the organizers' data can replace `demo.json` without touching code. `escenario.ts` validates it on load and says what is wrong if something does not add up.
+
+## What's inside
+
+| Path | What it is |
+|---|---|
+| `src/parqueadero/` | The engine, the split rule, wait estimates, scenario loading and the shared store |
+| `src/vistas/conductor/` | Driver: place in line, wait, stall reservation on the map, valet ticket |
+| `src/vistas/porteria/` | Gate: each passage, whose turn it is, free stalls, plate search |
+| `src/vistas/valet/` | Valet: current service, next step, tickets and the key board |
+| `src/vistas/oficina/` | Office: the whole lot live, simulation up to a chosen minute, log, reset |
+| `src/vistas/telefono/`, `simulador/`, `flujo/` | Phone view, a step simulator and all four views at once |
+| `brand/generar.py` | Builds the Hedge Parking symbol, wordmark and app icon as path-only SVGs |
+| `docs/` | Brief, visual direction, design rules, QA matrix, demo script, prompt log and the original Spanish README |
+
+## Tech stack
+
+React 19 · TypeScript 7 · Vite 8 · Vitest 5 · lucide-react · Inter and Newsreader via Fontsource · Playwright for screenshots and sweeps · localStorage for state · Node 22+, npm
+
+## Getting started
 
 ```bash
 npm install
 npm run dev     # http://127.0.0.1:5199/
-npm run check   # revisión de tipos
-npm run build   # revisión de tipos + build estático en dist/
-npm run foto    # foto inicial del escenario: lote, pasajes, turnos y valets
+npm test        # 27 Vitest checks on the split rule, waits and valet flow
+npm run foto    # prints the seed: lot, passages, turns and valets
+npm run build   # type check plus a static build in dist/
 ```
 
-## Qué funciona
+Everything is simulated: cameras, plate reads, arrivals, departures and payments. There is no database or backend. State lives in the browser tab, and Reiniciar in the office view returns to the seed. The 12 stalls are an example, not the real capacity. The Spanish write-up of what works and its limits is in [`docs/README.es.md`](docs/README.es.md).
 
-- Un solo módulo, `src/parqueadero/`, es dueño de todo cambio de estado: carros, los dos pasajes, celdas, valets, servicios, pagos, fichos y llaves. Las vistas del conductor, la portería, el valet y la oficina leen el mismo estado, así que no pueden contradecirse.
-- Celdas `libre → reservada → ocupada → libre` (y `reservada → libre`); valets `disponible → reservado → en servicio → disponible` (y `reservado → disponible`). Cualquier otro cambio se rechaza con un motivo en español y el estado queda igual.
-- Regla de equidad: la siguiente celda libre es para el carro que llegó primero, sin importar la entrada. Si empatan, va a la entrada que ha recibido menos celdas. Solo la portería de turno puede asignar.
-- Reserva en el mapa: cuando es tu turno eliges la celda libre que quieras y la reservas; si no es tu turno, la app dice cuántos carros hay antes que tú.
-- Espera estimada: carros adelante en ese orden, menos las celdas libres, por los minutos entre liberaciones que define el escenario.
-- Valet: el conductor pide valet desde la fila, recibe un ficho, entrega las llaves y camina a clase; el carro conserva su turno. Las llaves quedan en el tablero y el carro se devuelve contra el ficho, después del pago.
-- La app arranca siempre de la misma semilla (`src/parqueadero/escenarios/demo.json`).
+## License
 
-## Limitaciones
+MIT.
 
-- Todo es simulado: cámaras, registro de placas, llegadas, salidas y pagos. No hay base de datos, nube ni despliegue; el estado se guarda solo en este navegador (localStorage): recargar lo conserva y "Reiniciar" en Oficina vuelve a la semilla.
-- Las 12 celdas son un ejemplo, no la capacidad real. Los minutos entre liberaciones y las tarifas son supuestos del escenario.
-- El estado se comparte entre las vistas de una misma pestaña del navegador, no entre dispositivos.
-- No hay pruebas automáticas.
+---
 
-## Cambiar el escenario
-
-Los mapas, capacidades, condiciones iniciales y eventos salen solo de un archivo JSON. Para usar los de los organizadores: agrega su archivo en `src/parqueadero/escenarios/`, regístralo en `escenarios/index.ts` y apunta `ESCENARIO_INICIAL` a él. `escenario.ts` lo valida al cargar y dice qué está mal si algo no cuadra.
-
-## Dónde está cada cosa
-
-| Ruta | Es dueño de |
-|---|---|
-| `src/parqueadero/motor.ts` | `ejecutar(estado, comando)`: la única entrada para cambiar el estado; trabaja sobre una copia y rechaza con motivo |
-| `src/parqueadero/comandos/` | Filas y celdas, valet, pago y salida |
-| `src/parqueadero/transiciones.ts` | Los cambios permitidos de celdas y valets |
-| `src/parqueadero/equidad.ts`, `espera.ts` | A quién le toca la siguiente celda y cuánto espera cada carro |
-| `src/parqueadero/escenario.ts`, `escenarios/` | Validación del JSON y estado inicial |
-| `src/parqueadero/lecturas/` | Lo que lee cada vista: conductor, portería, valet y oficina |
-| `src/parqueadero/tienda.ts` | Una tienda en memoria que comparten las cuatro vistas (`useSyncExternalStore(tienda.suscribir, tienda.leer)`) |
-| `src/parqueadero/simulacion.ts` | Llegadas y salidas simuladas del escenario |
-| `src/shared/` | Kit base: rutas por hash, anunciador para lectores de pantalla, diálogos, controles de demo |
-| `scripts/foto.ts` | La foto inicial que imprime `npm run foto` |
-| `scripts/shot.mjs`, `scripts/sweep.mjs` | Capturas a 1440 y 390 px y barrido de errores, contraste y desbordes (con el servidor de desarrollo corriendo) |
-| `docs/` | Brief, dirección visual, reglas de diseño, matriz de QA, guion de la demo y registro de prompts |
+<p align="center">
+  <a href="https://pablomanjarres.com/oss/vibethon-hackathon">Landing</a> ·
+  <a href="https://pablomanjarres.com/portfolio/projects/vibethon-hackathon">Portfolio write-up</a> ·
+  Built by Pablo Manjarres
+</p>
